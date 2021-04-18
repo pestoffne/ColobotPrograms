@@ -1,0 +1,33 @@
+extern void object::CollectUranium() {
+	object item;
+	
+	while (true)
+	{
+		item = radar(UraniumOre);
+		goto(item.position);
+		grab();
+		
+		item = radar(NuclearPlant);
+		goto(item.position);
+		drop();
+		move(-2.5);
+		
+		wait(35);
+		
+		move(2.5);
+		grab();
+		
+		goto(space(position));
+		drop();
+		
+		if (energyCell.energyLevel < 0.5) {
+			item = radar(PowerStation);
+			if (item != null) {
+				goto(item.position);
+				while (energyCell.energyLevel < 1) {
+					wait(1);
+				}
+			}
+		}
+	}
+}

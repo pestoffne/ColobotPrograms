@@ -1,0 +1,95 @@
+void object::GoToFrontOf(object item, int dist) {
+	point pos;
+	pos.x = item.position.x - sin(item.orientation) * dist;
+	pos.y = item.position.y - cos(item.orientation) * dist;
+	
+	goto(pos);
+	turn(direction(item.position));
+}
+
+object object::RadarChargedCell(int[] cat, float charge, int angle=0, int focus=360, int min=0, int max=1000) {
+	object[] items = radarall(cat, angle, focus, min, max);
+	
+	// Expect: items array sorted by distance ascending
+	for (int i = 0; i < sizeof(items); ++i)
+	{
+		if (items[i].energyLevel >= charge) {
+			return items[i];
+		}
+	}
+	
+	return null;
+}
+
+extern void object::ServeNewBot() {
+	int bots[21];
+	
+	bots[0] = WheeledGrabber;
+	bots[1] = TrackedGrabber;
+	bots[2] = WingedGrabber;
+	bots[3] = LeggedGrabber;
+	
+	bots[4] = WheeledSniffer;
+	bots[5] = TrackedSniffer;
+	bots[6] = WingedSniffer;
+	bots[7] = LeggedSniffer;
+	
+	bots[8] = WheeledShooter;
+	bots[9] = TrackedShooter;
+	bots[10] = WingedShooter;
+	bots[11] = LeggedShooter;
+	
+	bots[12] = WheeledOrgaShooter;
+	bots[13] = TrackedOrgaShooter;
+	bots[14] = WingedOrgaShooter;
+	bots[15] = LeggedOrgaShooter;
+	
+	bots[16] = Subber;
+	bots[17] = Recycler;
+	bots[18] = Shielder;
+	bots[19] = Thumper;
+	bots[20] = PhazerShooter;
+	
+	int cells[2];
+	
+	cells[0] = PowerCell;
+	cells[1] = NuclearCell;
+	
+	object item;
+	object bot_factory;
+	point start;
+	
+	start = position;
+	
+	// 1) Grab Titanium
+	item = radar(Titanium);
+	goto(item.position);
+	grab();
+	
+	// 2) Drop Titanium into BotFactory
+	bot_factory = radar(BotFactory);
+	goto(bot_factory.position);
+	drop();
+	
+	// 3) Grab PowerCell or NuclearCell from groud,
+	// which charged more than for 50%
+	item = RadarChargedCell(cells, 0.5);
+	goto(item.position);
+	grab();
+	
+	// 4) Go to front of the same BotFactory
+	GoToFrontOf(bot_factory, 10);
+	
+	// 5) Wait until Bot created
+	do {
+		item = radar(bots, 0, 10, 0, 12);
+	} while (item == null);
+	
+	// 6) Drop PowerCell or NuclearCell to Bot
+	goto(item.position);
+	drop();
+	message("New " + item.category + " is ready.");
+	
+	// 7) Return to start position
+	goto(start);
+}

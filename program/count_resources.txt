@@ -1,0 +1,185 @@
+// Round(5.751, 1) --> 5.8
+float Round(float value, int digits) {
+	int a = pow(10, digits);
+	return round(value * a) / a;
+}
+
+string _(string key, int value) {
+	if (value == 0) {
+		return "";
+	}
+	
+	return key + "(" + value + ") ";
+}
+
+string _(string key, float value, int base) {
+	if (base == 0) {
+		return "";
+	}
+	
+	return key + "(" + value + " / " + base + ") ";
+}
+
+extern void object::CountResources() {
+	int bots[21];
+	
+	bots[0] = WheeledGrabber;
+	bots[1] = TrackedGrabber;
+	bots[2] = WingedGrabber;
+	bots[3] = LeggedGrabber;
+	
+	bots[4] = WheeledSniffer;
+	bots[5] = TrackedSniffer;
+	bots[6] = WingedSniffer;
+	bots[7] = LeggedSniffer;
+	
+	bots[8] = WheeledShooter;
+	bots[9] = TrackedShooter;
+	bots[10] = WingedShooter;
+	bots[11] = LeggedShooter;
+	
+	bots[12] = WheeledOrgaShooter;
+	bots[13] = TrackedOrgaShooter;
+	bots[14] = WingedOrgaShooter;
+	bots[15] = LeggedOrgaShooter;
+	
+	bots[16] = Subber;
+	bots[17] = Recycler;
+	bots[18] = Shielder;
+	bots[19] = Thumper;
+	bots[20] = PhazerShooter;
+	
+	object[] items;
+	int titanium_count;
+	int titanium_ores_count;
+	int power_cells_count;
+	float power_cells_charge_sum;
+	int nuclear_cells_count;
+	float nuclear_cells_charge_sum;
+	int uranium_ores_count;
+	int black_boxes_count;
+	int orga_matters_count;
+	int tnt_count;
+	
+	items = radarall(Titanium);
+	titanium_count = sizeof(items);
+	
+	items = radarall(TitaniumOre);
+	titanium_ores_count = sizeof(items);
+	
+	items = radarall(PowerCell);
+	power_cells_count = sizeof(items);
+	
+	power_cells_charge_sum = 0;
+	for (int i = sizeof(items) - 1; i >= 0; --i) {
+		power_cells_charge_sum += items[i].energyLevel;
+	}
+	
+	items = radarall(NuclearCell);
+	nuclear_cells_count = sizeof(items);
+	
+	nuclear_cells_charge_sum = 0;
+	for (int i = sizeof(items) - 1; i >= 0; --i) {
+		nuclear_cells_charge_sum += items[i].energyLevel;
+	}
+	
+	items = radarall(UraniumOre);
+	uranium_ores_count = sizeof(items);
+	
+	items = radarall(BlackBox);
+	black_boxes_count = sizeof(items);
+	
+	items = radarall(OrgaMatter);
+	orga_matters_count = sizeof(items);
+	
+	items = radarall(TNT);
+	tnt_count = sizeof(items);
+	
+	// Count current bot's PowerCell or NuclearCell in EnercyCell slot
+	if (energyCell.category == PowerCell) {
+		power_cells_count++;
+		power_cells_charge_sum += energyCell.energyLevel;
+	} else if (energyCell.category == NuclearCell) {
+		nuclear_cells_count++;
+		nuclear_cells_charge_sum += energyCell.energyLevel;
+	} else {
+		message("Unexpected cell type", DisplayError);
+		return;
+	}
+	
+	// Count current bot's loaded (= grabbed) item
+	if (load != null) {
+		if (load.category == Titanium) {
+			titanium_count++;
+		} else if (load.category == TitaniumOre) {
+			titanium_ores_count++;
+		} else if (load.category == PowerCell) {
+			power_cells_count++;
+			power_cells_charge_sum += load.energyLevel;
+		} else if (load.category == NuclearCell) {
+			nuclear_cells_count++;
+			nuclear_cells_charge_sum += load.energyLevel;
+		} else if (load.category == UraniumOre) {
+			uranium_ores_count++;
+		} else if (load.category == BlackBox) {
+			black_boxes_count++;
+		} else if (load.category == OrgaMatter) {
+			orga_matters_count++;
+		} else if (load.category == TNT) {
+			tnt_count++;
+		} else {
+			// may be key
+		}
+	}
+	
+	// Count PowerCells and NuclearCells inserted into bots
+	// Count items loaded by Grubbers
+	items = radarall(bots);
+	for (int i = sizeof(items) - 1; i >= 0; --i) {
+		if (items[i].energyCell != null) {
+			if (items[i].energyCell.category == PowerCell) {
+				power_cells_count++;
+				power_cells_charge_sum += items[i].energyCell.energyLevel;
+			} else if (items[i].energyCell.category == NuclearCell) {
+				nuclear_cells_count++;
+				nuclear_cells_charge_sum += items[i].energyCell.energyLevel;
+			} else {
+				message("Unexpected cell type", DisplayError);
+				return;
+			}
+		}
+		
+		if (items[i].load != null) {
+			if (items[i].load.category == Titanium) {
+				titanium_count++;
+			} else if (items[i].load.category == TitaniumOre) {
+				titanium_ores_count++;
+			} else if (items[i].load.category == PowerCell) {
+				power_cells_count++;
+				power_cells_charge_sum += items[i].load.energyLevel;
+			} else if (items[i].load.category == NuclearCell) {
+				nuclear_cells_count++;
+				nuclear_cells_charge_sum += items[i].load.energyLevel;
+			} else if (items[i].load.category == UraniumOre) {
+				uranium_ores_count++;
+			} else if (items[i].load.category == BlackBox) {
+				black_boxes_count++;
+			} else if (items[i].load.category == OrgaMatter) {
+				orga_matters_count++;
+			} else if (items[i].load.category == TNT) {
+				tnt_count++;
+			} else {
+				// may be key
+			}
+		}
+	}
+	
+	message(_("Titanium", titanium_count)
+	      + _("TitaniumOre", titanium_ores_count)
+	      + _("PowerCell", Round(power_cells_charge_sum, 1), power_cells_count)
+	      + _("NuclearCell", Round(nuclear_cells_charge_sum, 1), nuclear_cells_count)
+	      + _("UraniumOre", uranium_ores_count)
+	      + _("BlackBox", black_boxes_count)
+	      + _("OrgaMatter", orga_matters_count)
+	      + _("TNT", tnt_count));
+}

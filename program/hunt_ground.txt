@@ -1,0 +1,50 @@
+float object::AbsMin(float a, float b) {
+	if (abs(a) < abs(b)) {
+		return a;
+	} else {
+		return b;
+	}
+}
+
+extern void object::HuntGround() {
+	object item;
+	
+	int aliens[4];
+	aliens[0] = AlienAnt;
+	aliens[1] = AlienSpider;
+	aliens[2] = AlienWasp;
+	aliens[3] = AlienEgg;
+	
+	for (int tick = 0;; ++tick) {
+		
+		item = radar(aliens);
+		
+		if (item == null) {
+			break;
+		}
+		
+		turn(direction(item.position));
+		item = radar(aliens, 0, 360, 0, 40);
+		
+		if (item != null) {
+			float ay = atan((item.position.z - position.z - 1.5) / distance2d(item.position, position))
+			            - AbsMin(pitch, pitch - 360);
+			float bx = ay * sin(roll);
+			float by = ay * cos(roll);
+			bool can_aim = bx >= -45 and bx <= 45 and by >= -20 and by <= 20;
+			
+			if (can_aim) {
+				aim(by, bx);
+				fire(0.07);
+				
+				motor(1, 1);
+				wait(0.63);
+			}
+		}
+		
+		motor(1, 1);
+		wait(0.2);
+	}
+	
+	message("Hunt is complete");
+}
