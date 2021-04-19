@@ -1,0 +1,156 @@
+void object::CheckEnergyCell() {
+	object item;
+	
+	if (energyCell.energyLevel > 0.5) {
+		return;
+	}
+	
+	item = radar(PowerStation);
+	
+	if (item == null) {
+		return;
+	}
+	
+	goto(item.position);
+	
+	while (energyCell.energyLevel < 1) {
+		wait(1);
+	}
+}
+
+object RadarWait(int cat, int angle=0, int focus=360, int min=0, int max=1000) {
+	object item;
+	
+	for (;;) {
+		item = radar(cat, angle, focus, min, max);
+		
+		if (item != null) {
+			break;
+		}
+		
+		wait(1);
+	}
+	
+	return item;
+}
+
+void object::CollectNewPowerCell() {
+	object item;
+	
+	item = radar(PowerPlant);
+	goto(item.position);
+	
+	while (item.energyCell.category != PowerCell) {
+		wait(1);
+	}
+	
+	grab();
+}
+
+void object::CollectOneTitanium() {
+	object item;
+	
+	CheckEnergyCell();
+	
+	item = RadarWait(TitaniumOre);
+	goto(item.position);
+	grab();
+	
+	item = radar(Converter);
+	goto(item.position);
+	drop();
+	move(-2.5);
+	
+	item = RadarWait(Titanium, 0, 10, 0, 5);
+	goto(item.position);
+	grab();
+}
+
+void object::FillWheeledShooter() {
+	object[] items;
+	
+	for (;;) {
+		items = radarall(WheeledShooter);
+		
+		for (int i = sizeof(items) - 1; i >= 0; --i) {
+			if (items[i].energyCell == null) {
+				goto(items[i].position);
+				drop();
+				return;
+			}
+		}
+		
+		wait(1);
+	}
+}
+
+void object::Place(int a, int b, int c) {
+	move(-1);
+	turn(b);
+	move(a);
+	turn(c);
+	move(5);
+	drop();
+}
+
+extern void object::CodeBattle() {
+	object item;
+	point pos;
+	
+	grab();
+	move(-9);
+	drop();
+	build(Converter);
+	
+	CollectOneTitanium();
+	
+	Place(10, 90, 90);
+	build(PowerPlant);
+	
+	CollectOneTitanium();
+	
+	item = radar(PowerPlant);
+	goto(item.position);
+	drop();
+	
+	CollectOneTitanium();
+	
+	Place(10, 90, -90);
+	build(ResearchCenter);
+	
+	CollectNewPowerCell();
+	
+	item = RadarWait(ResearchCenter);
+	goto(item.position);
+	drop();
+	message("ResearchShooter");
+	
+	CollectOneTitanium();
+	
+	Place(26, -90, -90);
+	build(BotFactory);
+	
+	CollectOneTitanium();
+	
+	Place(13, -90, -90);
+	build(PowerStation);
+	
+	for (;;) {
+		CollectOneTitanium();
+		
+		item = radar(PowerPlant);
+		goto(item.position);
+		drop();
+		
+		CollectOneTitanium();
+		
+		item = radar(BotFactory);
+		goto(item.position);
+		drop();
+		move(-5);
+		factory(WheeledShooter, "hunt_ground.txt");
+		
+		CollectNewPowerCell();
+		FillWheeledShooter();
+	}
+}
