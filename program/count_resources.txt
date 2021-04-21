@@ -20,6 +20,14 @@ string _(string key, float value, int base) {
 	return key + "(" + value + " / " + base + ") ";
 }
 
+float Max(float a, float b) {
+	if (a > b) {
+		return a;
+	}
+	
+	return b;
+}
+
 extern void object::CountResources() {
 	int bots[21];
 	
@@ -72,7 +80,7 @@ extern void object::CountResources() {
 	
 	power_cells_charge_sum = 0;
 	for (int i = sizeof(items) - 1; i >= 0; --i) {
-		power_cells_charge_sum += items[i].energyLevel;
+		power_cells_charge_sum += Max(items[i].energyLevel, 0);
 	}
 	
 	items = radarall(NuclearCell);
@@ -80,7 +88,7 @@ extern void object::CountResources() {
 	
 	nuclear_cells_charge_sum = 0;
 	for (int i = sizeof(items) - 1; i >= 0; --i) {
-		nuclear_cells_charge_sum += items[i].energyLevel;
+		nuclear_cells_charge_sum += Max(items[i].energyLevel, 0);
 	}
 	
 	items = radarall(UraniumOre);
@@ -98,10 +106,10 @@ extern void object::CountResources() {
 	// Count current bot's PowerCell or NuclearCell in EnercyCell slot
 	if (energyCell.category == PowerCell) {
 		power_cells_count++;
-		power_cells_charge_sum += energyCell.energyLevel;
+		power_cells_charge_sum += Max(energyCell.energyLevel, 0);
 	} else if (energyCell.category == NuclearCell) {
 		nuclear_cells_count++;
-		nuclear_cells_charge_sum += energyCell.energyLevel;
+		nuclear_cells_charge_sum += Max(energyCell.energyLevel, 0);
 	} else {
 		message("Unexpected cell type", DisplayError);
 		return;
@@ -115,10 +123,10 @@ extern void object::CountResources() {
 			titanium_ores_count++;
 		} else if (load.category == PowerCell) {
 			power_cells_count++;
-			power_cells_charge_sum += load.energyLevel;
+			power_cells_charge_sum += Max(load.energyLevel, 0);
 		} else if (load.category == NuclearCell) {
 			nuclear_cells_count++;
-			nuclear_cells_charge_sum += load.energyLevel;
+			nuclear_cells_charge_sum += Max(load.energyLevel, 0);
 		} else if (load.category == UraniumOre) {
 			uranium_ores_count++;
 		} else if (load.category == BlackBox) {
@@ -139,10 +147,10 @@ extern void object::CountResources() {
 		if (items[i].energyCell != null) {
 			if (items[i].energyCell.category == PowerCell) {
 				power_cells_count++;
-				power_cells_charge_sum += items[i].energyCell.energyLevel;
+				power_cells_charge_sum += Max(items[i].energyCell.energyLevel, 0);
 			} else if (items[i].energyCell.category == NuclearCell) {
 				nuclear_cells_count++;
-				nuclear_cells_charge_sum += items[i].energyCell.energyLevel;
+				nuclear_cells_charge_sum += Max(items[i].energyCell.energyLevel, 0);
 			} else {
 				message("Unexpected cell type", DisplayError);
 				return;
@@ -156,10 +164,10 @@ extern void object::CountResources() {
 				titanium_ores_count++;
 			} else if (items[i].load.category == PowerCell) {
 				power_cells_count++;
-				power_cells_charge_sum += items[i].load.energyLevel;
+				power_cells_charge_sum += Max(items[i].load.energyLevel, 0);
 			} else if (items[i].load.category == NuclearCell) {
 				nuclear_cells_count++;
-				nuclear_cells_charge_sum += items[i].load.energyLevel;
+				nuclear_cells_charge_sum += Max(items[i].load.energyLevel, 0);
 			} else if (items[i].load.category == UraniumOre) {
 				uranium_ores_count++;
 			} else if (items[i].load.category == BlackBox) {
