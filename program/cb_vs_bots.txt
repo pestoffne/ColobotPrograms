@@ -1,0 +1,333 @@
+//-Shared-------------------------------------------------------------------------------------------//
+
+float Round(float value, int digits) {
+	int a = pow(10, digits);
+	return round(value * a) / a;
+}
+
+float Rand(float min, float max) {
+	return rand() * (max - min) + min;
+}
+
+public class Logger {
+	static string filename = "__my_log.txt";
+	static bool use_message = true;
+	
+	file handle = null;
+	float construct_time = 0;
+	
+	void Logger() {  // constructor
+		construct_time = abstime();
+		handle = new file();
+	}
+	
+	void ~Logger() {  // destructor
+	}
+	
+	void log(string text, int type=DisplayInfo) {
+		string line = Round(abstime() - construct_time, 1) + " " + text;
+		
+		if (use_message) {
+			message(line, type);
+		}
+		
+		handle.open(filename, "a");
+		handle.writeln(line);
+		handle.close();
+	}
+}
+
+object RadarWait(int cat, int angle=0, int focus=360, int min=0, int max=1000, int sens=1, int filter=FilterNone) {
+	object item;
+	
+	for (;;) {
+		item = radar(cat, angle, focus, min, max, sens, filter);
+		
+		if (item != null) {
+			break;
+		}
+		
+		wait(1);
+	}
+	
+	return item;
+}
+
+object RadarFriendly(int cat=Any, int angle=0, int focus=360, int min=0, int max=1000, int sens=1) {
+	return RadarWait(cat, angle, focus, min, max, sens, FilterFriendly);
+}
+
+object RadarEnemy(int cat=Any, int angle=0, int focus=360, int min=0, int max=1000, int sens=1) {
+	return RadarWait(cat, angle, focus, min, max, sens, FilterEnemy);
+}
+
+void object::WaitPowerCell() {
+	while (energyCell == null) {
+		wait(0.1);
+	}
+	wait(2.5);
+	move(-9);
+}
+
+bool object::CheckEnergyCell(float min_energy=0.2) {
+	object item;
+	
+	if (energyCell.energyLevel > min_energy) {
+		return false;
+	}
+	
+	item = radar(PowerStation);
+	
+	if (item == null) {
+		return false;
+	}
+	
+	goto(item.position);
+	
+	while (energyCell.energyLevel < 1) {
+		wait(0.1);
+	}
+	
+	return true;
+}
+
+//-WingedGrubber------------------------------------------------------------------------------------//
+
+public void object::Sabotage() {
+	object item;
+	
+	WaitPowerCell();
+	
+	item = RadarEnemy(BotFactory);
+	goto(item.position);
+	move(1);
+	turn(180);
+}
+
+//-WingedShooter------------------------------------------------------------------------------------//
+
+float object::AbsMin(float a, float b) {
+	if (abs(a) < abs(b)) {
+		return a;
+	} else {
+		return b;
+	}
+}
+
+public void object::HuntGround() {
+	object item;
+	point pos;
+	
+	WaitPowerCell();
+	
+	for (;;) {
+		pos.x = Rand(-25, 25);
+		pos.y = Rand(30, 80);
+		pos = flatspace(pos, 2, 0, 20, 0.5);
+		goto(pos);
+		
+		for (int tick = 0;; ++tick) {
+			
+			item = RadarEnemy();
+			
+			if (item == null) {
+				message("Hunt is complete");
+				return;
+			}
+			
+			turn(direction(item.position));
+			item = radar(Any, 0, 360, 0, 30, 1, FilterEnemy);
+			
+			if (item != null) {
+				float ay = atan((item.position.z - position.z - 1.5)
+				            / distance2d(item.position, position))
+				            - AbsMin(pitch, pitch - 360);
+				float bx = ay * sin(roll);
+				float by = ay * cos(roll);
+				bool can_aim = bx >= -45 and bx <= 45 and by >= -20 and by <= 20;
+				
+				if (can_aim) {
+					aim(by, bx);
+					fire(0.1);
+				}
+			} else {
+				motor(1, 1);
+				wait(0.1);
+			}
+			
+			if (CheckEnergyCell(0.5)) {
+				break;
+			}
+		}
+	}
+}
+
+//-WheeledGrabber-----------------------------------------------------------------------------------//
+
+void object::CollectNewPowerCell() {
+	object item;
+	
+	item = radar(PowerPlant);
+	goto(item.position);
+	
+	while (item.energyCell.category != PowerCell) {
+		wait(0.1);
+	}
+	
+	grab();
+}
+
+void object::CollectOneTitanium() {
+	object item;
+	
+	CheckEnergyCell();
+	
+	item = RadarWait(TitaniumOre);
+	goto(item.position);
+	grab();
+	
+	item = radar(Converter);
+	goto(item.position);
+	drop();
+	move(-2.5);
+	
+	item = RadarWait(Titanium, 0, 10, 0, 5);
+	goto(item.position);
+	grab();
+}
+
+void object::Fill(int cat) {
+	object[] items;
+	
+	for (;;) {
+		items = radarall(cat, 0, 360, 0, 1024, 1, FilterFriendly);
+		
+		for (int i = sizeof(items) - 1; i >= 0; --i) {
+			if (items[i].energyCell == null) {
+				goto(items[i].position);
+				drop();
+				return;
+			}
+		}
+		
+		wait(1);
+	}
+}
+
+void Place(Logger _, int v1, int v2, int v3, int cat) {
+	CollectOneTitanium();
+	move(-1);
+	turn(v2);
+	move(v1);
+	turn(v3);
+	move(5);
+	drop();
+	build(cat);
+	_.log("Created " + cat);
+}
+
+void object::setup(Logger _) {
+	object item;
+	
+	grab();
+	move(-9);
+	drop();
+	build(Converter);
+	_.log("Created " + Converter);  // 21.4 .. 21.5s
+	
+	Place(_, 10, 90, 90, PowerPlant);  // 70.6 .. 70.9s
+	
+	CollectOneTitanium();
+	item = RadarFriendly(PowerPlant);
+	goto(item.position);
+	drop();
+	
+	Place(_, 10, 90, -90, ResearchCenter);  // 162.4 .. 164.8s
+	
+	CollectNewPowerCell();
+	item = RadarFriendly(ResearchCenter);
+	goto(item.position);
+	drop();
+	item.research(ResearchWinged);
+	
+	Place(_, 13, -90, -90, BotFactory);  // 228.4 .. 228.6s
+	
+	CollectOneTitanium();
+	item = RadarFriendly(BotFactory);
+	goto(item.position);
+	drop();
+	move(-5);
+	item.factory(WingedGrabber, "Sabotage");
+	
+	CollectOneTitanium();
+	item = RadarFriendly(PowerPlant);
+	goto(item.position);
+	drop();
+	
+	while (item.energyCell.category != PowerCell) {
+		wait(0.1);
+	}
+	grab();
+	move(-5);
+	turn(90);
+	move(23);
+	turn(-90);
+	Fill(WingedGrabber);
+	_.log("WingedGrabber is ready");  // 332.6 .. 334.4s
+	
+	Place(_, 13, -90, 90, PowerStation);
+	
+	item = RadarFriendly(ResearchCenter);
+	goto(item.position);
+	grab();
+	item = RadarFriendly(PowerStation);
+	goto(item.position);
+	while (load.energyLevel < 1) {
+		wait(0.1);
+	}
+	item = RadarFriendly(ResearchCenter);
+	goto(item.position);
+	drop();
+	item.research(ResearchShooter);
+}
+
+void object::loop(Logger _) {
+	object item;
+	
+	// First loop:         442.7 .. 442.9s
+	// First WingedHunter: 548.6 .. 551.1s
+	_.log("Loop");
+	
+	CollectOneTitanium();
+	item = RadarFriendly(PowerPlant);
+	goto(item.position);
+	drop();
+	
+	CollectOneTitanium();
+	item = RadarFriendly(BotFactory);
+	goto(item.position);
+	drop();
+	move(-5);
+	item.factory(WingedShooter, "HuntGround");
+	
+	CollectNewPowerCell();
+	move(-5);
+	turn(90);
+	move(23);
+	turn(-90);
+	Fill(WingedShooter);
+}
+
+extern void object::CodeBattle() {
+	Logger _;
+	_ = new Logger();
+	_.filename = "log_cb_comp.txt";
+	_.use_message = false;
+	_.log("Start");
+	
+	setup(_);
+	
+	for (;;) {
+		loop(_);
+	}
+}
