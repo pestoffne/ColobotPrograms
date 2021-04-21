@@ -1,7 +1,7 @@
 void object::GoToFrontOf(object item, int dist) {
 	point pos;
-	pos.x = item.position.x - sin(item.orientation) * dist;
-	pos.y = item.position.y - cos(item.orientation) * dist;
+	pos.x = item.position.x + cos(item.orientation) * dist;
+	pos.y = item.position.y + sin(item.orientation) * dist;
 	
 	goto(pos);
 	turn(direction(item.position));
