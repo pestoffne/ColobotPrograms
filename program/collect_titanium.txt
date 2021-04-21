@@ -40,7 +40,7 @@ object object::RadarBestCell(int angle=0, int focus=360, int min=0, int max=1024
 	for (int i = 0; i < sizeof(power_cells); ++i) {
 		if (power_cells[i].energyLevel >= power_max_value) {
 			power_max_index = i;
-			power_max_value = nuclear_cells[i].energyLevel;
+			power_max_value = power_cells[i].energyLevel;
 		}
 	}
 	
