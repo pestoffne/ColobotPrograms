@@ -1,0 +1,611 @@
+//-Shared-------------------------------------------------------------------------------------------//
+
+float Round(float value, int digits) {
+	int a = pow(10, digits);
+	return round(value * a) / a;
+}
+
+float Rand(float min, float max) {
+	return rand() * (max - min) + min;
+}
+
+void log(string text) {
+	file handle = new file();
+	handle.open("cb_log_pl.txt", "a");
+	handle.writeln(Round(abstime(), 1) + " " + text);
+	handle.close();
+}
+
+object RadarWait(int cat, int angle=0, int focus=360, int min=0, int max=1000, int sens=1, int filter=FilterNone) {
+	object item; float wait_time;
+	
+	wait_time = 0;
+	
+	for (;;) {
+		item = radar(cat, angle, focus, min, max, sens, filter);
+		
+		if (item != null) {
+			break;
+		}
+		
+		wait_time += 0.1;
+		wait(0.1);
+	}
+	
+	log("RadarWait for " + Round(wait_time, 1));
+	return item;
+}
+
+object RadarFriendly(int cat=Any, float angle=0, float focus=360, float min=0, float max=1000, float sens=1) {
+	return RadarWait(cat, angle, focus, min, max, sens, FilterFriendly);
+}
+
+object RadarEnemy(int cat=Any, float angle=0, float focus=360, float min=0, float max=1000, float sens=1) {
+	return RadarWait(cat, angle, focus, min, max, sens, FilterEnemy);
+}
+
+void object::WaitPowerCell() {  // unsafe
+	while (energyCell == null) {
+		wait(0.1);
+	}
+	wait(3);
+	move(-9);
+}
+
+void object::GotoR(point pos) {  // unsafe
+	int ret;
+	
+	for (;;) {
+		ret = goto(pos);
+		
+		if (ret == 0) {
+			return;
+		}
+		
+		wait(3);
+	}
+}
+
+bool object::CheckEnergyCell(float min_energy=0.2) {  // unsafe
+	object item;
+	
+	if (energyCell.energyLevel > min_energy) {
+		return false;
+	}
+	
+	item = radar(PowerStation);
+	
+	if (item == null) {
+		return false;
+	}
+	
+	GotoR(item.position);
+	
+	while (energyCell != null and energyCell.energyLevel < 1) {
+		wait(0.1);
+	}
+	
+	return true;
+}
+
+int object::GotoGrab(Logger _, int cat, float wait_time=10, int retries=5, float angle=0, float focus=360, float min=0, float max=1000, float sens=1) {  // unsafe
+	object item; int ret;
+	
+	for (; retries > 0; --retries) {
+		if (load != null) {
+			if (load.category == cat) {
+				return 0;
+			}
+			
+			goto(space(position));
+			ret = drop();
+			
+			if (ret != 0) {
+				continue;
+			}
+		}
+		
+		for (;;) {
+			item = radar(cat, angle, focus, min, max, sens);
+			
+			if (item != null) {
+				break;
+			}
+			
+			if (wait_time > 0) {
+				wait_time -= 0.1;
+				wait(0.1);
+			} else {
+				return 1;
+			}
+		}
+		
+		ret = goto(item.position);
+		
+		if (ret != 0) {
+			continue;
+		}
+		
+		ret = grab();
+		
+		if (ret != 0 or load.category != cat) {
+			continue;
+		}
+	}
+	
+	return 1;
+}
+
+//-WingedGrubber------------------------------------------------------------------------------------//
+
+public bool object::HasEnergyCellSlot() {
+	return false
+	or category == PracticeBot
+	or category == TargetBot
+	or category == WheeledGrabber
+	or category == TrackedGrabber
+	or category == WingedGrabber
+	or category == LeggedGrabber
+	or category == WheeledSniffer
+	or category == TrackedSniffer
+	or category == WingedSniffer
+	or category == LeggedSniffer
+	or category == WheeledShooter
+	or category == TrackedShooter
+	or category == WingedShooter
+	or category == LeggedShooter
+	or category == WheeledOrgaShooter
+	or category == TrackedOrgaShooter
+	or category == WingedOrgaShooter
+	or category == LeggedOrgaShooter
+	or category == Subber
+	or category == Recycler
+	or category == Shielder
+	or category == Thumper
+	or category == PhazerShooter
+	or category == ResearchCenter
+	or category == DefenseTower
+	or category == AutoLab
+	or category == PowerPlant
+	or category == NuclearPlant
+	;
+}
+
+public void object::Sabotage() {  // unsafe
+	object items[]; int i;
+	errmode(0);
+	
+	WaitPowerCell();
+	
+	// Sabotage A: Block enemy's single Convertor
+	items = radarall(Converter, 0, 360, 0, 1024, 1, FilterEnemy);
+	
+	if (sizeof(items) == 1) {
+		GotoR(items[0].position);
+		grab();  // may be Titanium inside
+		move(1);
+		turn(180);
+	}
+	
+	while (sizeof(items) == 1) {
+		wait(1);
+		items = radarall(Converter, 0, 360, 0, 1024, 1, FilterEnemy);
+	}
+	
+	// Sabotage B: Block enemy's single BotFactory
+	items = radarall(BotFactory, 0, 360, 0, 1024, 1, FilterEnemy);
+	
+	if (sizeof(items) == 1) {
+		GotoR(items[0].position);
+		grab();  // may be Titanium inside
+		// TODO: may be a enemy's Bot inside
+		move(1);
+		turn(180);
+	}
+	
+	while (sizeof(items) == 1) {
+		wait(1);
+		items = radarall(BotFactory, 0, 360, 0, 1024, 1, FilterEnemy);
+	}
+	
+	// Sabotage C: Insert TitaniumOres into empty energyCells
+	for (;;) {
+		CheckEnergyCell();
+		
+		items = radarall(Any, 0, 360, 0, 1024, -1, FilterEnemy);
+		for (i = sizeof(items) - 1; i >= 0; --i) {
+			if (items[i].HasEnergyCellSlot()) {
+				break;
+			}
+		}
+		
+		GotoGrab(null, TitaniumOre);
+		goto(items[i].position);
+		drop();
+	}
+}
+
+//-WingedShooter------------------------------------------------------------------------------------//
+
+float object::AbsMin(float a, float b) {
+	if (abs(a) < abs(b)) {
+		return a;
+	}
+	
+	return b;
+}
+
+public void object::HuntGround() {
+	object item; point pos;
+	errmode(0);
+	
+	WaitPowerCell();
+	
+	for (;;) {
+		// goto enemy's side
+		// TODO: fix
+		if (team == Red) {
+			pos.x = Rand(-25, 25);
+			pos.y = Rand(-80, -30);
+		} else {
+			pos.x = Rand(-25, 25);
+			pos.y = Rand(30, 80);
+		}
+		
+		pos = flatspace(pos, 2, 0, 20, 0.5);
+		goto(pos);
+		
+		for (int tick = 0;; ++tick) {
+			
+			item = RadarEnemy();
+			
+			if (item == null) {
+				message("Hunt is complete");
+				return;
+			}
+			
+			turn(direction(item.position));
+			item = radar(Any, 0, 360, 0, 30, 1, FilterEnemy);
+			
+			if (item != null) {
+				float ay = atan((item.position.z - position.z - 1.5)
+				            / distance2d(item.position, position))
+				            - AbsMin(pitch, pitch - 360);
+				float bx = ay * sin(roll);
+				float by = ay * cos(roll);
+				bool can_aim = bx >= -45 and bx <= 45 and by >= -20 and by <= 20;
+				
+				if (can_aim) {
+					aim(by, bx);
+					fire(0.1);
+				}
+			} else {
+				motor(1, 1);
+				wait(0.1);
+			}
+			
+			if (CheckEnergyCell(0.33)) {
+				break;
+			}
+		}
+	}
+}
+
+//-WheeledGrabber-----------------------------------------------------------------------------------//
+
+void object::CollectNewPowerCell() {
+	object item;
+	
+	item = radar(PowerPlant);
+	goto(item.position);
+	
+	while (item.energyCell.category != PowerCell) {
+		wait(0.1);
+	}
+	
+	grab();
+}
+
+public bool object::IsEmpty() {
+	object item; float min_distance;
+	
+	if (category == Converter) {
+		min_distance = 2.0;
+	} else if (category == BotFactory) {
+		min_distance = 5.0;
+	} else {
+		return true;
+	}
+	
+	for (int j = 0;; ++j) {
+		item = retobject(j);
+		
+		if (item == null) {
+			break;
+		}
+		
+		if (category == item.category) {
+			continue;
+		}
+		
+		if (distance(position, item.position) < min_distance) {
+			return false;
+		}
+	}
+	
+	return true;
+}
+
+object RadarEmptyFriendlyConverter(Logger _) {
+	object[] items;
+	items = radarall(Converter, 0, 360, 0, 1000, -1, FilterFriendly);
+	
+	for (int i = sizeof(items) - 1; i >= 0; --i) {
+		if (items[i].IsEmpty()) {
+			return items[i];
+		}
+	}
+	
+	return null;
+}
+
+void GetOneTitanium(Logger _=null) {  // unsafe
+	object item; point base_center; int ret;
+	
+	// TODO: replace hardcoded coordinates
+	base_center.x = 0;
+	base_center.y = 52.25;
+	
+	for (int i = 0;; i++) {
+		
+		CheckEnergyCell();
+		ret = GotoGrab(_, Titanium, 0, 5, 0, 360, 0, 25);
+		
+		if (ret == 0) {
+			return;
+		}
+		
+		ret = GotoGrab(_, TitaniumOre, 11, 5, 0, 360, 0, 25);
+		
+		if (ret != 0) {
+			continue;
+		}
+		
+		item = RadarEmptyFriendlyConverter(_);
+		
+		if (item == null) {
+			wait(1);
+			continue;
+		}
+		
+		goto(item.position);
+		drop();
+		move(-2.5);
+		
+		ret = GotoGrab(_, Titanium, 16, 5, 0, 10, 0, 5);
+		
+		if (ret == 0) {
+			return;
+		}
+		
+		goto(space(base_center));
+	}
+}
+
+void GetOnePowerCell() {  // unsafe
+	// TODO: do it failsafe
+	CollectNewPowerCell();
+}
+
+void object::Fill(int cat) {  // unsafe
+	object[] items;
+	
+	// TODO: do it failsafe
+	for (;;) {
+		items = radarall(cat, 0, 360, 0, 1024, 1, FilterFriendly);
+		
+		for (int i = sizeof(items) - 1; i >= 0; --i) {
+			if (items[i].energyCell == null) {
+				goto(items[i].position);
+				drop();
+				return;
+			}
+		}
+		
+		wait(0.1);
+	}
+}
+
+void object::setup() {
+	object item; point pos;
+	
+	grab();  // Grab Titanium
+	move(-9);
+	drop();
+	build(Converter);  // 1) 21.5
+	log("Converter_1");
+	
+	grab(Behind);  // Grab TitaniumOre
+	move(5);
+	drop();  // Drop to Converter_1
+	move(-2);
+	wait(1);
+	move(0.5);
+	RadarWait(Titanium, 0, 15, 0, 6);
+	move(1.5);
+	grab();  // Grab Titanium
+	turn(-90);
+	move(10);
+	turn(90);
+	drop();
+	build(Converter);  // 2) 64.8
+	log("Converter_2");
+	
+	turn(90);
+	move(10);
+	turn(90);
+	grab();  // Grab TitaniumOre
+	turn(180);
+	move(5);
+	drop();  // Drop to Converter_1
+	move(-5);
+	grab(Behind);  // Grab TitaniumOre
+	turn(-63.43);
+	move(11.18);
+	turn(63.43);
+	drop();  // Drop to Converter_2
+	turn(90);
+	move(10);
+	turn(-90);
+	RadarWait(Titanium, 0, 15, 0, 6);
+	grab();  // Grab from Converter_1
+	turn(90);
+	move(8);
+	turn(-90);
+	drop();
+	build(PowerPlant);  // 3) 110.4
+	log("PowerPlant");
+	
+	turn(-90);
+	move(8);
+	turn(-90);
+	grab();  // Grab TitaniumOre
+	turn(180);
+	move(5);
+	drop();  // Drop to Converter_1
+	turn(-90);
+	move(10);
+	turn(90);
+	RadarWait(Titanium, 0, 15, 0, 6);
+	grab();  // Grab from Converter_2
+	turn(90);
+	move(18);
+	turn(-90);
+	drop();  // Drop to PowerPlant
+	turn(-122);
+	move(9.43);
+	turn(-58);
+	grab();  // Grab TitaniumOre
+	turn(116.57);
+	move(11.18);
+	turn(63.43);
+	drop();  // Drop to Converter_2
+	turn(90);
+	move(10);
+	turn(-90);
+	RadarWait(Titanium, 0, 15, 0, 6);
+	grab();  // Grab from Converter_1
+	turn(122);
+	move(9.43);
+	turn(58);
+	drop();
+	build(ResearchCenter);  // 4) 170.8
+	log("ResearchCenter");
+	
+	turn(180);
+	grab();  // Grab from PowerPlant
+	turn(180);
+	move(3);
+	drop();  // Drop to ResearchCenter
+	item = RadarFriendly(ResearchCenter);
+	item.research(ResearchWinged);
+	turn(90);
+	move(8);
+	turn(90);
+	move(-2);
+	grab(Behind);  // Grab TitaniumOre
+	move(5);
+	drop();  // Drop to Converter_1
+	turn(-90);
+	move(10);
+	turn(90);
+	RadarWait(Titanium, 0, 15, 0, 6);
+	grab();  // Grab from Converter_2
+	turn(90);
+	move(8);
+	turn(-90);
+	drop();  // Drop to PowerPlant
+	turn(-122);
+	move(9.43);
+	turn(-58);
+	grab();  // Grab TitaniumOre
+	turn(116.57);
+	move(11.18);
+	turn(63.43);
+	drop(); // Drop to Converter_2
+	turn(90);
+	move(10);
+	turn(-90);
+	RadarWait(Titanium, 0, 15, 0, 6);
+	grab();  // Grab from Converter_1
+	turn(-116.57);
+	move(11.18);
+	turn(-63.43);
+	drop();
+	build(BotFactory);  // 5) 
+	log("BotFactory");
+	
+	// --- unsafe line ---
+	
+	GetOneTitanium();
+	item = RadarFriendly(BotFactory);
+	GotoR(item.position);
+	drop();
+	move(-5);
+	item.factory(WingedGrabber, "Sabotage");
+	
+	GetOnePowerCell();
+	Fill(WingedGrabber);  //
+	
+	GetOneTitanium();
+	pos.x = -16;  // TODO: replace hardcoded coordinates
+	pos.y = -45;
+	GotoR(pos);
+	drop();
+	build(PowerStation);  // 6)  // TODO: do failsafe build
+	
+	item = RadarFriendly(ResearchCenter);
+	goto(item.position);
+	grab();
+	item = RadarFriendly(PowerStation);
+	goto(item.position);
+	while (load.energyLevel < 1) {
+		wait(0.1);
+	}
+	item = RadarFriendly(ResearchCenter);
+	goto(item.position);
+	drop();
+	item.research(ResearchShooter);
+}
+
+void object::loop() {
+	object item;
+	
+	GetOneTitanium();
+	item = RadarFriendly(PowerPlant);
+	goto(item.position);
+	drop();
+	
+	GetOneTitanium();
+	item = RadarFriendly(BotFactory);
+	goto(item.position);
+	drop();
+	move(-5);
+	item.factory(WingedShooter, "HuntGround");
+	
+	CollectNewPowerCell();
+	turn(-90);
+	move(8 + 10);
+	turn(-90);
+	Fill(WingedShooter);
+}
+
+extern void object::CodeBattle() {
+	errmode(0);
+	
+	setup();
+	
+	for (;;) {
+		loop();
+	}
+}
