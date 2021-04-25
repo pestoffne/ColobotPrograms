@@ -1,0 +1,47 @@
+// Simple Sabotage
+021.5 Converter
+070.7 PowerPlant
+163.0 ResearchCenter
+228.5 BotFactory
+333.0 WingedGrabber
+550.0 WingedShooter 1
+
+// 2xConverter Sabotage
+// triangle(5, 10, 11) with p = 26
+021.6 Converter 1
+066.4 Converter 2
+113.3 PowerPlant
+176.2 ResearchCenter
+247.8 BotFactory
+295.0 WingedGrabber
+
+// Two WheeledGrabbers
+// triangle(8.5, 8.5, 17) with p = 34
+023.7 Converter 1
+073.9 Converter 2
+126.6 BotFactory
+152.5 PowerPlant
+238.8 WheeledGrabber
+283.9 ResearchCenter
+394.7 WingedGrabber
+502.8 WingedShooter 1
+583.2 WingedShooter 2
+
+// Structure positions optimized
+// triangle(7, 7, 10) with p = 24
+024.3 Converter 1
+071.9 Converter 2
+120.7 BotFactory
+146.4 PowerPlant
+205.5 ResearchCenter
+287.2 WingedGrabber   // 277.8
+437.8 WingedShooter 1 // 429.3
+
+// Moves optimization
+022.5 Converter 1
+069.6 Converter 2
+116.8 PowerPlant
+143.8 BotFactory
+202.9 ResearchCenter
+282.8 WingedGrabber   (+79.9) /*Top timimg -- 277.8*/  // 282.9, 279.0, 281.8 (+80.2)
+417.1 WingedShooter 1 (+134.3)  /*Top timimg*/  // 420.9, 413.7, 401.3 (+119.5)

@@ -368,10 +368,10 @@ object RadarEmptyFriendly(int cat) {
 	return null;
 }
 
-int object::fill_q(point pos, float direct, int cat) {
+int object::fill_q(point pos, int cat) {
 	object item;
 	
-	goto_q(pos, direct, 5.5);
+	goto_p(pos, 5.5);
 	item = RadarFriendly(cat);
 	
 	if (item == null) {
@@ -387,7 +387,8 @@ int object::fill_q(point pos, float direct, int cat) {
 		return 1;
 	}
 	
-	return 1;
+	move(-1.5);
+	return 0;
 }
 
 void Replace() {
@@ -438,32 +439,27 @@ void object::orient(float direct) {
 	turn_q(direct);
 }
 
-void object::build_q(point pos, float direct, int cat) {
-	goto_q(pos, direct);
-	drop();
-	build(cat);
+int object::build_q(point pos, int cat) {
+	if (goto_p(pos) == 0 and drop() == 0 and build(cat) == 0) {
+		return 0;
+	}
+	
+	return 1;
 }
 
-int object::factory_q(point bot_factory_pos, float direct, int bot_cat, string program) {
+int object::factory_q(point bot_factory_pos, int bot_cat, string program) {
 	object item;
 	
-	goto_q(bot_factory_pos, direct, 5.5);
-	move(3);
+	goto_p(bot_factory_pos, 5);
+	move(2.5);
 	drop();
-	move(-3);
+	move(-2.5);
 	item = radar(BotFactory, 0, 15, 0, 10);
 	
 	if (item == null) {
 		log("warning factory_q BotFactory not found");
 		return 1;
 	}
-	
-	/*
-	if (item.factory(bot_cat, program) != 0) {
-		log("warning factory_q can not factor bot");
-		return 1;
-	}
-	*/
 	
 	while (item.factory(bot_cat, program) != 0) {
 		wait(1);
@@ -472,63 +468,70 @@ int object::factory_q(point bot_factory_pos, float direct, int bot_cat, string p
 	return 0;
 }
 
-void object::goto_q(point pos, float direct, float dist=1.5) {
+int object::goto_q(point pos, float dist=1.5, int oper=InFront) {
+	if (oper == InFront) {
+		turn(direction(pos));
+		move(distance2d(position, pos) - dist);
+	} else if (oper == Behind) {
+		turn_q(direction(pos) + 180);
+		move(dist - distance2d(position, pos));
+	} else {
+		log("error goto_q unexpected oper value = " + oper);
+		return 2;
+	}
+	
+	if (distance2d(pos, position) > dist + 1) {
+		log("warning goto_q i am not in the expecter place, distance = " + distance2d(pos, position));
+		return 1;
+	}
+	
+	return 0;
+}
+
+int object::goto_pp(point pos, float direct, float dist=1.5, int oper=InFront) {
 	point pos_bot;
 	
 	pos_bot.x = pos.x - cos(direct) * dist;
 	pos_bot.y = pos.y - sin(direct) * dist;
 	
-	turn(direction(pos_bot));
-	move(distance2d(position, pos_bot));
-	orient(direct);
+	goto_q(pos_bot, 0, oper);
 	
-	if (distance2d(pos_bot, position) > 0.25) {
-		log("warning goto_q retry going to (" + pos_bot.x + ";" + pos_bot.y + ")");
-		turn(direction(pos_bot));
-		move(distance2d(position, pos_bot));
+	if (oper == InFront) {
 		orient(direct);
-	}
-}
-
-void object::make_titaniums_1_2() {
-	Globals g();
-	
-	goto_q(g.b.derrick_out, 270);
-	grab_from_ground(TitaniumOre);
-	goto_q(g.b.converter_1, 270);
-	drop();
-	goto_q(g.b.derrick_out, 270);
-	grab_from_ground(TitaniumOre);
-	goto_q(g.b.converter_2, 270);
-	drop();
-	goto_q(g.b.converter_1, 270);
-	grab_from_ground(Titanium);
-}
-
-int object::take_titanium(point pos) {
-	object item;
-	
-	goto_q(pos, 270, 2);
-	item = radar(Titanium, 0, 360, 0, 30);
-	
-	if (item == null) {
-		log("warning get_titanium Titanium not found");
-		return 1;
+	} else {
+		orient(180 + direct);
 	}
 	
-	goto_q(item.position, 270);
-	grab_from_ground(Titanium);
 	return 0;
 }
 
-void object::get_out_power_cell(point pos, float direct, float inc) {
+int object::goto_p(point pos, float dist=1.5, int oper=InFront) {
+	return goto_pp(pos, pos.z, dist, oper);
+}
+
+void object::make_titaniums_1_2(float direct=270, int oper=InFront) {
+	Globals g();
+	
+	goto_q(g.b.derrick_out);
+	grab_from_ground(TitaniumOre);
+	goto_q(g.b.converter_1, 1.9);
+	drop();
+	goto_q(g.b.derrick_out, 1.5, Behind);
+	grab_from_ground(TitaniumOre, Behind);
+	goto_q(g.b.converter_2, 1.9);
+	drop();
+	goto_pp(g.b.converter_1, direct, 1.5, oper);
+	grab_from_ground(Titanium, oper);
+}
+
+void object::get_out_power_cell(point pos, float inc) {
 	if (load == null) {
 		return;
 	}
 	
 	// TODO: check position first, before drop try
 	for (;;) {
-		goto_q(pos, direct);
+		goto_q(pos);
 		
 		if (drop() == 0) {
 			break;
@@ -542,6 +545,11 @@ int object::research_q(int res_cat) {
 	object item;
 	Globals g();
 	
+	if (load == null or load.category != PowerCell) {
+		log("warning research_q PowerCell is not loaded");
+		return 1;
+	}
+	
 	item = RadarFriendly(ResearchCenter);
 	
 	if (item == null) {
@@ -549,19 +557,34 @@ int object::research_q(int res_cat) {
 		return 1;
 	}
 	
-	goto_q(g.b.research_center, 90, 4);
+	goto_p(g.b.research_center, 4);
 	
 	if (item.energyCell == null) {
 		drop();
+		
+		if (item.research(res_cat) != 0) {
+			log("warning research_q can not start research");
+			return 1;
+		}
 	} else {
-		log("info research_q energyCell slot is not empty");
-		Replace();
-		get_out_power_cell(g.b.empty_power_cell, 90, -1);
-	}
-	
-	if (item.research(res_cat) != 0) {
-		log("warning research_q can not start research");
-		return 1;
+		log("info research_q energyCell slot is not empty. replacing");
+		drop(Behind);
+		grab_from_energy_cell(PowerCell, ResearchCenter);
+		turn(90);
+		drop();
+		turn(-90);
+		grab_from_ground(PowerCell, Behind);
+		drop();
+		
+		if (item.research(res_cat) != 0) {
+			log("warning research_q can not start research");
+			return 1;
+		}
+		
+		turn(90);
+		grab_from_ground(PowerCell);
+		// We do not need to get out of PowerCell if we do just 2 or 3 researchers
+		// get_out_power_cell(g.b.empty_power_cell, 1);
 	}
 	
 	return 0;
@@ -570,7 +593,7 @@ int object::research_q(int res_cat) {
 // return 0 OK
 //        1 another item is loaded
 //        2 there is not item to grab
-int object::grab_from_ground(int cat) {
+int object::grab_from_ground(int cat, int oper=InFront) {
 	float max_wait;
 	
 	if (load != null) {
@@ -591,12 +614,22 @@ int object::grab_from_ground(int cat) {
 		max_wait = 0.5;
 	}
 	
-	if (RadarWait(cat, max_wait, 0, 15, 0, 6) == null) {
-		log("warning grab_from_ground timeout expired");
-		return 2;
+	if (oper == InFront) {
+		if (RadarWait(cat, max_wait, 0, 30, 0, 6) == null) {
+			log("warning grab_from_ground can not find expected object in front -- timeout expired");
+			return 2;
+		}
+	} else if (oper == Behind) {
+		if (RadarWait(cat, max_wait, 180, 30, 0, 6) == null) {
+			log("warning grab_from_ground can not find expected object behind -- timeout expired");
+			return 2;
+		}
+	} else {
+		log("error grab_from_ground unexpected oper value = " + oper);
+		return 3;
 	}
 	
-	grab();
+	grab(oper);
 	
 	if (load == null) {
 		log("warning grab_from_ground load is null after grab");
@@ -666,46 +699,35 @@ int object::grab_from_energy_cell(int item_cat, int container_cat) {
 	return 0;
 }
 
-void object::give_titanium(point pos, float direct, float inc) {
-	// TODO: check item before trying to drop
-	for (;;) {
-		goto_q(pos, direct);
-		
-		if (drop() == 0) {
-			break;
-		}
-		
-		pos.x += inc;
-	}
-}
-
 public class BasePlan {
-	static point derrick_out, converter_1, converter_2, power_plant, bot_factory, research_center, titanium_1, titanium_2, titanium_ore,
-	    power_plant_2, empty_power_cell;
+	static point derrick_out, converter_1, converter_2, power_plant, bot_factory, research_center, titanium_ore, empty_power_cell;
 	
 	void BasePlan() {
+		// triangle(10, 7, 7) with p = 24
 		derrick_out.x = 0;
 		derrick_out.y = -55.5;
-		converter_1.x =  8.5;
-		converter_1.y = -55.5;
-		converter_2.x = -8.5;
-		converter_2.y = -55.5;
-		power_plant.x = -8.5;
-		power_plant.y = -39;
-		power_plant_2.x = 8.5;
-		power_plant_2.y = -39;
-		empty_power_cell.x = -13;
+		derrick_out.z = 270;
+		converter_1.x = 5;
+		converter_1.y = -50.5;
+		converter_1.z = 315;
+		converter_2.x = -5;
+		converter_2.y = -50.5;
+		converter_2.z = 225;
+		titanium_ore.x = 3;
+		titanium_ore.y = -54.5;
+		titanium_ore.z = 315;
+		power_plant.x = 5;
+		power_plant.y = -44;
+		power_plant.z = 0;
+		bot_factory.x = -8;
+		bot_factory.y = -42;
+		bot_factory.z = 180;
+		research_center.x = 5;
+		research_center.y = -36;
+		research_center.z = 90;
+		empty_power_cell.x = 5;
 		empty_power_cell.y = -39;
-		bot_factory.x = -14;
-		bot_factory.y = -49;
-		research_center.x = 0;
-		research_center.y = -35;
-		titanium_1.x = -1;
-		titanium_1.y = -51;
-		titanium_2.x = -2;
-		titanium_2.y = -51;
-		titanium_ore.x = 3.5;
-		titanium_ore.y = -55.5;
+		empty_power_cell.z = 0;
 	}
 }
 
@@ -723,122 +745,89 @@ void object::setup() {
 	Globals g();
 	
 	grab_from_ground(Titanium);
-	build_q(g.b.converter_1, 270, Converter);
+	build_q(g.b.converter_1, Converter);
 	log("info setup Converter_1");
 	
-	goto_q(g.b.derrick_out, 270);
+	goto_q(g.b.derrick_out);
 	grab_from_ground(TitaniumOre);
-	goto_q(g.b.converter_1, 270);
+	goto_q(g.b.converter_1, 2);
 	drop();
-	goto_q(g.b.derrick_out, 270);
-	grab_from_ground(TitaniumOre);
-	goto_q(g.b.titanium_ore, 270);
+	goto_q(g.b.derrick_out, 1.5, Behind);
+	grab_from_ground(TitaniumOre, Behind);
+	goto_p(g.b.titanium_ore);
 	drop();
-	goto_q(g.b.converter_1, 270);
+	goto_pp(g.b.converter_1, 350, 2);
 	grab_from_ground(Titanium);
-	build_q(g.b.converter_2, 270, Converter);
+	build_q(g.b.converter_2, Converter);
 	log("info setup Converter_2");
 	
-	make_titaniums_1_2();
-	build_q(g.b.bot_factory, 180, BotFactory);
-	log("info setup BotFactory");
-	goto_q(g.b.converter_2, 270);
-	grab_from_ground(Titanium);
-	build_q(g.b.power_plant, 90, PowerPlant);
+	make_titaniums_1_2(285, Behind);
+	build_q(g.b.power_plant, PowerPlant);
 	log("info setup PowerPlant");
-	
-	make_titaniums_1_2();
-	goto_q(g.b.power_plant, 90);
-	drop();
-	goto_q(g.b.converter_2, 270);
+	goto_q(g.b.converter_2, 2);
 	grab_from_ground(Titanium);
-	factory_q(g.b.bot_factory, 180, WheeledGrabber, "cb_2");
+	build_q(g.b.bot_factory, BotFactory);
+	log("info setup BotFactory");
 	
-	// like make_titaniums_1_2(), but do not grabs Titanium
-	goto_q(g.b.derrick_out, 270);
-	grab_from_ground(TitaniumOre);
-	goto_q(g.b.converter_1, 270);
+	make_titaniums_1_2(275, Behind);
+	goto_q(g.b.power_plant);
 	drop();
-	goto_q(g.b.derrick_out, 270);
-	grab_from_ground(TitaniumOre);
-	goto_q(g.b.converter_2, 270);
-	drop();
-	
-	goto_q(g.b.power_plant, 90);
-	grab();
-	fill_q(g.b.bot_factory, 180, WheeledGrabber);
-	log("info setup WheeledGrabber");
-	
-	// --- two bots line ---
-	
-	goto_q(g.b.converter_1, 270);
+	goto_q(g.b.converter_2);
 	grab_from_ground(Titanium);
-	goto_q(g.b.power_plant, 90);
-	drop();  // TODO: check there is titanium inside power_plant
-	
-	take_titanium(g.b.titanium_2);
-	build_q(g.b.research_center, 90, ResearchCenter);
+	build_q(g.b.research_center, ResearchCenter);
 	log("info setup ResearchCenter");
-	
-	goto_q(g.b.power_plant, 90);
-	switch_powercell();
-	get_out_power_cell(g.b.empty_power_cell, 90, -1);
-	
-	take_titanium(g.b.titanium_1);
-	goto_q(g.b.power_plant, 90);
-	drop();
-	
-	goto_q(g.b.power_plant, 90);
+	//goto_q(g.b.power_plant);
+	orient(270);
 	grab_from_energy_cell(PowerCell, PowerPlant);
 	research_q(ResearchWinged);
 	
-	take_titanium(g.b.titanium_2);
-	factory_q(g.b.bot_factory, 180, WingedGrabber, "Sabotage");
-	
-	take_titanium(g.b.titanium_2);
-	goto_q(g.b.power_plant, 90);
+	make_titaniums_1_2(275, Behind);
+	goto_q(g.b.power_plant);
 	drop();
-	
-	goto_q(g.b.power_plant, 90);
+	goto_q(g.b.converter_2);
+	grab_from_ground(Titanium);
+	factory_q(g.b.bot_factory, WingedGrabber, "Sabotage");
+	goto_p(g.b.power_plant);
 	grab(EnergyCell);
 	drop(Behind);
 	grab_from_energy_cell(PowerCell, PowerPlant);
 	drop(EnergyCell);
 	turn(180);
-	grab();
-	fill_q(g.b.bot_factory, 180, WingedGrabber);
+	grab_from_ground(PowerCell);
+	fill_q(g.b.bot_factory, WingedGrabber);
 	log("info setup WingedGrabber");
 	
-	take_titanium(g.b.titanium_1);
-	goto_q(g.b.power_plant, 90);
-	drop();
+	// --- unsafe line ---
 	
-	goto_q(g.b.power_plant, 90);
+	make_titaniums_1_2(275, Behind);
+	goto_q(g.b.power_plant);
+	drop();
+	orient(180);
+	move(3);
+	orient(90);
+	move(3);
+	goto_p(g.b.research_center, 4);
+	grab_from_energy_cell(PowerCell, ResearchCenter);
+	turn(-90);
+	drop();
+	goto_q(g.b.power_plant);
 	grab_from_energy_cell(PowerCell, PowerPlant);
 	research_q(ResearchShooter);
+	goto_q(g.b.converter_2);
+	grab_from_ground(Titanium);
+	goto_q(g.b.power_plant);
+	drop();
 	
-	loop();
-	
-	take_titanium(g.b.titanium_1);
-	build_q(g.b.power_plant_2, 90, PowerStation);
+	make_titaniums_1_2();
+	factory_q(g.b.bot_factory, WingedShooter, "HuntGround");
+	goto_q(g.b.power_plant);
+	grab_from_energy_cell(PowerCell, PowerPlant);
+	fill_q(g.b.bot_factory, WingedShooter);
+	log("info setup WingedShooter");
 }
 
 void object::loop() {
-	Globals g();
 	
-	CheckEnergyCell();
-	
-	take_titanium(g.b.titanium_2);
-	goto_q(g.b.power_plant, 90);
-	drop();
-	
-	take_titanium(g.b.titanium_1);
-	factory_q(g.b.bot_factory, 180, WingedShooter, "HuntGround");
-	
-	goto_q(g.b.power_plant, 90);
-	grab_from_energy_cell(PowerCell, PowerPlant);
-	fill_q(g.b.bot_factory, 180, WingedShooter);
-	log("info setup WingedShooter");
 }
 
 extern void object::cb_1() {
@@ -847,40 +836,5 @@ extern void object::cb_1() {
 	
 	for (;;) {
 		loop();
-	}
-}
-
-void setup_2() {
-	Globals g();
-	
-	WaitPowerCell();
-	
-	goto_q(g.b.converter_2, 270);
-	grab_from_ground(Titanium);
-	goto_q(g.b.titanium_2, 90);
-	drop();
-}
-
-void object::loop_2() {
-	point pos;
-	Globals g();
-	
-	pos = position;
-	CheckEnergyCell();
-	goto(pos);
-	
-	make_titaniums_1_2();
-	give_titanium(g.b.titanium_1, 90, -1);
-	goto_q(g.b.converter_2, 270);
-	grab_from_ground(Titanium);
-	give_titanium(g.b.titanium_2, 90, -1);
-}
-
-public void object::cb_2() {
-	errmode(0);
-	setup_2();
-	
-	for (;;) {
-		loop_2();
 	}
 }
