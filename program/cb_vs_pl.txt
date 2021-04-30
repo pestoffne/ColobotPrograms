@@ -841,45 +841,23 @@ void object::check_energy_cell_wheeled_grabber(float energy_level=0.2) {
 }
 
 public class BasePlan {
-	static point derrick_out, converter_1, converter_2, power_plant, bot_factory, research_center, titanium_ore, empty_power_cell,
-	    bot_factory_e, power_plant_e, research_center_e, derrick_out_e;
+	static point derrick_out = new point(0, -55.5, 270);
+	static point converter_1 = new point(5, -50.5, 315);
+	static point converter_2 = new point(-5, -50, 225);
+	static point power_plant = new point(5, -44, 10);
+	static point bot_factory = new point(-8, -42, 150);
+	static point research_center = new point(2, -36, 111);
+	static point titanium_ore = new point(3, -54.5, 315);
+	static point empty_power_cell = new point(5, -39, 0);
 	
-	void BasePlan() {
-		// triangle(10, 7, 7) with p = 24
-		derrick_out.x = 0;
-		derrick_out.y = -55.5;
-		derrick_out.z = 270;
-		converter_1.x = 5;
-		converter_1.y = -50.5;
-		converter_1.z = 315;
-		converter_2.x = -5;
-		converter_2.y = -50.5;
-		converter_2.z = 225;
-		titanium_ore.x = 3;
-		titanium_ore.y = -54.5;
-		titanium_ore.z = 315;
-		power_plant.x = 5;
-		power_plant.y = -44;
-		power_plant.z = 10;
-		bot_factory.x = -8;
-		bot_factory.y = -42;
-		bot_factory.z = 150;
-		research_center.x = 2;
-		research_center.y = -36;
-		research_center.z = 111;
-		empty_power_cell.x = 5;
-		empty_power_cell.y = -39;
-		empty_power_cell.z = 0;
-	}
+	static point bot_factory_e = new point(0, 0, 0);
+	static point power_plant_e = new point(0, 0, 0);
+	static point research_center_e = new point(0, 0, 0);
+	static point derrick_out_e = new point(0, 0, 0);
 }
 
 public class Globals {
-	//public static BasePlan b = new BasePlan();  // crash game
-	public static BasePlan b = null;
-	
-	void Globals() {
-		b = new BasePlan();
-	}
+	public static BasePlan b = new BasePlan();
 }
 
 void object::setup() {
@@ -991,7 +969,7 @@ void object::loop(int i) {
 	drop();
 	goto_q(g.b.converter_2);
 	grab_from_ground(Titanium);
-	factory_q(g.b.bot_factory, WingedShooter, "HuntGround");
+	factory_q(g.b.bot_factory, WingedShooter, "destroy_enemies");
 	goto_q(g.b.power_plant);
 	
 	if (grab_from_energy_cell(PowerCell, PowerPlant, 1, 1) != 0) {
