@@ -1,0 +1,18 @@
+extern void object::Recycle() {
+	object item; point pos;
+	
+	for (;;) {
+		item = radar(Wreck);
+		
+		if (item == null) {
+			message("Recycle complete");
+			return;
+		}
+		
+		pos.x = item.position.x + 5;
+		pos.y = item.position.y;
+		goto(pos);
+		turn(direction(item.position));
+		recycle();
+	}
+}

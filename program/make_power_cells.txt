@@ -1,0 +1,28 @@
+extern void object::MakePowerCells() {
+	object item;
+	
+	for (;;) {
+		item = radar(Titanium);
+		goto(item.position);
+		grab();
+		
+		item = radar(PowerPlant);
+		goto(item.position);
+		drop();
+		
+		while (item.energyCell == null or item.energyCell.category != PowerCell) {
+			wait(0.1);
+		}
+		
+		grab();
+		
+		item = radar(GreenFlag, 0, 360, 0, 50);
+		
+		if (item == null) {
+			goto(space(position));
+			drop();
+		} else {
+			helix(item.position);
+		}
+	}
+}
