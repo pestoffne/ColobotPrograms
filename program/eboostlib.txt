@@ -1,0 +1,362 @@
+public class EBoost {
+	private object actor;
+	
+	void EBoost(object actor) {
+		this.actor = actor;
+		errmode(0);
+	}
+	
+	float normalize_angle(float angle) {
+		return angle - 360 * round(angle / 360);
+	}
+	
+	void orient(float direct) {
+		turn(normalize_angle(direct - actor.orientation));
+	}
+	
+	void goto_strait(point pos) {
+		turn(direction(pos));
+		move(distance2d(pos, actor.position));
+	}
+	
+	void goto_pp(point pos, float direct, float dist=1.5) {
+		pos.x -= cos(direct) * dist;
+		pos.y -= sin(direct) * dist;
+		goto(pos);
+		goto_strait(pos);  // to more precise position
+		orient(direct);
+	}
+	
+	void goto_p(point pos, float dist=1.5) {
+		goto_pp(pos, pos.z, dist);
+	}
+	
+	void switch_cell_quick() {
+		grab(EnergyCell);
+		drop(Behind);
+		grab();
+		drop(EnergyCell);
+	}
+	
+	void dock_to_ship() {
+		point ship_pos; point[] slots; point slot; int i;
+		
+		ship_pos = radar(SpaceShip).position;
+		
+		// create list of slots. better to do it staticaly
+		i = 0;
+		slots[i++] = new point(ship_pos.x - 4.00, ship_pos.y - 2.5,  90);
+		slots[i++] = new point(ship_pos.x - 2.50, ship_pos.y - 2.5,  90);
+		slots[i++] = new point(ship_pos.x - 0.75, ship_pos.y - 2.5,  90);
+		slots[i++] = new point(ship_pos.x + 0.75, ship_pos.y - 2.5,  90);
+		slots[i++] = new point(ship_pos.x + 2.50, ship_pos.y - 2.5,  90);
+		slots[i++] = new point(ship_pos.x + 4.00, ship_pos.y - 2.5,  90);
+		slots[i++] = new point(ship_pos.x - 4.00, ship_pos.y - 4.0, 150);
+		slots[i++] = new point(ship_pos.x - 2.50, ship_pos.y - 4.0,  90);
+		slots[i++] = new point(ship_pos.x + 4.00, ship_pos.y - 4.0,  30);
+		slots[i++] = new point(ship_pos.x + 2.50, ship_pos.y - 4.0,  90);
+		slots[i++] = new point(ship_pos.x - 0.75, ship_pos.y - 4.0,  90);
+		slots[i++] = new point(ship_pos.x + 0.75, ship_pos.y - 4.0,  90);
+		
+		for (i = 0; i < sizeof(slots); ++i) {
+			slot = slots[i];
+			
+			if (search(Any, slot, 0, 1.3) == null) {
+				goto_p(slot, 2);
+				move(0.5);
+				
+				if (drop() == 0) {
+					break;
+				}
+			}
+		}
+	}
+	
+	float wait_for_cat(int cat) {
+		if (cat == Titanium   ) { return 15.5; }
+		if (cat == TitaniumOre) { return 10.5; }
+		if (cat == PowerCell  ) { return 12.5; }
+		if (cat == UraniumOre ) { return 30.5; }
+		return 15.5;  // Build time
+	}
+	
+	object radar_wait(int cat, int angle=0, int focus=360, int min=0, int max=1024, int sens=1) {
+		object item; float wait_time;
+		
+		wait_time = wait_for_cat(cat);
+		
+		for (;;) {
+			item = radar(cat, angle, focus, min, max, sens);
+			
+			if (item != null) {
+				break;
+			}
+			
+			if (wait_time <= 0) {
+				return null;
+			}
+			
+			wait_time -= 0.1;
+			wait(0.1);
+		}
+		
+		return item;
+	}
+	
+	bool _helix_helper(point pos) {
+		object item;
+		
+		item = search(Any, pos, 0, 1.7);
+		
+		if (item != null) {
+			return false;
+		}
+		
+		goto_p(pos);
+		drop();
+		return true;
+	}
+	
+	void drop_to_helix(point p) {
+		int s;
+		
+		s = 2;
+		p.z = 270;  // angle
+		
+		for (int l = 1; l <= 7; ++l) {
+			for (int i = 0; i < l; ++i) {
+				p.x += s;
+				
+				if (_helix_helper(p)) {
+					return;
+				}
+			}
+			
+			s *= -1;
+			p.z += -90;
+			
+			if (p.z < 0) {
+				p.z += 360;
+			}
+			
+			for (int i = 0; i < l; ++i) {
+				p.y += s;
+				
+				if (_helix_helper(p)) {
+					return;
+				}
+			}
+			
+			p.z += -90;
+			
+			if (p.z < 0) {
+				p.z += 360;
+			}
+		}
+	}
+	
+	object radar_best_cell(int angle=0, int focus=360, int min=0, int max=1024) {
+		object[] nuclear_cells;
+		int nuclear_max_index;
+		int nuclear_max_value;
+		object[] power_cells;
+		int power_max_index;
+		int power_max_value;
+		
+		nuclear_cells = radarall(NuclearCell, angle, focus, min, max);
+		nuclear_max_index = -1;
+		nuclear_max_value = 0;
+		
+		for (int i = 0; i < sizeof(nuclear_cells); ++i) {
+			if (nuclear_cells[i].energyLevel >= nuclear_max_value) {
+				nuclear_max_index = i;
+				nuclear_max_value = nuclear_cells[i].energyLevel;
+			}
+		}
+		
+		power_cells = radarall(PowerCell, angle, focus, min, max);
+		power_max_index = -1;
+		power_max_value = 0;
+		
+		for (int i = 0; i < sizeof(power_cells); ++i) {
+			if (power_cells[i].energyLevel >= power_max_value) {
+				power_max_index = i;
+				power_max_value = power_cells[i].energyLevel;
+			}
+		}
+		
+		if (power_max_value >= 10 * nuclear_max_value) {
+			if (power_max_value == 0) {
+				return null;
+			}
+			
+			return power_cells[power_max_index];
+		}
+		
+		if (nuclear_max_value == 0) {
+			return null;
+		}
+		
+		return nuclear_cells[nuclear_max_index];
+	}
+	
+	bool can_switch_own_cell(int cat) {
+		return cat == WheeledGrabber
+		    or cat == TrackedGrabber
+		    or cat == WingedGrabber
+		    or cat == LeggedGrabber;
+	}
+	
+	int go_switch_cell() {
+		object item;
+		
+		if (can_switch_own_cell(actor.category)) {
+			return 1;
+		}
+		
+		item = radar_best_cell(0, 360, 0, 50);
+		
+		if (item == null) {
+			return 1;
+		}
+		
+		goto(item.position);
+		switch_cell_quick();
+		return 0;
+	}
+	
+	// return 0 -- PowerCell was recharged
+	//        1 -- failed to recharge on PowerStation
+	int go_power_station() {
+		object item; float wait_time;
+		
+		for (;;) {
+			item = radar(PowerStation);
+			
+			if (item == null) {
+				return 1;
+			}
+			
+			goto(item.position);
+			wait_time = 15.5;
+			
+			for (;;) {
+				if (distance2d(item.position, actor.position) > 1.0) {
+					turn(direction(item.position));
+					motor(1, 1);
+				}
+				
+				wait(0.1);
+				wait_time -= 0.1;
+				
+				if (wait_time <= 0) {
+					return 1;
+				}
+				
+				item = radar(PowerStation, 0, 360, 0, 10);
+				
+				if (item == null) {
+					break;  // PowerStation is loosed. Let's find another
+				}
+				
+				if (actor.energyCell == null or actor.energyCell.category != PowerCell) {
+					return 1;
+				}
+				
+				if (actor.energyCell.energyLevel > 0.95) {
+					return 0;
+				}
+			}
+		}
+		
+		return 1;  // never executes
+	}
+	
+	int go_repair() {
+		object item; float wait_time;
+		
+		for (;;) {
+			item = radar(RepairCenter);
+			
+			if (item == null) {
+				return 1;
+			}
+			
+			goto(item.position);
+			wait_time = 15.5;
+			
+			for (;;) {
+				if (distance2d(item.position, actor.position) > 1.0) {
+					turn(direction(item.position));
+					motor(1, 1);
+				}
+				
+				wait(0.1);
+				wait_time -= 0.1;
+				
+				if (wait_time <= 0) {
+					return 1;
+				}
+				
+				item = radar(RepairCenter, 0, 360, 0, 10);
+				
+				if (item == null) {
+					break;  // PowerStation is loosed. Let's find another
+				}
+				
+				if (actor.shieldLevel >= 1) {
+					return 0;
+				}
+			}
+		}
+		
+		return 1;  // never executes
+	}
+	
+	int check_shield(float need_shield=0.5) {
+		object item;
+		
+		if (actor.shieldLevel >= need_shield) {
+			return 0;
+		}
+		
+		return go_repair();
+	}
+	
+	int check_energy(float need_energy=0.33) {
+		object item;
+		
+		if (actor.energyCell.category == NuclearCell) {
+			if (actor.energyCell.energyLevel > need_energy * 0.1) {
+				return 0;  // There is no problem with NuclearCell energyLevel
+			}
+			
+			return go_switch_cell();
+		}
+		
+		if (actor.energyCell.energyLevel > need_energy) {
+			return 0;  // There is no problem with PowerCell energyLevel
+		}
+		
+		if (go_power_station() != 0) {
+			return go_switch_cell();
+		}
+		
+		return 0;  // Recharged
+	}
+}
+
+extern void object::EBoostLib() {
+	EBoost e(this);
+	//// Unit Tests
+	//message(e.normalize_angle(360 * 4 + 30) + " = " + 30);
+	//message(e.normalize_angle(179) + " = " + 179);
+	//message(e.normalize_angle(180) + " = " + 180 + " or " + -180);
+	//message(e.normalize_angle(181) + " = " + -179);
+	//message(e.normalize_angle(-179) + " = " + -179);
+	//message(e.normalize_angle(-180) + " = " + -180 + " or " + 180);
+	//message(e.normalize_angle(-181) + " = " + 179);
+	//message(e.normalize_angle(360 * -11 + 30) + " = " + 30);
+	//e.orient(this, -360);
+	//message(orientation);
+}

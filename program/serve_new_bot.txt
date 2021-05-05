@@ -1,26 +1,3 @@
-void object::GoToFrontOf(object item, int dist) {
-	point pos;
-	pos.x = item.position.x + cos(item.orientation) * dist;
-	pos.y = item.position.y + sin(item.orientation) * dist;
-	
-	goto(pos);
-	turn(direction(item.position));
-}
-
-object object::RadarChargedCell(int[] cat, float charge, int angle=0, int focus=360, int min=0, int max=1000) {
-	object[] items = radarall(cat, angle, focus, min, max);
-	
-	// Expect: items array sorted by distance ascending
-	for (int i = 0; i < sizeof(items); ++i)
-	{
-		if (items[i].energyLevel >= charge) {
-			return items[i];
-		}
-	}
-	
-	return null;
-}
-
 extern void object::ServeNewBot() {
 	int bots[21];
 	
@@ -55,34 +32,53 @@ extern void object::ServeNewBot() {
 	cells[0] = PowerCell;
 	cells[1] = NuclearCell;
 	
-	object item;
-	object bot_factory;
-	point start;
+	object[] items; object item; object bot_factory; point start;
+	EBoost e(this);
 	
 	start = position;
+	errmode(0);
 	
 	// 1) Grab Titanium
-	item = radar(Titanium);
-	goto(item.position);
-	grab();
+	items = radarall(Titanium);
+	if (items == null) {
+		message("Unable to find Titanium", DisplayError);
+		return;
+	}
+	for (int i = 0;; ++i) {
+		if (i >= sizeof(items)) {
+			message("Unable to grub Titanium", DisplayError);
+			return;
+		}
+		if (goto(items[i].position) == 0
+		        and grab() == 0
+		        and load != null) {
+			if (load.category == Titanium) {
+				break;  // success
+			} else {
+				goto(space(position));
+				drop();
+			}
+		}
+		// if something wrong go to the next item
+		message("next");
+	}
 	
 	// 2) Drop Titanium into BotFactory
 	bot_factory = radar(BotFactory);
 	goto(bot_factory.position);
 	drop();
 	
-	// 3) Grab PowerCell or NuclearCell from groud,
-	// which charged more than for 50%
-	item = RadarChargedCell(cells, 0.5);
+	// 3) Grab PowerCell or NuclearCell from groud
+	item = e.radar_best_cell();
 	goto(item.position);
 	grab();
 	
 	// 4) Go to front of the same BotFactory
-	GoToFrontOf(bot_factory, 10);
+	e.goto_p(bot_factory.position, 5.5);
 	
 	// 5) Wait until Bot created
 	do {
-		item = radar(bots, 0, 10, 0, 12);
+		item = radar(bots, 0, 15, 0, 12);
 	} while (item == null);
 	
 	// 6) Drop PowerCell or NuclearCell to Bot

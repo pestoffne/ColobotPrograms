@@ -1,167 +1,48 @@
-object RadarWait(int cat, int angle=0, int focus=360, int min=0, int max=1024) {
-	object item;
-	
-	for (;;) {
-		item = radar(cat, angle, focus, min, max);
-		
-		if (item != null) {
-			break;
-		}
-		
-		wait(1);
-	}
-	
-	return item;
-}
-
-object object::RadarBestCell(int angle=0, int focus=360, int min=0, int max=1024) {
-	object[] nuclear_cells;
-	int nuclear_max_index;
-	int nuclear_max_value;
-	object[] power_cells;
-	int power_max_index;
-	int power_max_value;
-	
-	nuclear_cells = radarall(NuclearCell, angle, focus, min, max);
-	nuclear_max_index = -1;
-	nuclear_max_value = 0;
-	
-	for (int i = 0; i < sizeof(nuclear_cells); ++i) {
-		if (nuclear_cells[i].energyLevel >= nuclear_max_value) {
-			nuclear_max_index = i;
-			nuclear_max_value = nuclear_cells[i].energyLevel;
-		}
-	}
-	
-	power_cells = radarall(PowerCell, angle, focus, min, max);
-	power_max_index = -1;
-	power_max_value = 0;
-	
-	for (int i = 0; i < sizeof(power_cells); ++i) {
-		if (power_cells[i].energyLevel >= power_max_value) {
-			power_max_index = i;
-			power_max_value = power_cells[i].energyLevel;
-		}
-	}
-	
-	if (power_max_value >= 10 * nuclear_max_value) {
-		if (power_max_value == 0) {
-			return null;
-		}
-		
-		return power_cells[power_max_index];
-	}
-	
-	if (nuclear_max_value == 0) {
-		return null;
-	}
-	
-	return nuclear_cells[nuclear_max_index];
-}
-
-void object::SwitchCell() {
-	grab(InFront);
-	drop(Behind);
-	grab(EnergyCell);
-	drop(InFront);
-	grab(Behind);
-	drop(EnergyCell);
-}
-
-void object::GoSwitchCell() {
-	object item;
-	
-	if (category == Subber) {
-		return;
-	}
-	
-	item = RadarBestCell();
-	
-	if (item == null) {
-		return;
-	}
-	
-	goto(item.position);
-	SwitchCell();
-}
-
-void object::CheckEnergy() {
-	object item;
-	
-	if (energyCell.category == NuclearCell) {
-		if (energyCell.energyLevel > 0.033) {
-			return;  // There is no problem with NuclearCell energyLevel
-		}
-		
-		GoSwitchCell();
-		return;
-	}
-	
-	if (energyCell.energyLevel > 0.33) {
-		return;  // There is no problem with PowerCell energyLevel
-	}
-	
-	item = radar(PowerStation);
-	
-	if (item == null) {
-		// There is no PowerStantion
-		GoSwitchCell();
-		return;
-	}
-	
-	// Expect: there is a path to item
-	goto(item.position);
-	
-	while (energyCell.energyLevel < 1) {
-		wait(1);
-	}
-}
-
-void object::CheckShield() {
-	object item;
-	
-	if (shieldLevel >= 0.5) {
-		return;
-	}
-	
-	item = radar(RepairCenter);
-	
-	if (item == null) {
-		return;
-	}
-	
-	goto(item.position);
-	
-	while (shieldLevel < 1) {
-		wait(1);
-	}
-}
-
 extern void object::CollectTitanium() {
-	object item;
-	point pos;
+	object item; point pos;
+	EBoost e(this);
 	
 	for (;;) {
-		item = RadarWait(TitaniumOre);
-		goto(item.position);
-		grab();
+		if (load == null or load.category != TitaniumOre) {
+			if (load != null) {
+				goto(space(position, 0));
+				drop();
+			}
+			
+			item = e.radar_wait(TitaniumOre);
+			
+			if (item == null) {
+				message("All TitaniumOres has been converted", DisplayWarning);
+				return;
+			}
+			
+			goto(item.position);
+			grab();
+		}
 		
-		item = RadarWait(Converter);
+		item = e.radar_wait(Converter);
 		goto(item.position);
 		drop();
 		move(-2.5);
 		
-		item = RadarWait(Titanium, 0, 10, 0, 5);
+		item = e.radar_wait(Titanium, 0, 15, 0, 7);
 		goto(item.position);
 		grab();
 		
-		goto(space(position));
-		drop();
+		item = radar(BlueFlag);
+		
+		if (item == null) {
+			goto(space(position));
+			drop();
+		} else {
+			e.drop_to_helix(item.position);
+		}
 		
 		pos = position;
-		CheckEnergy();
-		CheckShield();
-		if (distance2d(item.position, pos) > 10) {
+		e.check_energy(0.25);
+		e.check_shield(0.50);
+		
+		if (distance2d(position, pos) > 10.0) {
 			goto(pos);
 		}
 	}
