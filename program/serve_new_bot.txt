@@ -36,7 +36,6 @@ extern void object::ServeNewBot() {
 	EBoost e(this);
 	
 	start = position;
-	errmode(0);
 	
 	// 1) Grab Titanium
 	items = radarall(Titanium);
@@ -74,7 +73,7 @@ extern void object::ServeNewBot() {
 	grab();
 	
 	// 4) Go to front of the same BotFactory
-	e.goto_p(bot_factory.position, 5.5);
+	e.goto_pp(bot_factory.position, 180 + bot_factory.orientation, 5.5);
 	
 	// 5) Wait until Bot created
 	do {

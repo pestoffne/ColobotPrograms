@@ -1,0 +1,54 @@
+public void object::take_black_box() {
+	EBoost e(this);
+	
+	goto(radar(BlackBox).position);
+	grab();
+	goto(radar(SpaceShip).position);
+}
+
+extern void object::RB2_3_Solve() {
+	object item;
+	EBoost e(this);
+	
+	goto(radar(Titanium).position);
+	grab();
+	goto(radar(PowerPlant).position);
+	drop();
+	e.check_energy(0.1);
+	
+	goto(radar(Titanium).position);
+	grab();
+	item = radar(PowerPlant);
+	goto(item.position);
+	while (item.busy()) { wait(0.1); }
+	e.switch_for(item);
+	goto(e.radar_best_cell(0, 360, 0, 10).position);
+	grab();
+	item = radar(ResearchCenter);
+	goto(item.position);
+	drop();
+	item.research(ResearchTracked);
+	e.check_energy(0.1);
+	
+	goto(radar(Titanium).position);
+	grab();
+	item = radar(BotFactory);
+	goto(item.position);
+	drop();
+	turn(180);
+	move(5);
+	item.factory(TrackedGrabber, "take_black_box");
+	e.check_energy(0.1);
+	
+	item = radar(PowerPlant);
+	goto(item.position);
+	while (item.busy()) { wait(0.1); }
+	grab();
+	item = radar(BotFactory);
+	e.goto_pp(item.position, 180 + item.orientation, 5.5);
+	item = e.radar_wait(TrackedGrabber, 0, 30, 0, 20);
+	goto(item.position);
+	drop();
+	
+	goto(radar(SpaceShip).position);
+}

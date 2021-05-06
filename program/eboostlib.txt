@@ -6,6 +6,15 @@ public class EBoost {
 		errmode(0);
 	}
 	
+	object assert(bool value, string text="assertion error") {
+		if (value) {
+			return actor;
+		}
+		
+		message(text, DisplayError);
+		return null;
+	}
+	
 	float normalize_angle(float angle) {
 		return angle - 360 * round(angle / 360);
 	}
@@ -36,6 +45,20 @@ public class EBoost {
 		drop(Behind);
 		grab();
 		drop(EnergyCell);
+	}
+	
+	void switch_for(object item) {
+		assert(actor.load != null).id;
+		assert(item.energyCell != null).id;
+		
+		turn(direction(item.position));
+		drop(Behind);
+		grab();
+		turn(-90);
+		drop();
+		turn(90);
+		grab(Behind);
+		drop();
 	}
 	
 	void dock_to_ship() {
