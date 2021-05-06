@@ -29,51 +29,52 @@ float Max(float a, float b) {
 }
 
 extern void object::CountResources() {
-	int bots[21];
+	int bots[]; object[] items; float power_cells_charge_sum; float nuclear_cells_charge_sum; int i;
+	int titanium_count, titanium_ores_count, power_cells_count, nuclear_cells_count, uranium_ores_count, black_boxes_count, orga_matters_count, tnt_count, wreck_count;
 	
-	bots[0] = WheeledGrabber;
-	bots[1] = TrackedGrabber;
-	bots[2] = WingedGrabber;
-	bots[3] = LeggedGrabber;
+	i = 0;
 	
-	bots[4] = WheeledSniffer;
-	bots[5] = TrackedSniffer;
-	bots[6] = WingedSniffer;
-	bots[7] = LeggedSniffer;
+	bots[i++] = WheeledGrabber;
+	bots[i++] = TrackedGrabber;
+	bots[i++] = WingedGrabber;
+	bots[i++] = LeggedGrabber;
 	
-	bots[8] = WheeledShooter;
-	bots[9] = TrackedShooter;
-	bots[10] = WingedShooter;
-	bots[11] = LeggedShooter;
+	bots[i++] = WheeledSniffer;
+	bots[i++] = TrackedSniffer;
+	bots[i++] = WingedSniffer;
+	bots[i++] = LeggedSniffer;
 	
-	bots[12] = WheeledOrgaShooter;
-	bots[13] = TrackedOrgaShooter;
-	bots[14] = WingedOrgaShooter;
-	bots[15] = LeggedOrgaShooter;
+	bots[i++] = WheeledShooter;
+	bots[i++] = TrackedShooter;
+	bots[i++] = WingedShooter;
+	bots[i++] = LeggedShooter;
 	
-	bots[16] = Subber;
-	bots[17] = Recycler;
-	bots[18] = Shielder;
-	bots[19] = Thumper;
-	bots[20] = PhazerShooter;
+	bots[i++] = WheeledOrgaShooter;
+	bots[i++] = TrackedOrgaShooter;
+	bots[i++] = WingedOrgaShooter;
+	bots[i++] = LeggedOrgaShooter;
 	
-	object[] items;
-	int titanium_count;
-	int titanium_ores_count;
-	int power_cells_count;
-	float power_cells_charge_sum;
-	int nuclear_cells_count;
-	float nuclear_cells_charge_sum;
-	int uranium_ores_count;
-	int black_boxes_count;
-	int orga_matters_count;
-	int tnt_count;
+	bots[i++] = Subber;
+	bots[i++] = Recycler;
+	bots[i++] = Shielder;
+	bots[i++] = Thumper;
+	bots[i++] = PhazerShooter;
 	
-	items = radarall(Titanium);
-	titanium_count = sizeof(items);
+	bots[i++] = PracticeBot;
+	bots[i++] = TargetBot;
 	
-	items = radarall(TitaniumOre);
-	titanium_ores_count = sizeof(items);
+	bots[i++] = PowerPlant;
+	bots[i++] = NuclearPlant;
+	bots[i++] = ResearchCenter;
+	bots[i++] = DefenseTower;
+	
+	titanium_count = sizeof(radarall(Titanium));
+	titanium_ores_count = sizeof(radarall(TitaniumOre));
+	uranium_ores_count = sizeof(radarall(UraniumOre));
+	black_boxes_count = sizeof(radarall(BlackBox));
+	orga_matters_count = sizeof(radarall(OrgaMatter));
+	tnt_count = sizeof(radarall(TNT));
+	wreck_count = sizeof(radarall(Wreck));
 	
 	items = radarall(PowerCell);
 	power_cells_count = sizeof(items);
@@ -90,18 +91,6 @@ extern void object::CountResources() {
 	for (int i = sizeof(items) - 1; i >= 0; --i) {
 		nuclear_cells_charge_sum += Max(items[i].energyLevel, 0);
 	}
-	
-	items = radarall(UraniumOre);
-	uranium_ores_count = sizeof(items);
-	
-	items = radarall(BlackBox);
-	black_boxes_count = sizeof(items);
-	
-	items = radarall(OrgaMatter);
-	orga_matters_count = sizeof(items);
-	
-	items = radarall(TNT);
-	tnt_count = sizeof(items);
 	
 	// Count current bot's PowerCell or NuclearCell in EnercyCell slot
 	if (energyCell.category == PowerCell) {
@@ -189,5 +178,6 @@ extern void object::CountResources() {
 	      + _("UraniumOre", uranium_ores_count)
 	      + _("BlackBox", black_boxes_count)
 	      + _("OrgaMatter", orga_matters_count)
-	      + _("TNT", tnt_count));
+	      + _("TNT", tnt_count)
+	      + _("Wreck", wreck_count));
 }
