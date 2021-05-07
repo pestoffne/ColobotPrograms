@@ -179,12 +179,8 @@ public class EBoost {
 	}
 	
 	object radar_best_cell(int angle=0, int focus=360, int min=0, int max=1024) {
-		object[] nuclear_cells;
-		int nuclear_max_index;
-		int nuclear_max_value;
-		object[] power_cells;
-		int power_max_index;
-		int power_max_value;
+		object[] nuclear_cells; int nuclear_max_index; float nuclear_max_value;
+		object[] power_cells; int power_max_index; float power_max_value;
 		
 		nuclear_cells = radarall(NuclearCell, angle, focus, min, max);
 		nuclear_max_index = -1;
