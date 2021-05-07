@@ -1,7 +1,11 @@
 extern void object::Recycle() {
 	object item; point pos;
+	EBoost e(this);
+	e.logfile = "rb_logs.txt";
 	
 	for (;;) {
+		e.check_energy();
+		
 		item = radar(Wreck);
 		
 		if (item == null) {
@@ -11,8 +15,36 @@ extern void object::Recycle() {
 		
 		pos.x = item.position.x + 5;
 		pos.y = item.position.y;
-		goto(pos);
+		
+		if (goto(pos) != 0) {
+			pos.x = item.position.x - 5;
+			pos.y = item.position.y;
+			
+			if (goto(pos) != 0) {
+				pos.x = item.position.x;
+				pos.y = item.position.y + 5;
+				
+				if (goto(pos) != 0) {
+					pos.x = item.position.x;
+					pos.y = item.position.y - 5;
+					
+					if (goto(pos) != 0) {
+						message("Can't go to wrack", DisplayError);
+						return;
+					}
+				}
+			}
+		}
+		
 		turn(direction(item.position));
-		recycle();
+		
+		e.log(energyCell.energyLevel + " before");
+		
+		if (recycle() != 0) {
+			message("Failed to recycle");
+			return;
+		}
+		
+		e.log(energyCell.energyLevel + " after");
 	}
 }
