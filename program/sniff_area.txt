@@ -1,0 +1,43 @@
+extern void object::SniffArea() {
+	point pos; float step, radius, angle; int total_sniffs;
+	EBoost e(this);
+	
+	e.orient(0);
+	angle = 0;
+	
+	radius = 2.5;    // for Derrick
+	// radius = 4.0; // for PowerPlant
+	// radius = 6.0; // for PowerStation
+	
+	step = 1.0;
+	
+	total_sniffs = 0;
+	
+	for (;;) {
+		pos.x = position.x + step * cos(orientation);
+		pos.y = position.y + step * sin(orientation);
+		
+		if (flatground(pos, radius) < radius) {
+			e.orient(90);
+			sniff();
+			total_sniffs++;
+			
+			pos.x = position.x + step * cos(orientation);
+			pos.y = position.y + step * sin(orientation);
+			
+			if (flatground(pos, radius) < radius) {
+				message("Complete total sniffs = " + total_sniffs);
+				return;
+			}
+			
+			move(step);
+			angle = 180 - angle;
+			e.orient(angle);
+			continue;
+		}
+		
+		move(step);
+		sniff();
+		total_sniffs++;
+	}
+}
