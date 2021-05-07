@@ -69,8 +69,18 @@ extern void object::ServeNewBot() {
 	
 	// 3) Grab PowerCell or NuclearCell from groud
 	item = e.radar_best_cell();
-	goto(item.position);
-	grab();
+	
+	for (;;) {
+		goto(item.position);
+		grab();
+		
+		if (load != null and load.category == PowerCell and load.energyLevel >= item.energyLevel) {
+			break;
+		}
+		
+		goto(space(position));
+		drop();
+	}
 	
 	// 4) Go to front of the same BotFactory
 	e.goto_pp(bot_factory.position, 180 + bot_factory.orientation, 5.5);
