@@ -1,0 +1,25 @@
+## CBot highligtings for nano editor
+## include this file in ~/.config/nano/nanorc to see CBot highlightings in *.txt files
+
+
+syntax c "\.txt$"
+
+# Numeric constants
+color brightgreen "\<[0-9]+\>"
+
+color green "\<(float|bool|int|object|point|sizeof|void|static|extern)\>"
+color green "\<(class|public|protected|private|extends)\>"
+color brightyellow "\<(for|if|while|do|else|case|default|switch|and|or|not)\>"
+color brightyellow "\<(try|throw|catch|new|delete)\>"
+color brightred "\<(Converter|PowerPlant|PowerStation|Derrick|BotFactory|RepairCenter|ResearchCenter|DefenceTower|NuclearPlant)\>"
+color brightred "\<(Titanium|TitaniumOre|PowerCell|UraniumOre|NuclearCell)\>"
+color brightred "\<(null|true|false|nan)\>"
+color brightred "\<(ResearchWinged|ResearchShooter)\>"
+color brightred "\<(Wheeled|Winged)(Grabber|Shooter)\>"
+color magenta "\<(continue|break|return|this)\>"
+color brightmagenta "'([^'\]|(\\["'abfnrtv\\]))'" "'\\(([0-3]?[0-7]{1,2}))'" "'\\x[0-9A-Fa-f]{1,2}'"
+color brightyellow ""([^"]|\\")*"" "#[[:space:]]*include[[:space:]]+<[^[:blank:]=]*>"
+
+# Comments
+color brightblue "//.*"
+color brightblue start="/\*" end="\*/"
