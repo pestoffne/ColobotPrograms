@@ -1,5 +1,6 @@
 public class EBoost {
-	private object actor;
+	object actor;
+	string logfile = "common_logs.txt";
 	
 	void EBoost(object actor) {
 		this.actor = actor;
@@ -93,6 +94,18 @@ public class EBoost {
 				}
 			}
 		}
+	}
+	
+	float round_digits(float value, int digits) {
+		int a = pow(10, digits);
+		return round(value * a) / a;
+	}
+	
+	void log(string text) {
+		file handler = new file();
+		handler.open(logfile, "a");
+		handler.writeln(round_digits(abstime(), 1) + " " + actor.id + " " + text);
+		handler.close();
 	}
 	
 	float wait_for_cat(int cat) {
