@@ -1,0 +1,29 @@
+extern void object::RB2_4_Helper() {
+	EBoost e(this);
+	
+	do {
+		wait(1);
+	} while (sizeof(radarall(PowerCaptor)) < 2);
+	
+	e.orient(180);
+	move(5);
+	e.check_energy_loop(0.5);
+	
+	goto(e._radar_wait(Titanium, 180).position);
+	grab();
+	e.goto_pp(new point(-12, 147), 90);
+	drop();
+	build(PowerCaptor);
+	
+	goto(e._radar_wait(Titanium, 180).position);
+	grab();
+	e.goto_pp(new point(17, 180), 90);
+	drop();
+	build(PowerCaptor);
+	
+	goto(e._radar_wait(Titanium, 180).position);
+	grab();
+	e.goto_pp(new point(10, 204), 90);
+	drop();
+	build(PowerCaptor);
+}

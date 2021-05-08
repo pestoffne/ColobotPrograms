@@ -1,0 +1,40 @@
+extern void object::RB2_4_Solve() {
+	object exit, bot_factory, item;
+	EBoost e(this);
+	
+	goto(radar(Titanium).position);
+	grab();
+	e.goto_pp(new point(17, 21), 0);
+	drop();
+	build(BotFactory);
+	
+	goto(radar(Titanium).position);
+	grab();
+	bot_factory = radar(BotFactory);
+	goto(bot_factory.position);
+	drop();
+	turn(180);
+	move(6);
+	bot_factory.factory(Recycler);
+	
+	e.goto_pp(e.radar_best_cell().position, 330);
+	grab();
+	e.goto_pp(bot_factory.position, 0, 6);
+	goto(e.radar_wait(Recycler).position);
+	drop();
+	
+	e.goto_pp(new point(14, 40), 0);  // near Wreck
+	goto(e._radar_wait(Titanium, 60.0).position);
+	grab();
+	e.goto_pp(new point(-6, 47), 90);
+	drop();
+	build(PowerCaptor);
+	
+	e.goto_pp(radar(PowerCaptor).position, 0, 4);
+	goto(e._radar_wait(Titanium, 180.0).position);
+	grab();
+	
+	e.goto_pp(new point(-14, 97), 90);
+	drop();
+	build(PowerCaptor);
+}
