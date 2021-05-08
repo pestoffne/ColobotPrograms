@@ -20,7 +20,6 @@ extern void object::Recycle() {
 			return;
 		}
 		
-		message(item.category);
 		angle = e.inverse_direction(item.position);
 		
 		for (i = 0; i < 7; ++i) {

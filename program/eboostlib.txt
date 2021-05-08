@@ -153,6 +153,13 @@ public class EBoost {
 		return item;
 	}
 	
+	object _radar_wait(int cat, float wait_time, int angle=0, int focus=360, int min=0, int max=1024, int sens=1) {
+		int[] cat_list;
+
+		cat_list[0] = cat;
+		return _radar_wait(cat_list, wait_time, angle, focus, min, max, sens);
+	}
+	
 	object radar_wait(int cat, int angle=0, int focus=360, int min=0, int max=1024, int sens=1) {
 		int[] cat_list;
 
