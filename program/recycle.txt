@@ -1,50 +1,45 @@
 extern void object::Recycle() {
-	object item; point pos;
+	object item; point pos; int[] recycleble; int i, total_recycle; float angle;
 	EBoost e(this);
-	e.logfile = "rb_logs.txt";
+	
+	total_recycle = 0;
+	
+	i = 0;
+	recycleble[i++] = Wreck;  // = 601 or 603 or 605
+	//recycleble[i++] = 606;  // Broken BotFactory.
+	recycleble[i++] = 607;  // Converter half-cylinder
+	recycleble[i++] = 608;  // Some beeline fittings
+	recycleble[i++] = 609;  // Looks like radar fundament
 	
 	for (;;) {
-		e.check_energy();
-		
-		item = radar(Wreck);
+		e.check_energy_loop(0.33);
+		item = radar(recycleble);
 		
 		if (item == null) {
-			message("Recycle complete");
+			message("Recycle complete. Total recycle " + total_recycle);
 			return;
 		}
 		
-		pos.x = item.position.x + 5;
-		pos.y = item.position.y;
+		message(item.category);
+		angle = e.inverse_direction(item.position);
 		
-		if (goto(pos) != 0) {
-			pos.x = item.position.x - 5;
-			pos.y = item.position.y;
-			
-			if (goto(pos) != 0) {
-				pos.x = item.position.x;
-				pos.y = item.position.y + 5;
-				
-				if (goto(pos) != 0) {
-					pos.x = item.position.x;
-					pos.y = item.position.y - 5;
-					
-					if (goto(pos) != 0) {
-						message("Can't go to wrack", DisplayError);
-						return;
-					}
-				}
+		for (i = 0; i < 7; ++i) {
+			if (e.goto_pp(item.position, angle + 45 * i, 5.0) == 0) {
+				break;
 			}
 		}
 		
 		turn(direction(item.position));
 		
-		e.log(energyCell.energyLevel + " before");
+		e.assert(energyCell.category == PowerCell and energyCell.energyLevel >= 0.25
+		      or energyCell.category == NuclearCell and energyCell.energyLevel >= 0.025,
+		      "Not enough energy(" + e.round_digits(energyCell.energyLevel, 2) + ") for recycle").id;
 		
 		if (recycle() != 0) {
 			message("Failed to recycle");
 			return;
 		}
 		
-		e.log(energyCell.energyLevel + " after");
+		total_recycle++;
 	}
 }

@@ -38,28 +38,30 @@ extern void object::ServeNewBot() {
 	start = position;
 	
 	// 1) Grab Titanium
-	items = radarall(Titanium);
-	if (items == null) {
-		message("Unable to find Titanium", DisplayError);
-		return;
-	}
-	for (int i = 0;; ++i) {
-		if (i >= sizeof(items)) {
-			message("Unable to grub Titanium", DisplayError);
+	if (load == null or load.category == Titanium) {
+		items = radarall(Titanium);
+		if (items == null) {
+			message("Unable to find Titanium", DisplayError);
 			return;
 		}
-		if (goto(items[i].position) == 0
-		        and grab() == 0
-		        and load != null) {
-			if (load.category == Titanium) {
-				break;  // success
-			} else {
-				goto(space(position));
-				drop();
+		for (int i = 0;; ++i) {
+			if (i >= sizeof(items)) {
+				message("Unable to grub Titanium", DisplayError);
+				return;
 			}
+			if (goto(items[i].position) == 0
+			        and grab() == 0
+			        and load != null) {
+				if (load.category == Titanium) {
+					break;  // success
+				} else {
+					goto(space(position));
+					drop();
+				}
+			}
+			// if something wrong go to the next item
+			message("next");
 		}
-		// if something wrong go to the next item
-		message("next");
 	}
 	
 	// 2) Drop Titanium into BotFactory
@@ -78,7 +80,7 @@ extern void object::ServeNewBot() {
 			break;
 		}
 		
-		goto(space(position));
+		goto(space(position, 2));
 		drop();
 	}
 	
@@ -86,9 +88,7 @@ extern void object::ServeNewBot() {
 	e.goto_pp(bot_factory.position, 180 + bot_factory.orientation, 5.5);
 	
 	// 5) Wait until Bot created
-	do {
-		item = radar(bots, 0, 15, 0, 12);
-	} while (item == null);
+	item = e.radar_wait(bots, 0, 15, 0, 12);
 	
 	// 6) Drop PowerCell or NuclearCell to Bot
 	goto(item.position);
