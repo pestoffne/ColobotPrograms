@@ -274,7 +274,7 @@ public class EBoost {
 	int go_switch_cell() {
 		object item;
 		
-		if (can_switch_own_cell(actor.category)) {
+		if (not can_switch_own_cell(actor.category)) {
 			return 1;
 		}
 		
