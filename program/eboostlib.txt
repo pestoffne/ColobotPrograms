@@ -25,26 +25,40 @@ public class EBoost {
 	}
 	
 	float inverse_direction(point pos) {
+		// TODO: it is possible to do it without if statement
+		
+		if (actor.position.y > pos.y) {
+			return 270 - atan((pos.x - actor.position.x) / (pos.y - actor.position.y));
+		}
+		
 		return 90 - atan((pos.x - actor.position.x) / (pos.y - actor.position.y));
+	}
+	
+	point grab_position(float dist=1.5) {
+		point pos;
+		
+		pos.x = actor.position.x + cos(actor.orientation) * dist;
+		pos.y = actor.position.y + sin(actor.orientation) * dist;
+		return pos;
 	}
 	
 	void goto_straight(point pos, float dist=1.5) {
 		turn(direction(pos));
-		move(distance2d(pos, actor.position));
+		move(distance2d(pos, actor.position) - dist);
 	}
-
+	
 	int goto_pp(point pos, float direct, float dist=1.5) {
 		float dist_to_pos;
-
+		
 		pos.x -= cos(direct) * dist;
 		pos.y -= sin(direct) * dist;
 		goto(pos);
 		dist_to_pos = distance2d(actor.position, pos);
-
+		
 		if (dist_to_pos > 0.1 and dist_to_pos < 10.0) {
 			goto_straight(pos, 0);  // to more precise position
 		}
-
+		
 		orient(direct);
 		return round(distance2d(actor.position, pos));
 	}
@@ -52,16 +66,20 @@ public class EBoost {
 	int goto_p(point pos, float dist=1.5) {
 		return goto_pp(pos, pos.z, dist);
 	}
-
+	
 	int goto_o(point pos, float dist=1.5) {
 		return goto_pp(pos, inverse_direction(pos), dist);
 	}
 	
+	void switch_cell() {
+		grab(InFront);    drop(Behind);
+		grab(EnergyCell); drop(InFront);
+		grab(Behind);     drop(EnergyCell);
+	}
+	
 	void switch_cell_quick() {
-		grab(EnergyCell);
-		drop(Behind);
-		grab();
-		drop(EnergyCell);
+		grab(EnergyCell); drop(Behind);
+		grab(InFront);    drop(EnergyCell);
 	}
 	
 	void switch_for(object item) {
@@ -131,10 +149,10 @@ public class EBoost {
 		if (cat == UraniumOre ) { return 30.5; }
 		return 15.5;  // Build time
 	}
-
+	
 	object _radar_wait(int[] cat, float wait_time, int angle=0, int focus=360, int min=0, int max=1024, int sens=1) {
 		object item;
-
+		
 		for (;;) {
 			item = radar(cat, angle, focus, min, max, sens);
 			
@@ -155,22 +173,22 @@ public class EBoost {
 	
 	object _radar_wait(int cat, float wait_time, int angle=0, int focus=360, int min=0, int max=1024, int sens=1) {
 		int[] cat_list;
-
+		
 		cat_list[0] = cat;
 		return _radar_wait(cat_list, wait_time, angle, focus, min, max, sens);
 	}
 	
 	object radar_wait(int cat, int angle=0, int focus=360, int min=0, int max=1024, int sens=1) {
 		int[] cat_list;
-
+		
 		cat_list[0] = cat;
 		return _radar_wait(cat_list, wait_for_cat(cat), angle, focus, min, max, sens);
 	}
-
+	
 	object radar_wait(int[] cat, int angle=0, int focus=360, int min=0, int max=1024, int sens=1) {
 		return _radar_wait(cat, 15.5, angle, focus, min, max, sens);
 	}
-
+	
 	bool _helix_helper(point pos) {
 		object item;
 		
@@ -285,7 +303,7 @@ public class EBoost {
 		}
 		
 		goto(item.position);
-		switch_cell_quick();
+		switch_cell();
 		return 0;
 	}
 	
@@ -390,11 +408,11 @@ public class EBoost {
 		if (item.category == PowerCell) {
 			return item.energyLevel;
 		}
-
+		
 		if (item.category == NuclearCell) {
 			return item.energyLevel * 10;
 		}
-
+		
 		assert(false, "_get_energy_level of non cell").id;
 		return 0;  // never executes
 	}
@@ -416,33 +434,33 @@ public class EBoost {
 		if (_get_energy_level(actor.energyCell) >= need_energy) {
 			return 0;  // Energy level is already ok
 		}
-
+		
 		if (actor.energyCell.category == PowerCell) {
 			if (go_power_station() == 0) {
 				return 0;
 			}
 		}
-
+		
 		if (can_switch_own_cell(actor.category)) {
 			if (go_switch_cell() == 0) {
 				return 0;
 			}
 		}
-
+		
 		if (actor.energyCell.category == PowerCell) {
 			if (go_power_station(PowerCaptor, 180.0) == 0) {
 				return 0;
 			}
 		}
-
+		
 		return 1;
 	}
-
+	
 	void check_energy_loop(float need_energy=0.33) {
 		bool first;
-
+		
 		first = true;
-
+		
 		for (;;) {
 			if (check_energy(need_energy) == 0) {
 				return;

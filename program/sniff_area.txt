@@ -1,45 +1,51 @@
-extern void object::SniffArea() {
-	point pos; float step, radius, angle; int total_sniffs;
+void object::sniff_cylinder(point center, float area_r, float flat_r, float half_height, int sign_x=1) {
+	int min_x, min_y, max_x, max_y, sign_y, total_sniffs; point pos; float sniff_dist;
 	EBoost e(this);
 	
-	e.orient(0);
-	angle = 0;
-	
-	radius = 2.5;    // for Derrick
-	// radius = 4.0; // for PowerPlant
-	// radius = 6.0; // for PowerStation
-	
-	step = 1.0;
-	
+	sign_y = 1;
+	min_x = round(center.x - area_r);
+	min_y = round(center.y - area_r);
+	max_x = round(center.x + area_r);
+	max_y = round(center.y + area_r);
 	total_sniffs = 0;
+	sniff_dist = 1.875;
 	
-	for (;;) {
-		e.check_energy_loop();
-		
-		pos.x = position.x + step * cos(orientation);
-		pos.y = position.y + step * sin(orientation);
-		
-		if (flatground(pos, radius) < radius) {
-			e.orient(90);
-			sniff();
-			total_sniffs++;
-			
-			pos.x = position.x + step * cos(orientation);
-			pos.y = position.y + step * sin(orientation);
-			
-			if (flatground(pos, radius) < radius) {
-				message("Complete total sniffs = " + total_sniffs);
-				return;
+	for (pos.x = round(center.x - sign_x * area_r); pos.x >= min_x and pos.x <= max_x; pos.x += sign_x) {
+		for (pos.y = round(center.y - sign_y * area_r); pos.y >= min_y and pos.y <= max_y; pos.y += sign_y) {
+			if (distance2d(pos, center) > area_r
+			        or flatground(pos, flat_r) < flat_r
+			        or abs(topo(pos) - center.z) > half_height) {
+				continue;
 			}
 			
-			move(step);
-			angle = 180 - angle;
-			e.orient(angle);
-			continue;
+			if (distance2d(e.grab_position(sniff_dist), pos) > 10) {
+				e.goto_o(pos, sniff_dist);
+			}
+			
+			if (distance2d(e.grab_position(sniff_dist), pos) > 0.25) {
+				e.goto_straight(pos, sniff_dist);
+			}
+			
+			if (distance2d(e.grab_position(sniff_dist), pos) > 0.25) {
+				e.goto_straight(pos, sniff_dist);
+			}
+			
+			if (distance2d(e.grab_position(sniff_dist), pos) > 1.0) {
+				message("goto fail", DisplayWarning);
+				continue;
+			}
+			
+			sniff();
+			total_sniffs++;
+			e.check_energy_loop();
 		}
 		
-		move(step);
-		sniff();
-		total_sniffs++;
+		sign_y *= -1;
 	}
+	
+	message("sniff_cylinder is complete, total_sniffs = " + total_sniffs);
+}
+
+extern void object::SniffArea3() {
+	sniff_cylinder(radar(PowerCaptor).position, 50.0, 2.5, 5.0, -1);
 }
