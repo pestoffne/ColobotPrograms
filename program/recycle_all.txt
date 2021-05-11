@@ -1,4 +1,4 @@
-extern void object::Recycle() {
+extern void object::RecycleAll() {
 	object item; point pos; int[] recycleble; int i, total_recycle; float angle;
 	EBoost e(this);
 	
@@ -30,13 +30,9 @@ extern void object::Recycle() {
 		
 		turn(direction(item.position));
 		
-		e.assert(energyCell.category == PowerCell and energyCell.energyLevel >= 0.25
-		      or energyCell.category == NuclearCell and energyCell.energyLevel >= 0.025,
-		      "Not enough energy(" + e.round_digits(energyCell.energyLevel, 2) + ") for recycle").id;
-		
 		if (recycle() != 0) {
-			message("Failed to recycle");
-			return;
+			message("Failed to recycle", DisplayWarning);
+			continue;
 		}
 		
 		total_recycle++;
