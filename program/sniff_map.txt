@@ -1,140 +1,16 @@
-object object::RadarBestCell(int angle=0, int focus=360, int min=0, int max=1024) {
-	object[] nuclear_cells;
-	int nuclear_max_index;
-	int nuclear_max_value;
-	object[] power_cells;
-	int power_max_index;
-	int power_max_value;
-	
-	nuclear_cells = radarall(NuclearCell, angle, focus, min, max);
-	nuclear_max_index = -1;
-	nuclear_max_value = 0;
-	
-	for (int i = 0; i < sizeof(nuclear_cells); ++i) {
-		if (nuclear_cells[i].energyLevel >= nuclear_max_value) {
-			nuclear_max_index = i;
-			nuclear_max_value = nuclear_cells[i].energyLevel;
-		}
-	}
-	
-	power_cells = radarall(PowerCell, angle, focus, min, max);
-	power_max_index = -1;
-	power_max_value = 0;
-	
-	for (int i = 0; i < sizeof(power_cells); ++i) {
-		if (power_cells[i].energyLevel >= power_max_value) {
-			power_max_index = i;
-			power_max_value = nuclear_cells[i].energyLevel;
-		}
-	}
-	
-	if (power_max_value >= 10 * nuclear_max_value) {
-		if (power_max_value == 0) {
-			return null;
-		}
-		
-		return power_cells[power_max_index];
-	}
-	
-	if (nuclear_max_value == 0) {
-		return null;
-	}
-	
-	return nuclear_cells[nuclear_max_index];
-}
-
-void object::SwitchCell() {
-	grab(InFront);
-	drop(Behind);
-	grab(EnergyCell);
-	drop(InFront);
-	grab(Behind);
-	drop(EnergyCell);
-}
-
-void object::GoSwitchCell() {
-	object item;
-	
-	if (category == Subber) {
-		return;
-	}
-	
-	item = RadarBestCell();
-	
-	if (item == null) {
-		return;
-	}
-	
-	goto(item.position);
-	SwitchCell();
-}
-
-void object::CheckEnergy() {
-	object item;
-	
-	if (energyCell.category == NuclearCell) {
-		if (energyCell.energyLevel > 0.033) {
-			return;  // There is no problem with NuclearCell energyLevel
-		}
-		
-		GoSwitchCell();
-		return;
-	}
-	
-	if (energyCell.energyLevel > 0.33) {
-		return;  // There is no problem with PowerCell energyLevel
-	}
-	
-	item = radar(PowerStation);
-	
-	if (item == null) {
-		// There is no PowerStantion
-		GoSwitchCell();
-		return;
-	}
-	
-	// Expect: there is a path to item
-	goto(item.position);
-	
-	while (energyCell.energyLevel < 1) {
-		wait(1);
-	}
-}
-
-void object::CheckShield() {
-	object item;
-	
-	if (shieldLevel >= 0.5) {
-		return;
-	}
-	
-	item = radar(RepairCenter);
-	
-	if (item == null) {
-		return;
-	}
-	
-	goto(item.position);
-	
-	while (shieldLevel < 1) {
-		wait(1);
-	}
-}
-
 extern void object::SniffMap() {
-	point pos;
-	int sign_x;
-	int sign_y;
+	point pos; int sign_x, sign_y;
+	EBoost e(this);
 	
 	sign_x = 1;
 	sign_y = 1;
 	
 	for (pos.y = -sign_y * 350; abs(pos.y) <= 350; pos.y += sign_y * 50) {
 		for (pos.x = -sign_x * 350; abs(pos.x) <= 350; pos.x += sign_x * 50) {
-			goto(flatspace(pos, 2.5, 0, 50));
+			e.goto_o(flatspace(pos, 2.5, 0, 50));
 			sniff();
-			CheckEnergy();
-			CheckShield();
+			e.check_energy_loop();
+			e.check_shield();
 		}
 		
 		sign_x *= -1;
