@@ -1,5 +1,5 @@
 extern void object::CollectTitanium() {
-	object item; point pos;
+	object item;
 	EBoost e(this);
 	
 	for (;;) {
@@ -38,12 +38,7 @@ extern void object::CollectTitanium() {
 			e.drop_to_helix(item.position);
 		}
 		
-		pos = position;
-		e.check_energy(0.25);
+		e.check_energy_loop(0.50);
 		e.check_shield(0.50);
-		
-		if (distance2d(position, pos) > 10.0) {
-			goto(pos);
-		}
 	}
 }
