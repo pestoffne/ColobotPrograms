@@ -1,12 +1,16 @@
 extern void object::MakePowerCells() {
 	object item;
+	EBoost e(this);
 	
 	for (;;) {
-		item = radar(Titanium);
+		e.check_energy_loop(0.5);
+		e.check_shield();
+
+		item = e.radar_wait(Titanium);
 		goto(item.position);
 		grab();
 		
-		item = radar(PowerPlant);
+		item = e.radar_wait(PowerPlant);
 		goto(item.position);
 		drop();
 		
@@ -22,7 +26,7 @@ extern void object::MakePowerCells() {
 			goto(space(position));
 			drop();
 		} else {
-			helix(item.position);
+			e.drop_to_helix(item.position);
 		}
 	}
 }
