@@ -25,7 +25,7 @@ extern void object::CollectTitanium() {
 		drop();
 		move(-2.5);
 		
-		item = e.radar_wait(Titanium, 0, 15, 0, 7);
+		item = e.radar_wait(Titanium, 0, 30, 0, 10);
 		goto(item.position);
 		grab();
 		
