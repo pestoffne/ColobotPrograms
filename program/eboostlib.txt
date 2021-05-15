@@ -476,6 +476,62 @@ public class EBoost {
 	}
 }
 
+public class Message {
+	static int max_message_capacity = 80;
+	static int max_messages_count = 4;
+	static string input_separator = " ";
+	static string output_separator = " ";
+	
+	private string buffer = "";
+	
+	void add(string text) {
+		buffer += text;
+	}
+	
+	void show() {
+		string message_buffer; int space_index;
+		
+		if (strlen(buffer) > max_messages_count * max_message_capacity) {
+			message("Message too long " + strlen(buffer), DisplayError);
+			return;
+		}
+		
+		for (int i = max_messages_count - 1; i >= 0; --i) {
+			message_buffer = "";
+			
+			for (int j = 0; j < 10; ++j) {
+				space_index = strfind(buffer, input_separator);
+				
+				if (space_index == nan) {
+					// last word in buffer
+					message_buffer += buffer;
+					buffer = "";
+					break;
+				}
+				
+				if (strlen(message_buffer) + space_index > max_message_capacity) {
+					break;
+				}
+				
+				if (strlen(message_buffer) > 0) {
+					message_buffer += output_separator;
+				}
+				
+				message_buffer += strleft(buffer, space_index);
+				buffer = strright(buffer, strlen(buffer) - space_index - 1);
+			}
+			
+			message(message_buffer);
+			
+			if (strlen(buffer) == 0) {
+				return;
+			}
+		}
+		
+		message("Fail to split message. Too long " + strlen(buffer), DisplayError);
+	}
+}
+
 extern void object::EBoostLib() {
 	EBoost e(this);
 	//// Unit Tests
