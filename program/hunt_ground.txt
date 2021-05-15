@@ -1,49 +1,104 @@
 float object::AbsMin(float a, float b) {
 	if (abs(a) < abs(b)) {
 		return a;
-	} else {
-		return b;
 	}
+	
+	return b;
 }
 
 extern void object::HuntGround() {
-	object item;
+	object item; point pos; float t, ay, bx, by, angle; bool can_aim, stay;
 	
-	int aliens[4];
+	int aliens[];
 	aliens[0] = AlienAnt;
 	aliens[1] = AlienSpider;
 	aliens[2] = AlienWasp;
-	aliens[3] = AlienEgg;
+	aliens[3] = AlienWorm;
+	aliens[4] = AlienEgg;
+	
+	stay = false;
 	
 	for (int tick = 0;; ++tick) {
+		item = radar(aliens);
+		
+		if (item == null) {
+			motor(0, 0);
+			wait(1);
+			continue;
+		}
+		
+		if (not stay) {
+			motor(1, 1);
+		}
+		
+		wait(0.2);
 		
 		item = radar(aliens);
 		
 		if (item == null) {
-			break;
+			continue;
 		}
 		
-		turn(direction(item.position));
+		t = distance(item.position, position) / 100;
+		pos.x = item.position.x + item.velocity.x * t;
+		pos.y = item.position.y + item.velocity.y * t;
+		pos.z = item.position.z;
+		angle = direction(pos);
+		
+		if (abs(angle) > 1) {
+			turn(angle);
+		}
+		
 		item = radar(aliens, 0, 360, 0, 40);
 		
-		if (item != null) {
-			float ay = atan((item.position.z - position.z - 1.5) / distance2d(item.position, position))
-			            - AbsMin(pitch, pitch - 360);
-			float bx = ay * sin(roll);
-			float by = ay * cos(roll);
-			bool can_aim = bx >= -45 and bx <= 45 and by >= -20 and by <= 20;
-			
-			if (can_aim) {
-				aim(by, bx);
-				fire(0.07);
-				
-				motor(1, 1);
-				wait(0.63);
-			}
+		if (item == null) {
+			continue;
 		}
 		
-		motor(1, 1);
-		wait(0.2);
+		ay = atan((pos.z - position.z - 1.5) / distance2d(pos, position))
+		            - AbsMin(pitch, pitch - 360);
+		bx = ay * sin(roll);
+		by = ay * cos(roll);
+		aim(by, bx);
+		
+		item = radar(aliens, 0, 360, 0, 40);
+		
+		if (item == null) {
+			continue;
+		}
+		
+		t = distance(item.position, position) / 100;
+		pos.x = item.position.x + item.velocity.x * t;
+		pos.y = item.position.y + item.velocity.y * t;
+		pos.z = item.position.z;
+		angle = direction(pos);
+		
+		if (abs(angle) > 1) {
+			turn(angle);
+		}
+		
+		item = radar(aliens, 0, 360, 0, 40);
+		
+		if (item == null) {
+			continue;
+		}
+		
+		ay = atan((pos.z - position.z - 1.5) / distance2d(pos, position))
+		            - AbsMin(pitch, pitch - 360);
+		bx = ay * sin(roll);
+		by = ay * cos(roll);
+		aim(by, bx);
+		
+		can_aim = bx >= -45 and bx <= 45 and by >= -20 and by <= 20;
+		if (can_aim) {
+			fire(0.07);
+			
+			if (not stay) {
+				motor(1, 1);
+			}
+			
+			wait(0.63);
+		}
 	}
 	
 	message("Hunt is complete");
