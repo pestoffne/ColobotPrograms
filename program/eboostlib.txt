@@ -32,18 +32,13 @@ public class RadarArgs {
 	}
 }
 
-public class Globals {
-	static string logfile = "common_logs.txt";
-}
-
 public class EBoost {
 	object actor;
-	Globals g;
+	static string logfile = "common_logs.txt";
 	
 	void EBoost(object actor) {
 		this.actor = actor;
 		errmode(0);
-		g = new Globals();
 	}
 	
 	object assert(bool value, string text="assertion error") {
@@ -55,178 +50,92 @@ public class EBoost {
 		return null;
 	}
 	
-	float normalize_angle(float angle) {
-		return angle - 360 * round(angle / 360);
+	bool can_switch_own_cell(int cat) {
+		return cat == WheeledGrabber
+		    or cat == TrackedGrabber
+		    or cat == WingedGrabber
+		    or cat == LeggedGrabber;
 	}
 	
-	void orient(float direct) {
-		turn(normalize_angle(direct - actor.orientation));
-	}
-	
-	float inverse_direction(point pos) {
-		// TODO: it is possible to do it without if statement
-		
-		if (actor.position.y > pos.y) {
-			return 270 - atan((pos.x - actor.position.x) / (pos.y - actor.position.y));
+	float _get_energy_level(object item) {
+		if (item.category == PowerCell) {
+			return item.energyLevel;
 		}
 		
-		return 90 - atan((pos.x - actor.position.x) / (pos.y - actor.position.y));
-	}
-	
-	point grab_position(float dist=1.5) {
-		point pos;
-		
-		pos.x = actor.position.x + cos(actor.orientation) * dist;
-		pos.y = actor.position.y + sin(actor.orientation) * dist;
-		return pos;
-	}
-	
-	point fire_position(object item) {
-		point pos;
-		
-		pos = item.position;
-		
-		if (item.category == PowerStation or item.category == Converter) {
-			pos.x -= cos(item.orientation) * 2.5;
-			pos.y -= sin(item.orientation) * 2.5;
+		if (item.category == NuclearCell) {
+			return item.energyLevel * 10;
 		}
 		
-		return pos;
+		assert(false, "_get_energy_level of non cell").id;
+		return 0;  // never executes
 	}
 	
-	float get_height(int cat) {
-		float h;
+	int check_energy(float need_energy=0.33) {
+		// Charge methods priorities
+		// 1) Goto PowerStation [only PowerCell]
+		// 2) Goto switch cell  [only Grabbers]
+		// 3) Goto PowerCaptor  [only PowerCell]
+		// 4) Ask for help
+		object item;
 		
-		if (cat == Derrick) { h = 35;
-		} else if (cat == BotFactory) { h = 28;
-		} else if (cat == RepairCenter) { h = 30;
-		} else if (cat == PowerStation) { h = 13;
-		} else if (cat == Converter) { h = 20;
-		} else if (cat == DefenseTower) { h = 30;
-		} else if (cat == ResearchCenter) { h = 22;
-		} else if (cat == RadarStation) { h = 19;
-		} else if (cat == PowerPlant) { h = 20;
-		} else if (cat == AutoLab) { h = 16;
-		} else if (cat == NuclearPlant) { h = 40;
-		} else if (cat == ExchangePost) { h = 19;
-		} else {
-			return 1.5;  // Assume it is Bot
+		if (actor.energyCell == null
+		            or actor.energyCell.category != PowerCell
+		           and actor.energyCell.category != NuclearCell) {
+			return 1;
 		}
 		
-		return h * 0.25;
-	}
-	
-	void goto_straight(point pos, float dist=1.5) {
-		turn(direction(pos));
-		move(distance2d(pos, actor.position) - dist);
-	}
-	
-	int goto_pp(point pos, float direct, float dist=1.5) {
-		float dist_to_pos;
-		
-		pos.x -= cos(direct) * dist;
-		pos.y -= sin(direct) * dist;
-		goto(pos);
-		dist_to_pos = distance2d(actor.position, pos);
-		
-		if (dist_to_pos > 0.1 and dist_to_pos < 10.0) {
-			goto_straight(pos, 0);  // to more precise position
+		if (_get_energy_level(actor.energyCell) >= need_energy) {
+			return 0;  // Energy level is already ok
 		}
 		
-		orient(direct);
-		return round(distance2d(actor.position, pos));
-	}
-	
-	int goto_p(point pos, float dist=1.5) {
-		return goto_pp(pos, pos.z, dist);
-	}
-	
-	int goto_o(point pos, float dist=1.5) {
-		return goto_pp(pos, inverse_direction(pos), dist);
-	}
-	
-	void _drop_out() {
-		point pos;
-		
-		pos = actor.position;
-		pos.z = actor.orientation;
-		goto(space(actor.position, 3));
-		drop();
-		goto_p(pos);
-	}
-	
-	// return 0 OK
-	//        1 there is not item to grab
-	int grab_from_ground(int cat, int oper=InFront, float min_energy=0, float max_energy=1) {
-		        float max_wait; RadarArgs radar_args;
-		
-		for (int retries = 3; retries >= 0; --retries) {
-			if (actor.load.category == cat and actor.load.energyLevel >= min_energy and actor.load.energyLevel <= max_energy) {
-				log("warning grab_from_ground needed item is already loaded before grab");
+		if (actor.energyCell.category == PowerCell) {
+			if (go_power_station() == 0) {
 				return 0;
 			}
-			
-			log("warning grab_from_ground another item is already loaded before grab");
-			_drop_out();
 		}
 		
-		radar_args = new RadarArgs(cat, 0, 30, 0, 6);
-		
-		if (oper == Behind) {
-			radar_args.angle = 180;
+		if (can_switch_own_cell(actor.category)) {
+			if (go_switch_cell() == 0) {
+				return 0;
+			}
 		}
 		
-		for (int retries = 3; retries >= 0; --retries) {
-			if (radar_wait(radar_args) == null) {
-				log("warning grab_from_ground can not find expected object in front -- timeout expired");
-				return 1;
+		if (actor.energyCell.category == PowerCell) {
+			if (go_power_station(PowerCaptor, 180.0) == 0) {
+				return 0;
 			}
-			
-			grab(oper);
-			
-			if (actor.load == null) {
-				wait(0.5);
-				continue;
-			} else {
-				if (actor.load.category == cat and actor.load.energyLevel >= min_energy and actor.load.energyLevel <= max_energy) {
-					return 0;
-				}
-			}
-			
-			log("warning grab_from_ground another item is loaded after grab");
-			_drop_out();
 		}
 		
 		return 1;
 	}
 	
-	void switch_cell() {
-		grab(InFront);    drop(Behind);
-		grab(EnergyCell); drop(InFront);
-		grab(Behind);     drop(EnergyCell);
+	void check_energy_loop(float need_energy=0.33) {
+		bool first;
+		
+		first = true;
+		
+		for (;;) {
+			if (check_energy(need_energy) == 0) {
+				return;
+			}
+			
+			if (first) {
+				message("I need help with charge", DisplayWarning);
+			}
+			
+			wait(1);
+			first = false;
+		}
 	}
 	
-	void switch_cell_quick() {
-		if (actor.load != null) {
-			drop();
+	int check_shield(float need_shield=0.5) {
+		object item;
+		
+		if (actor.shieldLevel >= need_shield) {
+			return 0;
 		}
 		
-		grab(EnergyCell); drop(Behind);
-		grab(InFront);    drop(EnergyCell);
-	}
-	
-	void switch_for(object item) {
-		assert(actor.load != null).id;
-		assert(item.energyCell != null).id;
-		
-		turn(direction(item.position));
-		drop(Behind);
-		grab();
-		turn(-90);
-		drop();
-		turn(90);
-		grab(Behind);
-		drop();
+		return go_repair();
 	}
 	
 	void dock_to_ship() {
@@ -261,76 +170,6 @@ public class EBoost {
 				}
 			}
 		}
-	}
-	
-	float random(float min, float max) {
-		return rand() * (max - min) + min;
-	}
-	
-	float round_digits(float value, int digits) {
-		int a = pow(10, digits);
-		return round(value * a) / a;
-	}
-	
-	void log(string text) {
-		file handler = new file();
-		handler.open(g.logfile, "a");
-		handler.writeln(round_digits(abstime(), 1) + " " + actor.id + " " + text);
-		handler.close();
-	}
-	
-	float wait_for_cat(int cat) {
-		if (cat == Titanium   ) { return 15.5; }
-		if (cat == TitaniumOre) { return 10.5; }
-		if (cat == PowerCell  ) { return 12.5; }
-		if (cat == UraniumOre ) { return 30.5; }
-		return 15.5;  // Build time
-	}
-	
-	int[] to_list(int cat) {
-		int[] cat_list;
-		
-		cat_list[0] = cat;
-		return cat_list;
-	}
-	
-	object radar_wait(RadarArgs a, float wait_time=nan) {
-		object item;
-		
-		if (wait_time == nan) {
-			wait_time = wait_for_cat(a.cat[0]);
-		}
-		
-		for (;;) {
-			item = radar(a.cat, a.angle, a.focus, a.min, a.max, a.sens, a.filter);
-			
-			if (item != null) {
-				break;
-			}
-			
-			if (wait_time <= 0) {
-				return null;
-			}
-			
-			wait_time -= 0.1;
-			wait(0.1);
-		}
-		
-		return item;
-	}
-	
-	bool _helix_helper(point pos) {
-		object item;
-		
-		item = search(Any, pos, 0, 1.7);
-		
-		if (item != null) {
-			return false;
-		}
-		
-		goto_p(pos);
-		drop();
-		return true;
 	}
 	
 	void drop_to_helix(point p) {
@@ -371,70 +210,39 @@ public class EBoost {
 		}
 	}
 	
-	object radar_best_cell(int angle=0, int focus=360, int min=0, int max=1024) {
-		object[] nuclear_cells; int nuclear_max_index; float nuclear_max_value;
-		object[] power_cells; int power_max_index; float power_max_value;
+	point fire_position(object item) {
+		point pos;
 		
-		nuclear_cells = radarall(NuclearCell, angle, focus, min, max);
-		nuclear_max_index = -1;
-		nuclear_max_value = 0;
+		pos = item.position;
 		
-		for (int i = 0; i < sizeof(nuclear_cells); ++i) {
-			if (nuclear_cells[i].energyLevel >= nuclear_max_value) {
-				nuclear_max_index = i;
-				nuclear_max_value = nuclear_cells[i].energyLevel;
-			}
+		if (item.category == PowerStation or item.category == Converter) {
+			pos.x -= cos(item.orientation) * 2.5;
+			pos.y -= sin(item.orientation) * 2.5;
 		}
 		
-		power_cells = radarall(PowerCell, angle, focus, min, max);
-		power_max_index = -1;
-		power_max_value = 0;
-		
-		for (int i = 0; i < sizeof(power_cells); ++i) {
-			if (power_cells[i].energyLevel >= power_max_value) {
-				power_max_index = i;
-				power_max_value = power_cells[i].energyLevel;
-			}
-		}
-		
-		if (power_max_value >= 10 * nuclear_max_value) {
-			if (power_max_value == 0) {
-				return null;
-			}
-			
-			return power_cells[power_max_index];
-		}
-		
-		if (nuclear_max_value == 0) {
-			return null;
-		}
-		
-		return nuclear_cells[nuclear_max_index];
+		return pos;
 	}
 	
-	bool can_switch_own_cell(int cat) {
-		return cat == WheeledGrabber
-		    or cat == TrackedGrabber
-		    or cat == WingedGrabber
-		    or cat == LeggedGrabber;
-	}
-	
-	int go_switch_cell() {
-		object item;
+	float get_height(int cat) {
+		float h;
 		
-		if (not can_switch_own_cell(actor.category)) {
-			return 1;
+		if (cat == Derrick) { h = 35;
+		} else if (cat == BotFactory) { h = 28;
+		} else if (cat == RepairCenter) { h = 30;
+		} else if (cat == PowerStation) { h = 13;
+		} else if (cat == Converter) { h = 20;
+		} else if (cat == DefenseTower) { h = 30;
+		} else if (cat == ResearchCenter) { h = 22;
+		} else if (cat == RadarStation) { h = 19;
+		} else if (cat == PowerPlant) { h = 20;
+		} else if (cat == AutoLab) { h = 16;
+		} else if (cat == NuclearPlant) { h = 40;
+		} else if (cat == ExchangePost) { h = 19;
+		} else {
+			return 1.5;  // Assume it is Bot
 		}
 		
-		item = radar_best_cell(0, 360, 0, 50);
-		
-		if (item == null) {
-			return 1;
-		}
-		
-		goto(item.position);
-		switch_cell();
-		return 0;
+		return h * 0.25;
 	}
 	
 	// return 0 -- PowerCell was recharged
@@ -524,86 +332,284 @@ public class EBoost {
 		return 1;  // never executes
 	}
 	
-	int check_shield(float need_shield=0.5) {
+	int go_switch_cell() {
 		object item;
 		
-		if (actor.shieldLevel >= need_shield) {
-			return 0;
-		}
-		
-		return go_repair();
-	}
-	
-	float _get_energy_level(object item) {
-		if (item.category == PowerCell) {
-			return item.energyLevel;
-		}
-		
-		if (item.category == NuclearCell) {
-			return item.energyLevel * 10;
-		}
-		
-		assert(false, "_get_energy_level of non cell").id;
-		return 0;  // never executes
-	}
-	
-	int check_energy(float need_energy=0.33) {
-		// Charge methods priorities
-		// 1) Goto PowerStation [only PowerCell]
-		// 2) Goto switch cell  [only Grabbers]
-		// 3) Goto PowerCaptor  [only PowerCell]
-		// 4) Ask for help
-		object item;
-		
-		if (actor.energyCell == null
-		            or actor.energyCell.category != PowerCell
-		           and actor.energyCell.category != NuclearCell) {
+		if (not can_switch_own_cell(actor.category)) {
 			return 1;
 		}
 		
-		if (_get_energy_level(actor.energyCell) >= need_energy) {
-			return 0;  // Energy level is already ok
+		item = radar_best_cell(0, 360, 0, 50);
+		
+		if (item == null) {
+			return 1;
 		}
 		
-		if (actor.energyCell.category == PowerCell) {
-			if (go_power_station() == 0) {
-				return 0;
-			}
+		goto(item.position);
+		switch_cell();
+		return 0;
+	}
+	
+	int goto_o(point pos, float dist=1.5) {
+		return goto_pp(pos, inverse_direction(pos), dist);
+	}
+	
+	int goto_p(point pos, float dist=1.5) {
+		return goto_pp(pos, pos.z, dist);
+	}
+	
+	int goto_pp(point pos, float direct, float dist=1.5) {
+		float dist_to_pos;
+		
+		pos.x -= cos(direct) * dist;
+		pos.y -= sin(direct) * dist;
+		goto(pos);
+		dist_to_pos = distance2d(actor.position, pos);
+		
+		if (dist_to_pos > 0.1 and dist_to_pos < 10.0) {
+			goto_straight(pos, 0);  // to more precise position
 		}
 		
-		if (can_switch_own_cell(actor.category)) {
-			if (go_switch_cell() == 0) {
+		orient(direct);
+		return round(distance2d(actor.position, pos));
+	}
+	
+	void goto_straight(point pos, float dist=1.5) {
+		turn(direction(pos));
+		move(distance2d(pos, actor.position) - dist);
+	}
+	
+	void _drop_out() {
+		point pos;
+		
+		pos = actor.position;
+		pos.z = actor.orientation;
+		goto(space(actor.position, 3));
+		drop();
+		goto_p(pos);
+	}
+	
+	// return 0 OK
+	//        1 there is not item to grab
+	int grab_from_ground(int cat, int oper=InFront, float min_energy=0, float max_energy=1) {
+		        float max_wait; RadarArgs radar_args;
+		
+		for (int retries = 3; retries >= 0; --retries) {
+			if (actor.load.category == cat and actor.load.energyLevel >= min_energy and actor.load.energyLevel <= max_energy) {
+				log("warning grab_from_ground needed item is already loaded before grab");
 				return 0;
 			}
+			
+			log("warning grab_from_ground another item is already loaded before grab");
+			_drop_out();
 		}
 		
-		if (actor.energyCell.category == PowerCell) {
-			if (go_power_station(PowerCaptor, 180.0) == 0) {
-				return 0;
+		radar_args = new RadarArgs(cat, 0, 30, 0, 6);
+		
+		if (oper == Behind) {
+			radar_args.angle = 180;
+		}
+		
+		for (int retries = 3; retries >= 0; --retries) {
+			if (radar_wait(radar_args) == null) {
+				log("warning grab_from_ground can not find expected object in front -- timeout expired");
+				return 1;
 			}
+			
+			grab(oper);
+			
+			if (actor.load == null) {
+				wait(0.5);
+				continue;
+			} else {
+				if (actor.load.category == cat and actor.load.energyLevel >= min_energy and actor.load.energyLevel <= max_energy) {
+					return 0;
+				}
+			}
+			
+			log("warning grab_from_ground another item is loaded after grab");
+			_drop_out();
 		}
 		
 		return 1;
 	}
 	
-	void check_energy_loop(float need_energy=0.33) {
-		bool first;
+	point grab_position(float dist=1.5) {
+		point pos;
 		
-		first = true;
+		pos.x = actor.position.x + cos(actor.orientation) * dist;
+		pos.y = actor.position.y + sin(actor.orientation) * dist;
+		return pos;
+	}
+	
+	float inverse_direction(point pos) {
+		// TODO: it is possible to do it without if statement
+		
+		if (actor.position.y > pos.y) {
+			return 270 - atan((pos.x - actor.position.x) / (pos.y - actor.position.y));
+		}
+		
+		return 90 - atan((pos.x - actor.position.x) / (pos.y - actor.position.y));
+	}
+	
+	void log(string text) {
+		file handler = new file();
+		handler.open(logfile, "a");
+		handler.writeln(round_digits(abstime(), 1) + " " + actor.id + " " + text);
+		handler.close();
+	}
+	
+	float normalize_angle(float angle) {
+		return angle - 360 * round(angle / 360);
+	}
+	
+	void orient(float direct) {
+		turn(normalize_angle(direct - actor.orientation));
+	}
+	
+	object radar_best_cell(int angle=0, int focus=360, int min=0, int max=1024) {
+		object[] nuclear_cells; int nuclear_max_index; float nuclear_max_value;
+		object[] power_cells; int power_max_index; float power_max_value;
+		
+		nuclear_cells = radarall(NuclearCell, angle, focus, min, max);
+		nuclear_max_index = -1;
+		nuclear_max_value = 0;
+		
+		for (int i = 0; i < sizeof(nuclear_cells); ++i) {
+			if (nuclear_cells[i].energyLevel >= nuclear_max_value) {
+				nuclear_max_index = i;
+				nuclear_max_value = nuclear_cells[i].energyLevel;
+			}
+		}
+		
+		power_cells = radarall(PowerCell, angle, focus, min, max);
+		power_max_index = -1;
+		power_max_value = 0;
+		
+		for (int i = 0; i < sizeof(power_cells); ++i) {
+			if (power_cells[i].energyLevel >= power_max_value) {
+				power_max_index = i;
+				power_max_value = power_cells[i].energyLevel;
+			}
+		}
+		
+		if (power_max_value >= 10 * nuclear_max_value) {
+			if (power_max_value == 0) {
+				return null;
+			}
+			
+			return power_cells[power_max_index];
+		}
+		
+		if (nuclear_max_value == 0) {
+			return null;
+		}
+		
+		return nuclear_cells[nuclear_max_index];
+	}
+	
+	object radar_wait(RadarArgs a, float wait_time=nan) {
+		object item;
+		
+		if (wait_time == nan) {
+			wait_time = wait_for_cat(a.cat[0]);
+		}
 		
 		for (;;) {
-			if (check_energy(need_energy) == 0) {
-				return;
+			item = radar(a.cat, a.angle, a.focus, a.min, a.max, a.sens, a.filter);
+			
+			if (item != null) {
+				break;
 			}
 			
-			if (first) {
-				message("I need help with charge", DisplayWarning);
+			if (wait_time <= 0) {
+				return null;
 			}
 			
-			wait(1);
-			first = false;
+			wait_time -= 0.1;
+			wait(0.1);
 		}
+		
+		return item;
 	}
+	
+
+	void switch_cell() {
+		grab(InFront);    drop(Behind);
+		grab(EnergyCell); drop(InFront);
+		grab(Behind);     drop(EnergyCell);
+	}
+	
+	void switch_cell_quick() {
+		if (actor.load != null) {
+			drop();
+		}
+		
+		grab(EnergyCell); drop(Behind);
+		grab(InFront);    drop(EnergyCell);
+	}
+	
+	void switch_for(object item) {
+		assert(actor.load != null).id;
+		assert(item.energyCell != null).id;
+		
+		turn(direction(item.position));
+		drop(Behind);
+		grab();
+		turn(-90);
+		drop();
+		turn(90);
+		grab(Behind);
+		drop();
+	}
+	
+	float random(float min, float max) {
+		return rand() * (max - min) + min;
+	}
+	
+	float round_digits(float value, int digits) {
+		int a = pow(10, digits);
+		return round(value * a) / a;
+	}
+	
+	int[] to_list(int cat) {
+		int[] cat_list;
+		
+		cat_list[0] = cat;
+		return cat_list;
+	}
+	
+	bool _helix_helper(point pos) {
+		object item;
+		
+		item = search(Any, pos, 0, 1.7);
+		
+		if (item != null) {
+			return false;
+		}
+		
+		goto_p(pos);
+		drop();
+		return true;
+	}
+	
+	point team_transform(point p) {
+		if (actor.team == 2) {
+			p.x *= -1;
+			p.y *= -1;
+			p.z = 180 + p.z
+		}
+		
+		return p;
+	}
+	
+	float wait_for_cat(int cat) {
+		if (cat == Titanium   ) { return 15.5; }
+		if (cat == TitaniumOre) { return 10.5; }
+		if (cat == PowerCell  ) { return 12.5; }
+		if (cat == UraniumOre ) { return 30.5; }
+		return 15.5;  // Build time
+	}	
 }
 
 public class Message {
