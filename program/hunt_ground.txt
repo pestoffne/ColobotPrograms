@@ -6,15 +6,42 @@ float object::AbsMin(float a, float b) {
 	return b;
 }
 
-extern void object::HuntGround() {
-	object item; point pos; float t, ay, bx, by, angle; bool can_aim, stay;
+// TODO: divide by 0 is forbidden
+// TODO: nan velocity
+bool object::check_shoot_relief(point p1, point p2) {
+	float orient_, pitch_, distance2d_; point pm; int i;
 	
-	int aliens[];
-	aliens[0] = AlienAnt;
-	aliens[1] = AlienSpider;
-	aliens[2] = AlienWasp;
-	aliens[3] = AlienWorm;
-	aliens[4] = AlienEgg;
+	orient_ = atan((p1.y - p2.y) / (p1.x - p2.x));
+	
+	if (p1.x > p2.x) {
+		orient_ += 180;
+	}
+	
+	distance2d_ = distance2d(p1, p2);
+	pitch_ = atan((p2.z - p1.z) / distance2d_);
+	
+	for (i = 1; i < distance2d_; ++i) {
+		pm.x = p1.x - i * cos(orient_);
+		pm.y = p1.y - i * sin(orient_);
+		pm.z = p1.z - i * cos(pitch_);
+		message("i = " + i + " point(" +pm.x + ", " + pm.y + ", " + pm.z + "); topo = " + topo(pm));
+		
+		if (topo(pm) > pm.z) {
+			return false;
+		}
+	}
+	
+	return true;
+}
+
+extern void object::HuntGround() {
+	object item; point pos; float t, ay, bx, by, angle; bool can_aim, stay; int i; int aliens[];
+	
+	i = 0;
+	aliens[i++] = AlienAnt;
+	aliens[i++] = AlienSpider;
+	aliens[i++] = AlienWasp;
+	aliens[i++] = AlienWorm;
 	
 	stay = false;
 	
@@ -89,9 +116,13 @@ extern void object::HuntGround() {
 		by = ay * cos(roll);
 		aim(by, bx);
 		
+		//pos = position;
+		//pos.z += 1.5;
+		//message("" + check_shoot_relief(pos, item.position));
+		
 		can_aim = bx >= -45 and bx <= 45 and by >= -20 and by <= 20;
 		if (can_aim) {
-			fire(0.07);
+			//fire(0.07);
 			
 			if (not stay) {
 				motor(1, 1);
