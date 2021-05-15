@@ -38,7 +38,7 @@ extern void object::ServeNewBot() {
 	start = position;
 	
 	// 1) Grab Titanium
-	if (load == null or load.category == Titanium) {
+	if (load == null or load.category != Titanium) {
 		items = radarall(Titanium);
 		if (items == null) {
 			message("Unable to find Titanium", DisplayError);
