@@ -10,6 +10,10 @@ public class CodeBattleBoost extends EBoost {
 	}
 	
 	bool same_river_side(object item) {
+		if (item == null or item.position.y == nan) {
+			return false;
+		}
+		
 		return item.position.y * actor.position.y > 0;
 	}
 	
@@ -104,7 +108,8 @@ public class Goal {
 		cb.assert(cb.is_structure(cat)).id;
 		
 		item = radar(cat);
-		return item != null and cb.same_river_side(item) and not item.busy() and not cb.is_blocked(item);
+		//return item != null and cb.same_river_side(item) and not item.busy() and not cb.is_blocked(item);
+		return item != null and cb.same_river_side(item);
 	}
 }
 
@@ -215,7 +220,7 @@ public class GoalPowerPlant extends GoalStructure {
 	
 	public bool check_prerequirements() {
 		return super.check_prerequirements()
-		and _add_goal(_required_structure(Converter), new GoalStructure(Converter));
+		and _add_goal(_required_structure(Converter), new GoalConverter());
 	}
 	
 	public string to_str() {
@@ -225,35 +230,64 @@ public class GoalPowerPlant extends GoalStructure {
 
 public class TaskList {
 	static CodeBattleBoost cb;
-	private Goal[] task_list_;
-	private int task_index_ = 0;
+	Goal[] task_list_;
+	int task_index_ = 0;
 	private object exit_ = null;
+	
+	public void log_task_list() {
+		file handler; int i;
+		
+		handler = new file();
+		handler.open(cb.logfile, "a");
+		
+		for (i = 0; i < sizeof(task_list_); ++i) {
+			handler.writeln(i + " " + task_list_[i]);
+		}
+		
+		handler.close();
+		
+		/*for (int i = 0; i < sizeof(task_list_); ++i) {
+			cb.log(i + " " + task_list_[i]);
+		}*/
+	}
 	
 	public void push_uniq(Goal goal) {
 		int i;
 		
 		if (task_index_ > 30) {
 			cb.log("Task list is overflow. Exit program");
+			log_task_list();
 			exit_.id;
 		}
 		
-		for (i = 1; i < task_index_ and not task_list_[i - 1].equals(goal); ++i) { }
+		for (i = 1;; ++i) {
+			if (i >= task_index_) {
+				cb.log("push_uniq " + task_index_ + " " + goal.to_str());
+				task_list_[task_index_++] = goal;
+				return;
+			}
+			
+			if (task_list_[i - 1].equals(goal)) {
+				break;
+			}
+		}
 		
 		for (;i < task_index_; ++i) {
 			task_list_[i - 1] = task_list_[i];
 		}
 		
-		cb.log("push " + goal.to_str());
-		task_list_[task_index_++] = goal;
+		cb.log("push_uniq " + (task_index_ - 1) + " " + goal.to_str());
+		task_list_[task_index_ - 1] = goal;
 	}
 	
 	public void push(Goal goal) {
 		if (task_index_ > 30) {
 			cb.log("Task list is overflow. Exit program");
+			log_task_list();
 			exit_.id;
 		}
 		
-		cb.log("push " + goal.to_str());
+		cb.log("push " + task_index_ + goal.to_str());
 		task_list_[task_index_++] = goal;
 	}
 	
@@ -271,6 +305,12 @@ public class TaskList {
 		}
 		
 		return task_list_[task_index_ - 1];
+	}
+	
+	public Goal take(int index) {
+		for (int i = index + 1; i < sizeof(task_list_); ++i) {
+			
+		}
 	}
 	
 	public void solve() {
