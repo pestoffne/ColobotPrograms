@@ -41,20 +41,36 @@ public class EBoost {
 		errmode(0);
 	}
 	
+	int another_team() {
+		return 3 - actor.team;
+	}
+	
 	object assert(bool value, string text="assertion error") {
 		if (value) {
-			return actor;
+			return retobject(0);
 		}
 		
 		message(text, DisplayError);
 		return null;
 	}
 	
+	bool can_load(int cat) {
+		return false
+		or cat == WheeledGrabber
+		or cat == TrackedGrabber
+		or cat == WingedGrabber
+		or cat == LeggedGrabber
+		or cat == Subber
+		or cat == Me
+		or cat == AlienWasp;
+	}
+	
 	bool can_switch_own_cell(int cat) {
-		return cat == WheeledGrabber
-		    or cat == TrackedGrabber
-		    or cat == WingedGrabber
-		    or cat == LeggedGrabber;
+		return false
+		or cat == WheeledGrabber
+		or cat == TrackedGrabber
+		or cat == WingedGrabber
+		or cat == LeggedGrabber;
 	}
 	
 	float _get_energy_level(object item) {
@@ -136,6 +152,16 @@ public class EBoost {
 		}
 		
 		return go_repair();
+	}
+	
+	bool contains(int[] list, int value) {
+		for (int i = 0; i < sizeof(list); ++i) {
+			if (list[i] == value) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	void dock_to_ship() {
@@ -350,6 +376,13 @@ public class EBoost {
 		return 0;
 	}
 	
+	int goto_grab(int cat) {  // TODO: grab from slots
+		return 0 +
+		goto_radar_item_position(new RadarArgs(cat), true, false, false) +
+		//goto_radar_position(new RadarArgs(cat)) +
+		grab_from_ground(cat);
+	}
+	
 	int goto_o(point pos, float dist=1.5) {
 		return goto_pp(pos, inverse_direction(pos), dist);
 	}
@@ -374,6 +407,30 @@ public class EBoost {
 		return round(distance2d(actor.position, pos));
 	}
 	
+	int goto_radar_item_position(RadarArgs a, bool grab_ground=true, bool grab_slots=true, bool grab_load=false) {
+		object item;
+		
+		item = radar_item(a, grab_ground, grab_slots, grab_load);
+		
+		if (item == null) {
+			return 1;
+		}
+		
+		return goto(item.position);
+	}
+	
+	int goto_radar_position(RadarArgs a) {
+		object item;
+		
+		item = radar_(a);
+		
+		if (item == null) {
+			return 1;
+		}
+		
+		return goto(item.position);
+	}
+	
 	void goto_straight(point pos, float dist=1.5) {
 		turn(direction(pos));
 		move(distance2d(pos, actor.position) - dist);
@@ -389,13 +446,16 @@ public class EBoost {
 		goto_p(pos);
 	}
 	
-	// return 0 OK
-	//        1 there is not item to grab
 	int grab_from_ground(int cat, int oper=InFront, float min_energy=0, float max_energy=1) {
-		        float max_wait; RadarArgs radar_args;
+		float max_wait; RadarArgs radar_args;
 		
 		for (int retries = 3; retries >= 0; --retries) {
-			if (actor.load.category == cat and actor.load.energyLevel >= min_energy and actor.load.energyLevel <= max_energy) {
+			if (actor.load == null) {
+				break;
+			}
+			
+			if (actor.load.category == cat and actor.load.energyLevel >= min_energy
+			                               and actor.load.energyLevel <= max_energy) {
 				log("warning grab_from_ground needed item is already loaded before grab");
 				return 0;
 			}
@@ -442,6 +502,14 @@ public class EBoost {
 		return pos;
 	}
 	
+	bool has_slot(int cat) {
+		return is_bot(cat)
+		or cat == DefenseTower
+		or cat == NuclearPlant
+		or cat == PowerPlant
+		or cat == ResearchCenter;
+	}
+	
 	float inverse_direction(point pos) {
 		// TODO: it is possible to do it without if statement
 		
@@ -450,6 +518,31 @@ public class EBoost {
 		}
 		
 		return 90 - atan((pos.x - actor.position.x) / (pos.y - actor.position.y));
+	}
+	
+	bool is_blocked(object item) {
+		return false;  // TODO
+	}
+	
+	bool is_bot(int cat) {
+		return true;  // TODO
+	}
+	
+	bool is_item(int cat) {
+		return false
+		or cat == TitaniumOre
+		or cat == Titanium
+		or cat == PowerCell;  // TODO
+	}
+	
+	bool is_structure(int cat) {
+		return false
+		or cat == BotFactory
+		or cat == Converter
+		or cat == DefenseTower
+		or cat == ResearchCenter
+		or cat == PowerPlant
+		or cat == PowerStation;  // TODO
 	}
 	
 	void log(string text) {
@@ -467,6 +560,7 @@ public class EBoost {
 		turn(normalize_angle(direct - actor.orientation));
 	}
 	
+	// TODO: use RadarArgs
 	object radar_best_cell(int angle=0, int focus=360, int min=0, int max=1024) {
 		object[] nuclear_cells; int nuclear_max_index; float nuclear_max_value;
 		object[] power_cells; int power_max_index; float power_max_value;
@@ -508,6 +602,33 @@ public class EBoost {
 		return nuclear_cells[nuclear_max_index];
 	}
 	
+	object radar_item(RadarArgs a, bool radar_ground=true, bool radar_slots=true, bool radar_load=false) {
+		object[] items; object item; int[] item_cats;
+		
+		item_cats = a.cat;
+		items = radarall(Any, a.angle, a.focus, a.min, a.max, a.sens, a.filter);
+		
+		for (int i = 0; i < sizeof(items); ++i) {
+			item = items[i];
+			
+			if (radar_ground and contains(item_cats, item.category)) {
+				return item;
+			}
+			
+			if (radar_slots and has_slot(item.category) and item.energyCell != null
+			                and contains(item_cats, item.energyCell.category)) {
+				return item.energyCell;
+			}
+			
+			if (radar_load and can_load(item.category) and item.load != null
+			               and contains(item_cats, item.load.category)) {
+				return item.load;
+			}
+		}
+		
+		return null;
+	}
+	
 	object radar_wait(RadarArgs a, float wait_time=nan) {
 		object item;
 		
@@ -516,7 +637,7 @@ public class EBoost {
 		}
 		
 		for (;;) {
-			item = radar(a.cat, a.angle, a.focus, a.min, a.max, a.sens, a.filter);
+			item = radar_(a);
 			
 			if (item != null) {
 				break;
@@ -533,7 +654,14 @@ public class EBoost {
 		return item;
 	}
 	
-
+	object radar_(RadarArgs a) {
+		return radar(a.cat, a.angle, a.focus, a.min, a.max, a.sens, a.filter);
+	}
+	
+	object[] radarall_(RadarArgs a) {
+		return radarall(a.cat, a.angle, a.focus, a.min, a.max, a.sens, a.filter);
+	}
+	
 	void switch_cell() {
 		grab(InFront);    drop(Behind);
 		grab(EnergyCell); drop(InFront);
@@ -572,6 +700,14 @@ public class EBoost {
 		return round(value * a) / a;
 	}
 	
+	int to_int(bool flag) {
+		if (flag) {
+			return 1;
+		}
+		
+		return 0;
+	}
+	
 	int[] to_list(int cat) {
 		int[] cat_list;
 		
@@ -597,7 +733,7 @@ public class EBoost {
 		if (actor.team == 2) {
 			p.x *= -1;
 			p.y *= -1;
-			p.z = 180 + p.z
+			p.z = 180 + p.z;
 		}
 		
 		return p;
@@ -609,7 +745,7 @@ public class EBoost {
 		if (cat == PowerCell  ) { return 12.5; }
 		if (cat == UraniumOre ) { return 30.5; }
 		return 15.5;  // Build time
-	}	
+	} 
 }
 
 public class Message {

@@ -1,52 +1,69 @@
-public class BuildPositions {
-	int converters_index = 2;
-	int power_plants_index = 1;
-	int general_index = 1;
+public class CodeBattleBoost extends EBoost {
+	static TaskList task_list;
+	static BuildPositions build_positions;
 	
-	/*
-	point team_transform(point p) {
-		if (team == 2) {
-			p.x *= -1;
-			p.y *= -1;
-			p.z = 180 - p.z
-		}
-		
-		return p;
+	int goto_build(int cat) {
+		return 0 +
+		goto_p(build_positions.get(cat)) +
+		drop() +
+		build(cat);
 	}
-	*/
 	
-	point get(int cat) {
-		if (cat == Converter) {
-			if (converters_index > 0) {
-				point[] converters;
-				converters[0] = new point(5, -50.5, 315);
-				converters[1] = new point(-5, -50.5, 225);
-				return converters[--converters_index];
-			}
-		} else if (cat == PowerPlant) {
-			point[] power_plants;
-			power_plants[0] = new point(5, -44, 10);
-			if (power_plants_index > 0) {
-				return power_plants[--power_plants_index];
-			}
+	bool same_river_side(object item) {
+		return item.position.y * actor.position.y > 0;
+	}
+	
+	void setup() {
+		task_list.push(new GoalPowerPlant());
+	}
+	
+	void loop() {
+		Goal goal;
+		
+		goal = task_list.get();
+		
+		if (goal == null) {
+			log("Task list is empty");
+			wait(1);
+			return;
 		}
 		
-		point[] general;
-		general[0] = new point(-8, -42, 150);
-		return general[--general_index];
+		log("get " + goal.to_str());
+		goal.assign(actor);
+		
+		if (not goal.check_prerequirements()) {
+			log("false preqs");
+			return;
+		}
+		
+		log("true preqs");
+		
+		if (goal.make() != 0) {
+			log("make not ok");
+			return;
+		}
+		
+		log("pop");
+		task_list.pop();
+		wait(1);
 	}
 }
 
 public class Goal {
-	protected Globals2 g = new Globals2();
+	/*protected*/ CodeBattleBoost cb = new CodeBattleBoost();
+	/*protected Goal[] depends; // unused */
 	
-	public bool check_prerequirements(object actor) {
+	public void assign(object actor) {
+		cb.actor = actor;
+	}
+	
+	public bool check_prerequirements() {
 		return false;
 	}
 	
 	// Makes some to archieve goal
 	// return: 0 if goal achieved, 1 on error
-	public int make(object actor) {
+	public int make() {
 		return 2;
 	}
 	
@@ -61,6 +78,34 @@ public class Goal {
 	public string to_str() {
 		return "Goal";
 	}
+	
+	public bool equals(Goal goal) {
+		return to_str() == goal.to_str();
+	}
+	
+	/*protected*/ bool _add_goal(bool flag, Goal goal) {
+		if (not flag) {
+			cb.task_list.push_uniq(goal);
+		}
+		
+		return flag;
+	}
+	
+	/*protected*/ bool _required_item(int cat) {
+		object item;
+		cb.assert(cb.is_item(cat)).id;
+		
+		item = cb.radar_item(new RadarArgs(cat), true, true, false);  // TODO: fails here
+		return item != null and cb.same_river_side(item);
+	}
+	
+	/*protected*/ bool _required_structure(int cat) {
+		object item;
+		cb.assert(cb.is_structure(cat)).id;
+		
+		item = radar(cat);
+		return item != null and cb.same_river_side(item) and not item.busy() and not cb.is_blocked(item);
+	}
 }
 
 public class GoalResource extends Goal {
@@ -70,40 +115,18 @@ public class GoalResource extends Goal {
 }
 
 public class GoalTitanium extends GoalResource {
-	public bool check_prerequirements(object actor) {
-		object item;
-		
-		item = radar(Converter, 0, 360, 0, 30);
-		
-		if (item == null or not g.same_river_side(actor, item)/* or not item.is_empty()*/) {
-			g.t.push(new GoalConverter());
-			return false;
-		}
-		
-		item = radar(TitaniumOre, 0, 360, 0, 30);
-		
-		if (item == null or not g.same_river_side(actor, item)) {
-			return false;
-		}
-		
-		return true;
+	public bool check_prerequirements() {
+		return true
+		and _add_goal(_required_structure(Converter), new GoalConverter())
+		and _required_item(TitaniumOre);
 	}
 	
-	public int make(object actor) {
-		object item;
-		
-		item = radar(TitaniumOre, 0, 360, 0, 30);
-		
-		if (item == null/* or not same_river_side(item)*/) {
-			return 1;
-		}
-		
-		goto(item.position);
-		grab(); //grab_from_ground(TitaniumOre);
-		g.goto_free(actor, Converter);
-		drop();
+	public int make() {
+		return 0 +
+		cb.goto_grab(TitaniumOre) +
+		cb.goto_radar_position(new RadarArgs(Converter)) +
+		drop() +
 		move(-2.5);
-		return 0;
 	}
 	
 	public float get_resolve_time() {
@@ -120,49 +143,17 @@ public class GoalTitanium extends GoalResource {
 }
 
 public class GoalPowerCell extends GoalResource {
-	public bool check_prerequirements(object actor) {
-		object item; bool ret;
-		
-		ret = true;
-		
-		item = radar(Titanium, 0, 360, 0, 30);
-		
-		if (item == null or not g.same_river_side(actor, item)) {
-			g.t.push(new GoalTitanium());
-			ret = false;
-		}
-		
-		item = radar(PowerPlant, 0, 360, 0, 30);
-		
-		if (item == null or not g.same_river_side(actor, item)) {
-			g.t.push(new GoalPowerPlant());
-			ret = false;
-		}
-		
-		item = radar(Converter, 0, 360, 0, 30);
-		
-		if (item == null or not g.same_river_side(actor, item)) {
-			g.t.push(new GoalConverter());
-			ret = false;
-		}
-		
-		return ret;
+	public bool check_prerequirements() {
+		return true
+		and _add_goal(_required_structure(PowerPlant), new GoalPowerPlant())
+		and _required_item(Titanium);
 	}
 	
-	public int make(object actor) {
-		object item;
-		
-		item = radar(Titanium);
-		
-		if (item == null or not g.same_river_side(actor, item)) {
-			return 1;
-		}
-		
-		g.goto_q(actor, item.position);
-		grab(); //grab_from_ground(Titanium);
-		g.goto_free(actor, PowerPlant);
-		drop();
-		return 0;
+	public int make() {
+		return 0 +
+		cb.goto_grab(Titanium) +
+		cb.goto_radar_position(new RadarArgs(PowerPlant)) +
+		grab();  // grab_from_slot
 	}
 	
 	public float get_resolve_time() {
@@ -181,23 +172,21 @@ public class GoalPowerCell extends GoalResource {
 public class GoalStructure extends Goal {
 	protected int cat;
 	
-	public bool check_prerequirements() {
-		object item;
-		
-		item = radar(Titanium, 0, 360, 0, 30);
-		
-		if (item == null/* or same_river_side(item)*/) {
-			g.t.push(new GoalTitanium());
-			return false;
-		}
-		
-		return true;
+	void GoalStructure(int cat) {
+		cb.assert(cb.is_structure(cat)).id;
+		this.cat = cat;
 	}
 	
-	public int make(object actor) {
-		g.log("GoalStructure::make");
-		return g.goto_grab(actor, Titanium)
-		     + g.goto_build(actor, cat);
+	public bool check_prerequirements() {
+		return _add_goal(_required_item(Titanium), new GoalTitanium());
+	}
+	
+	public int make() {
+		cb.log("GoalStructure::make");
+		
+		return 0 +
+		cb.goto_grab(Titanium) +
+		cb.goto_build(cat);
 	}
 	
 	public float get_resolve_time() {
@@ -224,31 +213,47 @@ public class GoalPowerPlant extends GoalStructure {
 		super.cat = PowerPlant;
 	}
 	
+	public bool check_prerequirements() {
+		return super.check_prerequirements()
+		and _add_goal(_required_structure(Converter), new GoalStructure(Converter));
+	}
+	
 	public string to_str() {
 		return "GoalPowerPlant";
 	}
 }
 
 public class TaskList {
+	static CodeBattleBoost cb;
 	private Goal[] task_list_;
 	private int task_index_ = 0;
 	private object exit_ = null;
-	// private Globals2 g = new Globals();  // crash game ?
 	
-	// Adds goal to the list
-	// return 0 if goal itself and all its dependensies are added to the list,
-	//        1 if goal impossible to archieve
-	public int add(Goal goal) {
-		return 0;
+	public void push_uniq(Goal goal) {
+		int i;
+		
+		if (task_index_ > 30) {
+			cb.log("Task list is overflow. Exit program");
+			exit_.id;
+		}
+		
+		for (i = 1; i < task_index_ and not task_list_[i - 1].equals(goal); ++i) { }
+		
+		for (;i < task_index_; ++i) {
+			task_list_[i - 1] = task_list_[i];
+		}
+		
+		cb.log("push " + goal.to_str());
+		task_list_[task_index_++] = goal;
 	}
 	
 	public void push(Goal goal) {
 		if (task_index_ > 30) {
-			//log("Task list is overflow. Exit program");
+			cb.log("Task list is overflow. Exit program");
 			exit_.id;
 		}
 		
-		//log("push " + goal.to_str());
+		cb.log("push " + goal.to_str());
 		task_list_[task_index_++] = goal;
 	}
 	
@@ -277,195 +282,69 @@ public class TaskList {
 	}
 }
 
-public class Globals2 {
-	static TaskList t = new TaskList();
-	static BuildPositions p = new BuildPositions();
+public class BuildPositions {
+	int converters_index = 2;
+	int power_plants_index = 1;
+	int general_index = 1;
 	
-	int goto_build(object actor, int cat) {
-		point pos;
+	point team_transform(point p) {
+		/*if (team == 2) {
+			p.x *= -1;
+			p.y *= -1;
+			p.z = 180 + p.z
+		}*/
 		
-		pos = p.get(cat);
-		goto_p(actor, pos);
-		drop();
-		build(cat);
-		return 0;
+		return p;
 	}
 	
-	int goto_grab(object actor, int cat, float wait_time=10, int retries=5, float angle=0, float focus=360, float min=0, float max=1000, float sens=1) {
-		object item;
-		
-		for (; retries > 0; --retries) {
-			if (actor.load != null) {
-				if (actor.load.category == cat) {
-					return 0;
-				}
+	point get(int cat) {
+		if (cat == Converter) {
+			if (converters_index > 0) {
+				point[] converters;
+				converters[0] = team_transform(new point(5, -50.5, 315));
+				converters[1] = team_transform(new point(-5, -50.5, 225));
+				return converters[--converters_index];
 			}
-			
-			for (;;) {
-				item = radar(cat, angle, focus, min, max, sens);
-				
-				if (item != null) {
-					break;
-				}
-				
-				if (wait_time > 0) {
-					wait_time -= 0.1;
-					wait(0.1);
-				} else {
-					return 1;
-				}
+		} else if (cat == PowerPlant) {
+			point[] power_plants;
+			power_plants[0] = team_transform(new point(5, -44, 10));
+			if (power_plants_index > 0) {
+				return power_plants[--power_plants_index];
 			}
-			
-			if (actor.load != null) {
-				goto(space(actor.position));
-				
-				if (drop() != 0) {
-					continue;
-				}
-			}
-			
-			if (goto(item.position) != 0) {
-				continue;
-			}
-			
-			grab();
 		}
 		
-		return 1;
-	}
-	
-	// Goes to friendly structure which:
-	// 1) does not blocked by enemie's WingedGrubber;
-	// 2) does not busy
-	int goto_free(object actor, int cat) {
-		object item;
-		
-		item = radar(cat);
-		// TODO: check free
-		
-		if (item == null) {
-			return 1;
-		}
-		
-		return goto_q(actor, item.position);
-	}
-	
-	int goto_pp(object actor, point pos, float direct, float dist=1.5, int oper=InFront) {
-		point pos_bot;
-		
-		pos_bot.x = pos.x - cos(direct) * dist;
-		pos_bot.y = pos.y - sin(direct) * dist;
-		
-		goto(pos_bot); //goto_q(pos_bot, 0, oper);
-		
-		if (oper == InFront) {
-			orient(actor, direct);
-		} else {
-			orient(actor, 180 + direct);
-		}
-		
-		return 0;
-	}
-	
-	int goto_p(object actor, point pos, float dist=1.5, int oper=InFront) {
-		return goto_pp(actor, pos, pos.z, dist, oper);
-	}
-	
-	int goto_q(object actor, point pos, float dist=1.5, int oper=InFront) {
-		if (oper == InFront) {
-			turn(direction(pos));
-			move(distance2d(actor.position, pos) - dist);
-		} else if (oper == Behind) {
-			turn_q(direction(pos) + 180);
-			move(dist - distance2d(actor.position, pos));
-		} else {
-			log("error goto_q unexpected oper value = " + oper);
-			return 2;
-		}
-		
-		if (distance2d(pos, actor.position) > dist + 1) {
-			log("warning goto_q i am not in the expected place, distance = " + distance2d(pos, actor.position));
-			return 1;
-		}
-		
-		return 0;
-	}
-	
-	void log(string text) {
-		file handle = new file();
-		handle.open("log_tasks.txt", "a");
-		handle.writeln(round_d(abstime(), 1) + " " + text);
-		handle.close();
-	}
-	
-	// Expect direct >= 0, 90 is Nord direction
-	void orient(object actor, float direct) {
-		direct -= actor.orientation;
-		turn_q(direct);
-	}
-	
-	float round_d(float value, int digits) {
-		int a = pow(10, digits);
-		return round(value * a) / a;
-	}
-	
-	bool same_river_side(object actor, object item) {
-		return item.position.y * actor.position.y > 0;
-	}
-	
-	void turn_q(float angle) {
-		if (angle < -180) {
-			angle += 360;
-		} else if (angle > 180) {
-			angle -= 360;
-		}
-		
-		turn(angle);
-	}
-	
-	void setup(object actor) {
-		wait(9);
-		t.push(new GoalPowerCell());
-	}
-	
-	void loop(object actor) {
-		Goal goal;
-		
-		goal = t.get();
-		log("get " + goal.to_str());
-		
-		if (goal == null) {
-			log("Task list is empty");
-			wait(10);
-		}
-		
-		if (not goal.check_prerequirements(actor)) {
-			log("false preqs");
-			return;
-		}
-		
-		log("true preqs");
-		
-		if (goal.make(actor) != 0) {
-			log("make not ok");
-			return;
-		}
-		
-		log("pop");
-		t.pop();
-		wait(1);
+		point[] general;
+		general[0] = team_transform(new point(-8, -42, 150));
+		return general[--general_index];
 	}
 }
 
 extern void object::cb_goals() {
-	errmode(0);
-	Globals2 g();
-	g.setup(this);
+	CodeBattleBoost cb();
+	
+	// init cb
+	cb.actor = this;
+	
+	// init static variables
+	cb.task_list = new TaskList();
+	cb.task_list.cb = cb;
+	cb.build_positions = new BuildPositions();
+	
+	cb.setup();
 	
 	for (;;) {
-		g.loop(this);
+		cb.loop();
 	}
 }
+
+// WingedShooter x N
+// 0) BotFactory
+// 1) PowerPlant (to make PowerCell x N)
+// 2) Converter (to make Titanium x N)
+// 3) ResearchWinged
+// 3.1) ResearchCenter
+// 4) ResearchShooter
+// 4.1) link to 3.1
 
 // WingedGrabber ()
 // 1) Titanium ()
