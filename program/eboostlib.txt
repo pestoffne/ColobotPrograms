@@ -525,7 +525,30 @@ public class EBoost {
 	}
 	
 	bool is_bot(int cat) {
-		return true;  // TODO
+		return false
+		or cat == PracticeBot
+		or cat == TargetBot
+		or cat == WheeledGrabber
+		or cat == TrackedGrabber
+		or cat == WingedGrabber
+		or cat == LeggedGrabber
+		or cat == WheeledSniffer
+		or cat == TrackedSniffer
+		or cat == WingedSniffer
+		or cat == LeggedSniffer
+		or cat == WheeledShooter
+		or cat == TrackedShooter
+		or cat == WingedShooter
+		or cat == LeggedShooter
+		or cat == WheeledOrgaShooter
+		or cat == TrackedOrgaShooter
+		or cat == WingedOrgaShooter
+		or cat == LeggedOrgaShooter
+		or cat == Subber
+		or cat == Recycler
+		or cat == Shielder
+		or cat == Thumper
+		or cat == PhazerShooter;
 	}
 	
 	bool is_item(int cat) {
