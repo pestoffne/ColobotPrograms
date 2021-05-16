@@ -446,7 +446,7 @@ public class EBoost {
 		goto_p(pos);
 	}
 	
-	int grab_from_ground(int cat, int oper=InFront, float min_energy=0, float max_energy=1) {
+	int grab_from_ground(int cat, int oper=InFront, float min_energy=-1, float max_energy=1) {
 		float max_wait; RadarArgs radar_args;
 		
 		for (int retries = 3; retries >= 0; --retries) {
