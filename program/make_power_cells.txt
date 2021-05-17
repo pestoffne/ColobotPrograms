@@ -3,20 +3,23 @@ extern void object::MakePowerCells() {
 	EBoost e(this);
 	
 	for (;;) {
-		e.check_energy_loop(0.5);
-		e.check_shield();
-
-		item = e.radar_wait(Titanium);
+		item = e.radar_wait(new RadarArgs(Titanium));
 		goto(item.position);
 		grab();
 		
-		item = e.radar_wait(PowerPlant);
+		e.check_energy_loop(0.5);
+		e.check_shield();
+		
+		item = e.radar_wait(new RadarArgs(PowerPlant));
 		goto(item.position);
 		drop();
 		
 		while (item.energyCell == null or item.energyCell.category != PowerCell) {
 			wait(0.1);
 		}
+		
+		e.check_energy_loop(0.5);
+		e.check_shield();
 		
 		grab();
 		
