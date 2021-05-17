@@ -3,13 +3,16 @@ extern void object::CollectTitanium() {
 	EBoost e(this);
 	
 	for (;;) {
+		e.check_energy_loop(0.50);
+		e.check_shield(0.50);
+		
 		if (load == null or load.category != TitaniumOre) {
 			if (load != null) {
 				goto(space(position, 0));
 				drop();
 			}
 			
-			item = e.radar_wait(TitaniumOre);
+			item = e.radar_wait(new RadarArgs(TitaniumOre));
 			
 			if (item == null) {
 				message("All TitaniumOres has been converted", DisplayWarning);
@@ -20,14 +23,24 @@ extern void object::CollectTitanium() {
 			grab();
 		}
 		
-		item = e.radar_wait(Converter);
+		item = e.radar_wait(new RadarArgs(Converter));
 		goto(item.position);
 		drop();
 		move(-2.5);
 		
-		item = e.radar_wait(Titanium, 0, 30, 0, 10);
-		goto(item.position);
-		grab();
+		item = e.radar_wait(new RadarArgs(Titanium, 0, 30, 0, 10));
+		
+		if (item == null) {
+			message("No TitaniumOre near me", DisplayWarning);
+			return;
+		}
+		
+		if (goto(item.position) != 0) {
+			message("Failed going to TitaniumOre", DisplayWarning);
+			return;
+		}
+		
+		e.grab_from_ground(TitaniumOre);
 		
 		item = radar(BlueFlag);
 		
@@ -37,8 +50,5 @@ extern void object::CollectTitanium() {
 		} else {
 			e.drop_to_helix(item.position);
 		}
-		
-		e.check_energy_loop(0.50);
-		e.check_shield(0.50);
 	}
 }
