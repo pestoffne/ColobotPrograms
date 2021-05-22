@@ -624,6 +624,22 @@ public class EBoost {
 		return angle - 360 * round(angle / 360);
 	}
 	
+	float max(float a, float b) {
+		if (a > b) {
+			return a;
+		}
+		
+		return b;
+	}
+	
+	float min(float a, float b) {
+		if (a < b) {
+			return a;
+		}
+		
+		return b;
+	}
+	
 	void orient(float direct) {
 		turn(normalize_angle(direct - actor.orientation));
 	}
