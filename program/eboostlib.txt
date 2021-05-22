@@ -429,8 +429,13 @@ public class EBoost {
 			goto_straight(pos, 0);  // to more precise position
 		}
 		
-		orient(direct);
-		return round(distance2d(actor.position, pos));
+		dist_to_pos = distance2d(actor.position, pos);
+		
+		if (dist_to_pos < 0.5) {
+			orient(direct);
+		}
+		
+		return round(dist_to_pos);
 	}
 	
 	int goto_radar_item_position(RadarArgs a, bool grab_ground=true, bool grab_slots=true, bool grab_load=false) {
