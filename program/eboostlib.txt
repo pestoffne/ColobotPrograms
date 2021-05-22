@@ -289,6 +289,8 @@ public class EBoost {
 				if (distance2d(item.position, actor.position) > 1.0) {
 					turn(direction(item.position));
 					motor(1, 1);
+				} else {
+					motor(0, 0);
 				}
 				
 				wait(0.1);
