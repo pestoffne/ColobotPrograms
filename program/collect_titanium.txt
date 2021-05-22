@@ -9,7 +9,7 @@ extern void object::CollectTitanium() {
 				drop();
 			}
 			
-			item = e.radar_wait(TitaniumOre);
+			item = e.radar_wait(new RadarArgs(TitaniumOre));
 			
 			if (item == null) {
 				message("All TitaniumOres has been converted", DisplayWarning);
@@ -20,12 +20,12 @@ extern void object::CollectTitanium() {
 			grab();
 		}
 		
-		item = e.radar_wait(Converter);
+		item = e.radar_wait(new RadarArgs(Converter));
 		goto(item.position);
 		drop();
 		move(-2.5);
 		
-		item = e.radar_wait(Titanium, 0, 30, 0, 10);
+		item = e.radar_wait(new RadarArgs(Titanium, 0, 30, 0, 10));
 		goto(item.position);
 		grab();
 		
