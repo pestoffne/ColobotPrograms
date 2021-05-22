@@ -198,6 +198,26 @@ public class EBoost {
 		}
 	}
 	
+	bool _helix_helper(point pos) {
+		object item;
+		
+		item = search(Any, pos, 0, 1.7);
+		
+		if (item != null and not is_label(item.category)) {
+			return false;
+		}
+		
+		for (int i = 0; i < 4; ++i) {
+			if (goto_p(pos) == 0 and drop() == 0) {
+				return true;
+			}
+			
+			pos.z += 90;
+		}
+		
+		return false;
+	}
+	
 	void drop_to_helix(point p) {
 		int s;
 		
@@ -206,11 +226,11 @@ public class EBoost {
 		
 		for (int l = 1; l <= 7; ++l) {
 			for (int i = 0; i < l; ++i) {
-				p.x += s;
-				
 				if (_helix_helper(p)) {
 					return;
 				}
+				
+				p.x += s;
 			}
 			
 			s *= -1;
@@ -221,11 +241,11 @@ public class EBoost {
 			}
 			
 			for (int i = 0; i < l; ++i) {
-				p.y += s;
-				
 				if (_helix_helper(p)) {
 					return;
 				}
+				
+				p.y += s;
 			}
 			
 			p.z += -90;
@@ -553,6 +573,20 @@ public class EBoost {
 		or cat == PhazerShooter;
 	}
 	
+	bool is_label(int cat) {
+		return false
+		or cat == BlueFlag
+		or cat == GreenFlag
+		or cat == YellowFlag
+		or cat == VioletFlag
+		or cat == RedFlag
+		or cat == TitaniumSpot
+		or cat == UraniumSpot
+		or cat == PowerSpot
+		or cat == WayPoint
+		or cat == Target2;
+	}
+	
 	bool is_item(int cat) {
 		return false
 		or cat == TitaniumOre
@@ -738,20 +772,6 @@ public class EBoost {
 		
 		cat_list[0] = cat;
 		return cat_list;
-	}
-	
-	bool _helix_helper(point pos) {
-		object item;
-		
-		item = search(Any, pos, 0, 1.7);
-		
-		if (item != null) {
-			return false;
-		}
-		
-		goto_p(pos);
-		drop();
-		return true;
 	}
 	
 	point team_transform(point p) {
