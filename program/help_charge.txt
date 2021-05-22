@@ -1,5 +1,6 @@
-extern void object::HelpCharge()
-{
+extern void object::HelpCharge() {
+	EBoost e(this);
+	
 	int bots[];
 	
 	bots[0] = WheeledGrabber;
@@ -40,11 +41,9 @@ extern void object::HelpCharge()
 	items = radarall(bots, 0, 360, 0, 1024, -1);
 	
 	for (int i = sizeof(items) - 1; i >= 0; --i) {
-		/*
-		
 		if (items[i].energyCell != null and
 		        items[i].energyCell.category == PowerCell and
-		        items[i].energyCell.energyLevel < 0.1) {
+		        items[i].energyCell.energyLevel < 0.25) {
 			goto(items[i].position);
 			grab();
 			
@@ -58,7 +57,6 @@ extern void object::HelpCharge()
 			goto(items[i].position);
 			drop();
 		}
-		*/
 		
 		if (items[i].energyCell != null and
 		        items[i].energyCell.category == NuclearCell and
@@ -67,7 +65,7 @@ extern void object::HelpCharge()
 			
 			for (int j = sizeof(nuclear_cells) - 1; j >= 0; --j) {
 				if (nuclear_cells[j].energyLevel > 0.75) {
-					CheckEnergy();
+					e.check_energy_loop();
 					
 					goto(nuclear_cells[j].position);
 					grab();
@@ -95,7 +93,7 @@ extern void object::HelpCharge()
 			
 			for (int j = sizeof(nuclear_cells) - 1; j >= 0; --j) {
 				if (nuclear_cells[j].energyLevel > 0.75) {
-					CheckEnergy();
+					e.check_energy_loop();
 					
 					goto(nuclear_cells[j].position);
 					grab();
