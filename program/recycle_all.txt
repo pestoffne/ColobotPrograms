@@ -5,8 +5,7 @@ extern void object::RecycleAll() {
 	total_recycle = 0;
 	
 	i = 0;
-	recycleble[i++] = Wreck;  // = 601 or 603 or 605
-	//recycleble[i++] = 606;  // Broken BotFactory.
+	recycleble[i++] = Wreck;
 	recycleble[i++] = 607;  // Converter half-cylinder
 	recycleble[i++] = 608;  // Some beeline fittings
 	recycleble[i++] = 609;  // Looks like radar fundament
@@ -23,16 +22,15 @@ extern void object::RecycleAll() {
 		angle = e.inverse_direction(item.position);
 		
 		for (i = 0; i < 7; ++i) {
-			if (e.goto_pp(item.position, angle + 45 * i, 5.0) == 0) {
+			if (e.goto_pp(item.position, angle + 45 * i, 5.0) != 0) {
+				continue;
+			}
+			
+			turn(direction(item.position));
+			
+			if (recycle() == 0) {
 				break;
 			}
-		}
-		
-		turn(direction(item.position));
-		
-		if (recycle() != 0) {
-			message("Failed to recycle", DisplayWarning);
-			continue;
 		}
 		
 		total_recycle++;
