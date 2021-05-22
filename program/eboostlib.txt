@@ -54,6 +54,10 @@ public class EBoost {
 		return null;
 	}
 	
+	object assert_equal(float a, float b) {
+		return assert(a == b, "assert(" + a + " == " + b + ") failed");
+	}
+	
 	bool can_load(int cat) {
 		return false
 		or cat == WheeledGrabber
@@ -721,6 +725,19 @@ public class EBoost {
 		return radarall(a.cat, a.angle, a.focus, a.min, a.max, a.sens, a.filter);
 	}
 	
+	float random(float min, float max) {
+		return rand() * (max - min) + min;
+	}
+	
+	float round_cell(float value) {
+		return round(value / 5 - 0.5) * 5 + 2.5;
+	}
+	
+	float round_digits(float value, int digits) {
+		int a = pow(10, digits);
+		return round(value * a) / a;
+	}
+	
 	void switch_cell() {
 		grab(InFront);    drop(Behind);
 		grab(EnergyCell); drop(InFront);
@@ -748,15 +765,6 @@ public class EBoost {
 		turn(90);
 		grab(Behind);
 		drop();
-	}
-	
-	float random(float min, float max) {
-		return rand() * (max - min) + min;
-	}
-	
-	float round_digits(float value, int digits) {
-		int a = pow(10, digits);
-		return round(value * a) / a;
 	}
 	
 	int to_int(bool flag) {
@@ -851,15 +859,16 @@ public class Message {
 
 extern void object::EBoostLib() {
 	EBoost e(this);
-	//// Unit Tests
-	//message(e.normalize_angle(360 * 4 + 30) + " = " + 30);
-	//message(e.normalize_angle(179) + " = " + 179);
-	//message(e.normalize_angle(180) + " = " + 180 + " or " + -180);
-	//message(e.normalize_angle(181) + " = " + -179);
-	//message(e.normalize_angle(-179) + " = " + -179);
-	//message(e.normalize_angle(-180) + " = " + -180 + " or " + 180);
-	//message(e.normalize_angle(-181) + " = " + 179);
-	//message(e.normalize_angle(360 * -11 + 30) + " = " + 30);
-	//e.orient(this, -360);
-	//message(orientation);
+	
+	// Unit Tests
+	e.assert_equal(e.normalize_angle(179), 179).id;
+	e.assert_equal(e.normalize_angle(181), -179).id;
+	e.assert_equal(e.normalize_angle(-179), -179).id;
+	e.assert_equal(e.normalize_angle(360 * -11 + 30), 30).id;
+	e.assert_equal(e.normalize_angle(360 * 4 + 30), 30).id;
+	e.assert_equal(e.round_cell(-0.1), -2.5).id;
+	e.assert_equal(e.round_cell(0.1), 2.5).id;
+	e.assert_equal(e.round_cell(4.9), 2.5).id;
+	e.assert_equal(e.round_cell(5.1), 7.5).id;
+	message("Tests passed", DisplayInfo);
 }
