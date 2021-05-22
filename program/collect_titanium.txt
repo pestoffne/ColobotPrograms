@@ -40,7 +40,7 @@ extern void object::CollectTitanium() {
 			return;
 		}
 		
-		e.grab_from_ground(TitaniumOre);
+		e.grab_from_ground(Titanium);
 		
 		item = radar(BlueFlag);
 		
