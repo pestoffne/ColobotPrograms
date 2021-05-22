@@ -88,7 +88,7 @@ extern void object::ServeNewBot() {
 	e.goto_pp(bot_factory.position, 180 + bot_factory.orientation, 5.5);
 	
 	// 5) Wait until Bot created
-	item = e.radar_wait(bots, 0, 15, 0, 12);
+	item = e.radar_wait(new RadarArgs(bots, 0, 15, 0, 12));
 	
 	// 6) Drop PowerCell or NuclearCell to Bot
 	goto(item.position);

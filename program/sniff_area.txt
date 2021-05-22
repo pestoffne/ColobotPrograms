@@ -10,8 +10,10 @@ void object::sniff_cylinder(point center, float area_r, float flat_r, float half
 	total_sniffs = 0;
 	sniff_dist = 1.875;
 	
-	for (pos.x = round(center.x - sign_x * area_r); pos.x >= min_x and pos.x <= max_x; pos.x += sign_x) {
-		for (pos.y = round(center.y - sign_y * area_r); pos.y >= min_y and pos.y <= max_y; pos.y += sign_y) {
+	for (pos.x = e.round_cell(center.x - sign_x * (area_r - 2.55));
+	        pos.x >= min_x and pos.x <= max_x; pos.x += 5 * sign_x) {
+		for (pos.y = e.round_cell(center.y - sign_y * (area_r - 2.55));
+		             pos.y >= min_y and pos.y <= max_y; pos.y += 5 * sign_y) {
 			if (distance2d(pos, center) > area_r
 			        or flatground(pos, flat_r) < flat_r
 			        or abs(topo(pos) - center.z) > half_height) {
