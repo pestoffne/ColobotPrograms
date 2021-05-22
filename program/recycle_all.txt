@@ -11,7 +11,7 @@ extern void object::RecycleAll() {
 	recycleble[i++] = 609;  // Looks like radar fundament
 	
 	for (;;) {
-		e.check_energy_loop(0.33);
+		e.check_energy_loop(0.5);
 		item = radar(recycleble);
 		
 		if (item == null) {
@@ -31,6 +31,8 @@ extern void object::RecycleAll() {
 			if (recycle() == 0) {
 				break;
 			}
+			
+			message("Failed to recycle", DisplayWarning);
 		}
 		
 		total_recycle++;
