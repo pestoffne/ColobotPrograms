@@ -1,18 +1,13 @@
 extern void object::RecycleAll() {
-	object item; point pos; int[] recycleble; int i, total_recycle; float angle;
+	object item; point pos; int[] recyclable; int total_recycle; float angle;
 	EBoost e(this);
 	
 	total_recycle = 0;
-	
-	i = 0;
-	recycleble[i++] = Wreck;
-	recycleble[i++] = 607;  // Converter half-cylinder
-	recycleble[i++] = 608;  // Some beeline fittings
-	recycleble[i++] = 609;  // Looks like radar fundament
+	recyclable = e.list_recyclable();
 	
 	for (;;) {
 		e.check_energy_loop(0.5);
-		item = radar(recycleble);
+		item = radar(recyclable);
 		
 		if (item == null) {
 			message("Recycle complete. Total recycle " + total_recycle);
@@ -21,7 +16,7 @@ extern void object::RecycleAll() {
 		
 		angle = e.inverse_direction(item.position);
 		
-		for (i = 0; i < 7; ++i) {
+		for (int i = 0; i < 7; ++i) {
 			if (e.goto_pp(item.position, angle + 45 * i, 5.0) != 0) {
 				continue;
 			}

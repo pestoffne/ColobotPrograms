@@ -613,6 +613,83 @@ public class EBoost {
 		or cat == PowerStation;  // TODO
 	}
 	
+	int[] list_bots() {
+		int[] bots; int i;
+		
+		i = 0;
+		bots[i++] = WheeledGrabber;
+		bots[i++] = TrackedGrabber;
+		bots[i++] = WingedGrabber;
+		bots[i++] = LeggedGrabber;
+		bots[i++] = WheeledSniffer;
+		bots[i++] = TrackedSniffer;
+		bots[i++] = WingedSniffer;
+		bots[i++] = LeggedSniffer;
+		bots[i++] = WheeledShooter;
+		bots[i++] = TrackedShooter;
+		bots[i++] = WingedShooter;
+		bots[i++] = LeggedShooter;
+		bots[i++] = WheeledOrgaShooter;
+		bots[i++] = TrackedOrgaShooter;
+		bots[i++] = WingedOrgaShooter;
+		bots[i++] = LeggedOrgaShooter;
+		bots[i++] = Subber;
+		bots[i++] = Recycler;
+		bots[i++] = Shielder;
+		bots[i++] = Thumper;
+		bots[i++] = PhazerShooter;
+		bots[i++] = PracticeBot;
+		bots[i++] = TargetBot;
+		
+		return bots;
+	}
+	
+	int[] list_buildable() {
+		int[] structs; int i;
+		
+		i = 0;
+		structs[i++] = BotFactory;
+		structs[i++] = ResearchCenter;
+		structs[i++] = RadarStation;
+		structs[i++] = ExchangePost;
+		structs[i++] = RepairCenter;
+		structs[i++] = DefenseTower;
+		structs[i++] = AutoLab;
+		structs[i++] = PowerStation;
+		structs[i++] = PowerPlant;
+		structs[i++] = NuclearPlant;
+		structs[i++] = Converter;
+		structs[i++] = Derrick;
+		structs[i++] = PowerCaptor;
+		
+		return structs;
+	}
+	
+	int[] list_objects_with_slot() {
+		int[] cats; int i;
+		
+		cats = list_bots();
+		i = sizeof(cats);
+		cats[i++] = PowerPlant;
+		cats[i++] = NuclearPlant;
+		cats[i++] = ResearchCenter;
+		cats[i++] = DefenseTower;
+		
+		return cats;
+	}
+	
+	int[] list_recyclable() {
+		int[] cats; int i;
+		
+		i = 0;
+		cats[i++] = Wreck;
+		cats[i++] = 607;
+		cats[i++] = 608;
+		cats[i++] = 609;
+		
+		return cats;
+	}
+	
 	void log(string text) {
 		file handler = new file();
 		handler.open(logfile, "a");

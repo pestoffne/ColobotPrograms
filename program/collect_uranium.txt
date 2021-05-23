@@ -8,13 +8,13 @@ extern void object::CollectUranium() {
 				goto(space(position), 0);
 				drop();
 			}
-
-			item = e.radar_wait(UraniumOre);
+			
+			item = e.radar_wait(new RadarArgs(UraniumOre));
 			goto(item.position);
 			grab();
 		}
 		
-		item = e.radar_wait(NuclearPlant);
+		item = e.radar_wait(new RadarArgs(NuclearPlant));
 		goto(item.position);
 		drop();
 		move(-2.5);
