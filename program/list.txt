@@ -1,0 +1,125 @@
+public class UnaryPredicateInt {
+	bool _(int value) {
+		return true;
+	}
+}
+
+public class UnaryPredicateIntMore extends UnaryPredicateInt {
+	private int _value;
+	
+	void UnaryPredicateMore(int value) {
+		_value = value;
+	}
+	
+	bool _(int value) {
+		return value > _value;
+	}
+}
+
+public class ListElemInt {
+	int value;
+	ListElemInt prev;
+	ListElemInt next;
+	
+	void ListElemInt(int value, ListElemInt prev = null, ListElemInt next = null) {
+		this.value = value;
+		this.prev = prev;
+		this.next = next;
+	}
+}
+
+// Linked list like std::list<int>
+public class ListInt {
+	private ListElemInt _front = null;
+	private ListElemInt _back = null;
+	static int default_value = 0;
+	
+	// returns last element
+	int back() {
+		if (_back == null) {
+			return default_value;
+		}
+		
+		return _back.value;
+	}
+	
+	// returns first element
+	int front() {
+		if (_front == null) {
+			return default_value;
+		}
+		
+		return _front.value;
+	}
+	
+	ListElemInt begin() {
+		return _front;
+	}
+	
+	bool empty() {
+		return false;  // TODO
+	}
+	
+	int size() {
+		return 0;  // TODO
+	}
+	
+	void clear() {
+		// TODO
+	}
+	
+	ListElemInt insert(ListElemInt pos, int value) {
+		return pos; // TODO
+	}
+	
+	void push_back(int value) {
+		_back = new ListElemInt(value, _back, null);
+		
+		if (_front == null) {  // if pushes first element
+			_front = _back;
+		} else {
+			_back.prev.next = _back;
+		}
+	}
+	
+	void pop_back() {
+		// TODO
+	}
+	
+	void push_front(int value) {
+		// TODO
+	}
+	
+	void pop_front() {
+		// TODO
+	}
+	
+	// removes all elements with value
+	void remove(int value) {
+		// TODO
+	}
+	
+	void remove_if(UnaryPredicateInt pred) {
+		// TODO
+	}
+	
+	void unique() {
+		// TODO
+	}
+	
+	void sort() {
+		// TODO
+	}
+}
+
+extern void object::list() {
+	ListInt li();
+	li.push_back(10);
+	li.push_back(20);
+	li.push_back(35);
+	
+	ListElemInt e = null;
+	for (e = li.begin(); e != null; e = e.next) {
+		message(e.value);
+	}
+}
