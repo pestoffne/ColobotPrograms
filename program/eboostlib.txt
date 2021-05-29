@@ -665,6 +665,19 @@ public class EBoost {
 		return structs;
 	}
 	
+	int[] list_bushes() {
+		int[] cats; int i;
+		
+		i = 0;
+		cats[i++] = 70;
+		cats[i++] = 71;
+		cats[i++] = 72;
+		cats[i++] = 73;
+		cats[i++] = 74;
+		
+		return cats;
+	}
+	
 	int[] list_objects_with_slot() {
 		int[] cats; int i;
 		
