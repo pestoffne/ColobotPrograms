@@ -72,7 +72,7 @@ extern void object::HuntGround() {
 		pos.z = item.position.z;
 		angle = direction(pos);
 		
-		if (abs(angle) > 1) {
+		if (not stay and abs(angle) > 1) {
 			turn(angle);
 		}
 		
@@ -100,7 +100,7 @@ extern void object::HuntGround() {
 		pos.z = item.position.z;
 		angle = direction(pos);
 		
-		if (abs(angle) > 1) {
+		if (stay and abs(angle) > 1) {
 			turn(angle);
 		}
 		
