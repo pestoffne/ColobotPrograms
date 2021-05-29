@@ -4,19 +4,19 @@ public class UnaryPredicateInt {
 	}
 }
 
-public class UnaryPredicateIntMore extends UnaryPredicateInt {
+public class UnaryPredicateMoreInt extends UnaryPredicateInt {
 	private int _value;
 	
-	void UnaryPredicateMore(int value) {
-		_value = value;
+	void UnaryPredicateMoreInt(int value) {
+		this._value = value;
 	}
 	
 	bool _(int value) {
-		return value > _value;
+		return value > this._value;
 	}
 }
 
-public class ListElemInt {
+public /*actualy private*/ class ListElemInt {
 	int value;
 	ListElemInt prev;
 	ListElemInt next;
@@ -28,79 +28,276 @@ public class ListElemInt {
 	}
 }
 
+public class ListIteratorInt {
+	protected ListElemInt _elem;
+	
+	void ListIteratorInt(ListElemInt elem) {
+		this._elem = elem;
+	}
+	
+	bool equals(ListIteratorInt that) {
+		return this._elem == that._elem;
+	}
+	
+	ListElemInt get_elem() {
+		return this._elem;
+	}
+	
+	int value() {
+		return this._elem.value;
+	}
+	
+	ListIteratorInt shift() {
+		return this;
+	}
+	
+	ListIteratorInt copy() {
+		return new ListIteratorInt(this._elem);
+	}
+}
+
+public class ListForwardIteratorInt extends ListIteratorInt {
+	void ListForwardIteratorInt(ListElemInt elem) {
+		this._elem = elem;
+	}
+	
+	ListForwardIteratorInt shift() {
+		this._elem = _elem.next;
+		return this;
+	}
+	
+	ListForwardIteratorInt copy() {
+		return new ListForwardIteratorInt(this._elem);
+	}
+}
+
+public class ListBackwardIteratorInt extends ListIteratorInt {
+	void ListBackwardIteratorInt(ListElemInt elem) {
+		this._elem = elem;
+	}
+	
+	ListBackwardIteratorInt shift() {
+		this._elem = _elem.prev;
+		return this;
+	}
+	
+	ListBackwardIteratorInt copy() {
+		return new ListBackwardIteratorInt(this._elem);
+	}
+}
+
 // Linked list like std::list<int>
 public class ListInt {
-	private ListElemInt _front = null;
 	private ListElemInt _back = null;
-	static int default_value = 0;
+	private ListElemInt _front = null;
+	/*private*/ static int default_value = 0;
+	
+	void ~ListInt() {
+		this.clear();
+	}
 	
 	// returns last element
 	int back() {
-		if (_back == null) {
-			return default_value;
+		if (this._back == null) {
+			return this.default_value;
 		}
 		
-		return _back.value;
+		return this._back.value;
 	}
 	
 	// returns first element
 	int front() {
-		if (_front == null) {
-			return default_value;
+		if (this._front == null) {
+			return this.default_value;
 		}
 		
-		return _front.value;
+		return this._front.value;
 	}
 	
-	ListElemInt begin() {
-		return _front;
+	ListForwardIteratorInt begin() {
+		return new ListForwardIteratorInt(this._front);
+	}
+	
+	ListForwardIteratorInt end() {
+		return new ListForwardIteratorInt(null);
+	}
+	
+	ListBackwardIteratorInt rbegin() {
+		return new ListBackwardIteratorInt(this._back);
+	}
+	
+	ListBackwardIteratorInt rend() {
+		return new ListBackwardIteratorInt(null);
 	}
 	
 	bool empty() {
-		return false;  // TODO
+		return this._back == null;
 	}
 	
 	int size() {
-		return 0;  // TODO
+		ListIteratorInt it; int count;
+		
+		count = 0;
+		
+		for (it = this.begin(); not it.equals(this.end()); it.shift()) {
+			++count;
+		}
+		
+		return count;
 	}
 	
 	void clear() {
-		// TODO
+		while (not this.empty()) {
+			this.pop_back();
+		}
 	}
 	
-	ListElemInt insert(ListElemInt pos, int value) {
-		return pos; // TODO
+	// Inserts new element before specified position
+	ListIteratorInt insert(ListIteratorInt pos, int value) {
+		ListElemInt elem_prev, elem_new, elem_next, front_prev;
+		
+		if (pos.equals(this.end())) {  // if insert at the end or insert first
+			// TODO: x.insert(x.rend(), 0) inserts 0 into back, but expect 0 in front
+			this.push_back(value);
+			return new ListIteratorInt(this._back);
+		}
+		
+		elem_next = pos.get_elem();  // can not be null
+		elem_prev = elem_next.prev;
+		elem_new = new ListElemInt(value, elem_prev, elem_next);
+		elem_next.prev = elem_new;
+		
+		if (elem_prev == null) {
+			this._front = elem_new;
+		} else {
+			elem_prev.next = elem_new;
+		}
+		
+		return new ListIteratorInt(elem_new);
 	}
 	
 	void push_back(int value) {
-		_back = new ListElemInt(value, _back, null);
+		this._back = new ListElemInt(value, _back, null);
 		
-		if (_front == null) {  // if pushes first element
-			_front = _back;
+		if (this._front == null) {  // if pushes first element
+			this._front = this._back;
 		} else {
-			_back.prev.next = _back;
+			this._back.prev.next = this._back;
 		}
 	}
 	
 	void pop_back() {
-		// TODO
+		ListElemInt elem_prev;
+		
+		elem_prev = this._back.prev;
+		
+		if (elem_prev != null) {
+			elem_prev.next = null;
+		} else {
+			this._front = null;
+		}
+		
+		this._back = elem_prev;
 	}
 	
 	void push_front(int value) {
-		// TODO
+		_front = new ListElemInt(value, null, _front);
+		
+		if (_back == null) {  // if pushes first element
+			_back = _front;
+		} else {
+			_front.next.prev = _front;
+		}
 	}
 	
 	void pop_front() {
-		// TODO
+		ListElemInt elem_next;
+		
+		elem_next = this._front.next;
+		
+		if (elem_next != null) {
+			elem_next.prev = null;
+		} else {
+			this._back = null;
+		}
+		
+		this._front = elem_next;
+	}
+	
+	/*private*/ void _unlink_elem(ListElemInt elem_curr) {
+		ListElemInt elem_prev, elem_next;
+		
+		elem_prev = elem_curr.prev;
+		elem_next = elem_curr.next;
+		
+		if (elem_prev == null) {
+			this._front = elem_next;
+		} else {
+			elem_prev.next = elem_next;
+			elem_curr.prev = null;
+		}
+		
+		if (elem_next == null) {
+			this._back = elem_prev;
+		} else {
+			elem_next.prev = elem_prev;
+			elem_curr.next = null;
+		}
 	}
 	
 	// removes all elements with value
 	void remove(int value) {
-		// TODO
+		ListIteratorInt it1, it2;
+		ListElemInt elem;
+		
+		if (this.empty()) {
+			return;
+		}
+		
+		it1 = this.begin();
+		it2 = this.begin().shift();
+		
+		for (;;) {
+			elem = it1.get_elem();
+			
+			if (elem.value == value) {
+				this._unlink_elem(elem);
+			}
+			
+			if (it2.equals(this.end())) {
+				return;
+			}
+			
+			it1 = it2.copy();
+			it2.shift();
+		}
 	}
 	
 	void remove_if(UnaryPredicateInt pred) {
-		// TODO
+		ListIteratorInt it1, it2;
+		ListElemInt elem;
+		
+		if (this.empty()) {
+			return;
+		}
+		
+		it1 = this.begin();
+		it2 = this.begin().shift();
+		
+		for (;;) {
+			elem = it1.get_elem();
+			
+			if (pred._(elem.value)) {
+				this._unlink_elem(elem);
+			}
+			
+			if (it2.equals(this.end())) {
+				return;
+			}
+			
+			it1 = it2.copy();
+			it2.shift();
+		}
 	}
 	
 	void unique() {
@@ -112,14 +309,267 @@ public class ListInt {
 	}
 }
 
-extern void object::list() {
-	ListInt li();
-	li.push_back(10);
-	li.push_back(20);
-	li.push_back(35);
+public class TestListInt extends EBoost {
+	private ListInt list = null;
 	
-	ListElemInt e = null;
-	for (e = li.begin(); e != null; e = e.next) {
-		message(e.value);
+	void setup() {
+		list = new ListInt();
+		list.push_back(10);
+		list.push_back(20);
+		list.push_back(30);
+	}
+	
+	void cleanup() {
+		list.clear();
+	}
+	
+	/*private*/ void _check_invariants() {
+		ListBackwardIteratorInt it; ListElemInt elem; int front_count, back_count;
+		
+		front_count = 0;
+		back_count = 0;
+		
+		for (it = list.rbegin(); not it.equals(list.rend()); it.shift()) {
+			elem = it.get_elem();
+			
+			if (it.equals(list.begin())) {
+				assert(elem.prev == null).id;
+				++front_count;
+			} else {
+				assert(elem.prev.next == elem).id;
+			}
+			
+			if (it.equals(list.rbegin())) {
+				assert(elem.next == null).id;
+				++back_count;
+			} else {
+				assert(elem.next.prev == elem).id;
+			}
+		}
+		
+		if (list.empty()) {
+			assert_equal(list.back(), 0).id;
+			assert_equal(list.front(), 0).id;
+		} else {
+			assert_equal(front_count, 1).id;
+			assert_equal(back_count, 1).id;
+		}
+	}
+	
+	void test_push_back() {
+		setup();
+		
+		list.push_back(40);
+		
+		assert_equal(list.front(), 10).id;
+		assert_equal(list.back(), 40).id;
+		assert_equal(list.size(), 4).id;
+		_check_invariants();
+		
+		cleanup();
+	}
+	
+	void test_push_front() {
+		setup();
+		
+		list.push_front(0);
+		
+		assert_equal(list.front(), 0).id;
+		assert_equal(list.back(), 30).id;
+		assert_equal(list.size(), 4).id;
+		_check_invariants();
+		
+		cleanup();
+	}
+	
+	void test_insert() {
+		ListForwardIteratorInt it_10, it_20, it_30, it;
+		ListIteratorInt it_8, it_9, it_18, it_19, it_28, it_29, it_40, it_end;
+		
+		// prepare
+		setup();
+		it_10 = list.begin();
+		it_20 = it_10.copy().shift();
+		it_30 = it_20.copy().shift();
+		it_end = list.end();
+		
+		// test
+		it_8 = list.insert(it_10, 8);
+		it_9 = list.insert(it_10, 9);
+		it_18 = list.insert(it_20, 18);
+		it_19 = list.insert(it_20, 19);
+		it_28 = list.insert(it_30, 28);
+		it_29 = list.insert(it_30, 29);
+		it_40 = list.insert(it_end, 40);
+		
+		// assert
+		assert_equal(it_8.value(), 8).id;
+		assert_equal(it_9.value(), 9).id;
+		assert_equal(it_10.value(), 10).id;
+		assert_equal(it_18.value(), 18).id;
+		assert_equal(it_19.value(), 19).id;
+		assert_equal(it_20.value(), 20).id;
+		assert_equal(it_28.value(), 28).id;
+		assert_equal(it_29.value(), 29).id;
+		assert_equal(it_30.value(), 30).id;
+		assert_equal(it_40.value(), 40).id;
+		
+		assert_equal(list.front(), 8).id;
+		assert_equal(list.back(), 40).id;
+		
+		it = list.begin();
+		assert_equal(it.value(), 8).id;
+		it.shift();
+		assert_equal(it.value(), 9).id;
+		it.shift();
+		assert_equal(it.value(), 10).id;
+		it.shift();
+		assert_equal(it.value(), 18).id;
+		it.shift();
+		assert_equal(it.value(), 19).id;
+		it.shift();
+		assert_equal(it.value(), 20).id;
+		it.shift();
+		assert_equal(it.value(), 28).id;
+		it.shift();
+		assert_equal(it.value(), 29).id;
+		it.shift();
+		assert_equal(it.value(), 30).id;
+		it.shift();
+		assert_equal(it.value(), 40).id;
+		it.shift();
+		assert(it.equals(list.end())).id;
+		
+		assert_equal(list.size(), 10).id;
+		_check_invariants();
+		
+		cleanup();
+	}
+	
+	void test_pop_back() {
+		setup();
+		
+		list.pop_back();
+		
+		assert_equal(list.front(), 10).id;
+		assert_equal(list.back(), 20).id;
+		assert_equal(list.size(), 2).id;
+		_check_invariants();
+		
+		cleanup();
+	}
+	
+	void test_pop_front() {
+		setup();
+		
+		list.pop_front();
+		
+		assert_equal(list.front(), 20).id;
+		assert_equal(list.back(), 30).id;
+		assert_equal(list.size(), 2).id;
+		_check_invariants();
+		
+		cleanup();
+	}
+	
+	void test_pop_front_3() {
+		setup();
+		
+		list.pop_front();
+		list.pop_front();
+		list.pop_front();
+		
+		assert_equal(list.front(), 0).id;
+		assert_equal(list.back(), 0).id;
+		assert_equal(list.size(), 0).id;
+		assert(list.empty()).id;
+		_check_invariants();
+		
+		cleanup();
+	}
+	
+	void test_remove() {
+		ListForwardIteratorInt it;
+		
+		// prepare
+		setup();
+		list.push_back(20);
+		list.push_front(20);
+		
+		// test
+		list.remove(20);
+		
+		// assert
+		assert_equal(list.front(), 10).id;
+		assert_equal(list.back(), 30).id;
+		
+		it = list.begin();
+		assert_equal(it.value(), 10).id;
+		it.shift();
+		assert_equal(it.value(), 30).id;
+		it.shift();
+		assert(it.equals(list.end())).id;
+		
+		assert_equal(list.size(), 2).id;
+		_check_invariants();
+		
+		cleanup();
+	}
+	
+	void test_remove_if() {
+		ListForwardIteratorInt it; UnaryPredicateInt pred;
+		
+		// prepare
+		setup();
+		list.push_front(0);
+		pred = new UnaryPredicateMoreInt(10);
+		
+		// test
+		list.remove_if(pred);
+		
+		// assert
+		assert_equal(list.front(), 0).id;
+		assert_equal(list.back(), 10).id;
+		
+		it = list.begin();
+		assert_equal(it.value(), 0).id;
+		it.shift();
+		assert_equal(it.value(), 10).id;
+		it.shift();
+		assert(it.equals(list.end())).id;
+		
+		assert_equal(list.size(), 2).id;
+		_check_invariants();
+		
+		cleanup();
 	}
 }
+
+///*
+extern void object::RunListTests() {
+	TestListInt t();
+	t.test_push_back();
+	t.test_push_front();
+	t.test_insert();
+	t.test_pop_back();
+	t.test_pop_front();
+	t.test_pop_front_3();
+	t.test_remove();
+	t.test_remove_if();
+	message("Tests passed", DisplayInfo);
+}
+//*/
+/*
+extern void object::ListUsageExample() {
+	ListInt list; ListIteratorInt it;
+	
+	list = new ListInt();
+	list.push_back(10);
+	list.push_back(20);
+	list.push_back(35);
+	
+	for (it = list.begin(); not it.equals(list.end()); it.shift()) {
+		message(it.value());
+	}
+}
+//*/
