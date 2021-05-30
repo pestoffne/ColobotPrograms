@@ -1,3 +1,16 @@
+public class UnaryPredicateMoreInt extends UnaryPredicateInt {
+	private int _value;
+	
+	void UnaryPredicateMoreInt(int value) {
+		this._value = value;
+	}
+	
+	// calculates predicate for specified value
+	bool _(int value) {
+		return value > this._value;
+	}
+}
+
 public class TestListInt extends EBoost {
 	private ListInt list = null;
 	
@@ -13,22 +26,22 @@ public class TestListInt extends EBoost {
 	}
 	
 	/*private*/ void _check_invariants() {
-		ListBackwardIteratorInt it; ListElemInt elem; int front_count, back_count;
+		ListIteratorInt it; ListElemInt elem; int front_count, back_count;
 		
 		front_count = 0;
 		back_count = 0;
 		
-		for (it = list.rbegin(); not it.equals(list.rend()); it.shift()) {
+		for (it = list.rbegin(); not it.equal(list.rend()); it.shift()) {
 			elem = it.get_elem();
 			
-			if (it.equals(list.begin())) {
+			if (it.equal(list.begin())) {
 				assert(elem.prev == null).id;
 				++front_count;
 			} else {
 				assert(elem.prev.next == elem).id;
 			}
 			
-			if (it.equals(list.rbegin())) {
+			if (it.equal(list.rbegin())) {
 				assert(elem.next == null).id;
 				++back_count;
 			} else {
@@ -72,8 +85,7 @@ public class TestListInt extends EBoost {
 	}
 	
 	void test_insert() {
-		ListForwardIteratorInt it_10, it_20, it_30, it;
-		ListIteratorInt it_8, it_9, it_18, it_19, it_28, it_29, it_40, it_end;
+		ListIteratorInt it_8, it_9, it_10, it_18, it_19, it_20, it_28, it_29, it_30, it_40, it_end, it;
 		
 		// prepare
 		setup();
@@ -127,7 +139,7 @@ public class TestListInt extends EBoost {
 		it.shift();
 		assert_equal(it.value(), 40).id;
 		it.shift();
-		assert(it.equals(list.end())).id;
+		assert(it.equal(list.end())).id;
 		
 		assert_equal(list.size(), 10).id;
 		_check_invariants();
@@ -178,7 +190,7 @@ public class TestListInt extends EBoost {
 	}
 	
 	void test_remove() {
-		ListForwardIteratorInt it;
+		ListIteratorInt it;
 		
 		// prepare
 		setup();
@@ -197,7 +209,7 @@ public class TestListInt extends EBoost {
 		it.shift();
 		assert_equal(it.value(), 30).id;
 		it.shift();
-		assert(it.equals(list.end())).id;
+		assert(it.equal(list.end())).id;
 		
 		assert_equal(list.size(), 2).id;
 		_check_invariants();
@@ -206,15 +218,15 @@ public class TestListInt extends EBoost {
 	}
 	
 	void test_remove_if() {
-		ListForwardIteratorInt it; UnaryPredicateInt pred;
+		ListIteratorInt it; UnaryPredicateInt more_then_10;
 		
 		// prepare
 		setup();
 		list.push_front(0);
-		pred = new UnaryPredicateMoreInt(10);
+		more_then_10 = new UnaryPredicateMoreInt(10);
 		
 		// test
-		list.remove_if(pred);
+		list.remove_if(more_then_10);
 		
 		// assert
 		assert_equal(list.front(), 0).id;
@@ -225,10 +237,54 @@ public class TestListInt extends EBoost {
 		it.shift();
 		assert_equal(it.value(), 10).id;
 		it.shift();
-		assert(it.equals(list.end())).id;
+		assert(it.equal(list.end())).id;
 		
 		assert_equal(list.size(), 2).id;
 		_check_invariants();
+		
+		cleanup();
+	}
+	
+	void test_find_if() {
+		ListIteratorInt it_20, it_30, it_null; UnaryPredicateInt more_then_10;
+		
+		// prepare
+		setup();
+		list.push_back(-40);
+		more_then_10 = new UnaryPredicateMoreInt(10);
+		
+		// test
+		it_20 = list_find_if(list.begin(), list.end(), more_then_10);
+		it_30 = list_find_if(it_20.copy().shift(), list.end(), more_then_10);
+		it_null = list_find_if(it_30.copy().shift(), list.end(), more_then_10);
+		
+		// assert
+		assert_equal(it_20.value(), 20).id;
+		assert_equal(it_30.value(), 30).id;
+		assert(it_null.is_null()).id;
+		
+		cleanup();
+	}
+	
+	void test_find_if_backward() {
+		ListIteratorInt it_20, it_30, it_40, it_null; UnaryPredicateInt more_then_10;
+		
+		// prepare
+		setup();
+		list.push_front(40);
+		more_then_10 = new UnaryPredicateMoreInt(10);
+		
+		// test
+		it_30 = list_find_if(list.rbegin(), list.rend(), more_then_10);
+		it_20 = list_find_if(it_30.copy().shift(), list.rend(), more_then_10);
+		it_40 = list_find_if(it_20.copy().shift(), list.rend(), more_then_10);
+		it_null = list_find_if(it_40.copy().shift(), list.rend(), more_then_10);
+		
+		// assert
+		assert_equal(it_20.value(), 20).id;
+		assert_equal(it_30.value(), 30).id;
+		assert_equal(it_40.value(), 40).id;
+		assert(it_null.is_null()).id;
 		
 		cleanup();
 	}
@@ -244,5 +300,7 @@ extern void Test_ListInt() {
 	t.test_pop_front_3();
 	t.test_remove();
 	t.test_remove_if();
+	t.test_find_if();
+	t.test_find_if_backward();
 	message("Tests passed", DisplayInfo);
 }

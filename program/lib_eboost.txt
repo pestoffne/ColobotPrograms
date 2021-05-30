@@ -968,6 +968,98 @@ public class Message {
 	}
 }
 
+public class TaskState {
+	public string to_str() {
+		nan * 0;  // abstract method
+		return "";
+	}
+}
+
+public class TaskStateProposed extends TaskState {
+	public string to_str() {
+		return "proposed";
+	}
+}
+
+public class TaskStateInInvestigation extends TaskState {
+	public string to_str() {
+		return "in-investigation";
+	}
+}
+
+public class TaskStateActive extends TaskState {
+	public string to_str() {
+		return "active";
+	}
+}
+
+public class TaskStateResolved extends TaskState {
+	public string to_str() {
+		return "resolved";
+	}
+}
+
+public class TaskStateClosed extends TaskState {
+	public string to_str() {
+		return "closed";
+	}
+}
+
+public class TaskStateFailed extends TaskState {
+	public string to_str() {
+		return "failed";
+	}
+}
+
+public class Goal {
+	protected TaskState _state = new TaskStateProposed();
+	
+	public void Goal() {
+		nan * 0;  // abstract class
+	}
+	
+	public void assign(object actor) {
+		nan * 0;  // abstract method
+	}
+	
+	public void change_state(TaskState state) {
+		this._state = state;
+	}
+	
+	public bool check_prerequirements() {
+		nan * 0;  // abstract method
+		return false;
+	}
+	
+	public TaskState get_state() {
+		return this._state;
+	}
+	
+	public bool equal(Goal that) {
+		return this.to_str() == that.to_str();
+	}
+	
+	public float get_resolve_time() {
+		return 0;
+	}
+	
+	public float get_close_time() {
+		return this.get_resolve_time();
+	}
+	
+	// Makes some to archieve goal
+	// return: 0 if goal achieved, 1 on error
+	public int make() {
+		nan * 0;  // abstract method
+		return 0;
+	}
+	
+	public string to_str() {
+		nan * 0;  // abstract method
+		return "";
+	} 
+}
+
 extern void Library_EBoost() {
 	EBoost e(null);
 	

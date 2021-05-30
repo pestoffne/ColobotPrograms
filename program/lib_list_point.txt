@@ -1,43 +1,43 @@
 // This file is generated automaticaly from template. Do not edit.
 
-public class UnaryPredicateInt {
-void UnaryPredicateInt() {
+public class UnaryPredicatePoint {
+void UnaryPredicatePoint() {
 nan * 0;
 }
 
-bool _(int value) {
+bool _(point value) {
 return true;
 }
 }
 
-public class ListElemInt {
-int value;
-ListElemInt prev;
-ListElemInt next;
+public class ListElemPoint {
+point value;
+ListElemPoint prev;
+ListElemPoint next;
 
-void ListElemInt(int value, ListElemInt prev = null, ListElemInt next = null) {
+void ListElemPoint(point value, ListElemPoint prev = null, ListElemPoint next = null) {
 this.value = value;
 this.prev = prev;
 this.next = next;
 }
 }
 
-public class ListIteratorInt {
-protected ListElemInt _elem;
+public class ListIteratorPoint {
+protected ListElemPoint _elem;
 
-void ListIteratorInt(ListElemInt elem) {
+void ListIteratorPoint(ListElemPoint elem) {
 this._elem = elem;
 }
 
-ListIteratorInt copy() {
-return new ListIteratorInt(this._elem);
+ListIteratorPoint copy() {
+return new ListIteratorPoint(this._elem);
 }
 
-bool equal(ListIteratorInt that) {
+bool equal(ListIteratorPoint that) {
 return this._elem == that._elem;
 }
 
-ListElemInt get_elem() {
+ListElemPoint get_elem() {
 return this._elem;
 }
 
@@ -45,73 +45,73 @@ bool is_null() {
 return this._elem == null;
 }
 
-int value() {
+point value() {
 return this._elem.value;
 }
 
-ListIteratorInt shift() {
+ListIteratorPoint shift() {
 this._elem = this._elem.next;
 return this;
 }
 }
 
-public class ListBackwardIteratorInt extends ListIteratorInt {
-void ListBackwardIteratorInt(ListElemInt elem) {
+public class ListBackwardIteratorPoint extends ListIteratorPoint {
+void ListBackwardIteratorPoint(ListElemPoint elem) {
 super._elem = elem;
 }
 
-ListBackwardIteratorInt copy() {
-return new ListBackwardIteratorInt(this._elem);
+ListBackwardIteratorPoint copy() {
+return new ListBackwardIteratorPoint(this._elem);
 }
 
-ListIteratorInt shift() {
+ListIteratorPoint shift() {
 this._elem = this._elem.prev;
 return this;
 }
 }
 
 
-public class ListInt {
-private ListElemInt _back = null;
-private ListElemInt _front = null;
+public class ListPoint {
+private ListElemPoint _back = null;
+private ListElemPoint _front = null;
 private int _size = 0;
 
-void ~ListInt() {
+void ~ListPoint() {
 this.clear();
 }
 
 
-int back() {
+point back() {
 if (this._back == null) {
-return 0;
+return new point(400, 400);
 }
 
 return this._back.value;
 }
 
 
-int front() {
+point front() {
 if (this._front == null) {
-return 0;
+return new point(400, 400);
 }
 
 return this._front.value;
 }
 
-ListIteratorInt begin() {
-return new ListIteratorInt(this._front);
+ListIteratorPoint begin() {
+return new ListIteratorPoint(this._front);
 }
 
-ListIteratorInt end() {
-return new ListIteratorInt(null);
+ListIteratorPoint end() {
+return new ListIteratorPoint(null);
 }
 
-ListIteratorInt rbegin() {
-return new ListBackwardIteratorInt(this._back);
+ListIteratorPoint rbegin() {
+return new ListBackwardIteratorPoint(this._back);
 }
 
-ListIteratorInt rend() {
-return new ListBackwardIteratorInt(null);
+ListIteratorPoint rend() {
+return new ListBackwardIteratorPoint(null);
 }
 
 bool empty() {
@@ -129,18 +129,18 @@ this.pop_back();
 }
 
 
-ListIteratorInt insert(ListIteratorInt pos, int value) {
-ListElemInt elem_prev, elem_new, elem_next, front_prev;
+ListIteratorPoint insert(ListIteratorPoint pos, point value) {
+ListElemPoint elem_prev, elem_new, elem_next, front_prev;
 
 if (pos.equal(this.end())) {
 
 this.push_back(value);
-return new ListIteratorInt(this._back);
+return new ListIteratorPoint(this._back);
 }
 
 elem_next = pos.get_elem();
 elem_prev = elem_next.prev;
-elem_new = new ListElemInt(value, elem_prev, elem_next);
+elem_new = new ListElemPoint(value, elem_prev, elem_next);
 elem_next.prev = elem_new;
 
 if (elem_prev == null) {
@@ -150,11 +150,11 @@ elem_prev.next = elem_new;
 }
 
 this._size++;
-return new ListIteratorInt(elem_new);
+return new ListIteratorPoint(elem_new);
 }
 
-void push_back(int value) {
-this._back = new ListElemInt(value, _back, null);
+void push_back(point value) {
+this._back = new ListElemPoint(value, _back, null);
 
 if (this._front == null) {
 this._front = this._back;
@@ -166,7 +166,7 @@ this._size++;
 }
 
 void pop_back() {
-ListElemInt elem_prev;
+ListElemPoint elem_prev;
 
 elem_prev = this._back.prev;
 
@@ -180,8 +180,8 @@ this._back = elem_prev;
 this._size--;
 }
 
-void push_front(int value) {
-_front = new ListElemInt(value, null, _front);
+void push_front(point value) {
+_front = new ListElemPoint(value, null, _front);
 
 if (_back == null) {
 _back = _front;
@@ -193,7 +193,7 @@ this._size++;
 }
 
 void pop_front() {
-ListElemInt elem_next;
+ListElemPoint elem_next;
 
 elem_next = this._front.next;
 
@@ -207,8 +207,8 @@ this._front = elem_next;
 this._size--;
 }
 
-void _unlink_elem(ListElemInt elem_curr) {
-ListElemInt elem_prev, elem_next;
+void _unlink_elem(ListElemPoint elem_curr) {
+ListElemPoint elem_prev, elem_next;
 
 elem_prev = elem_curr.prev;
 elem_next = elem_curr.next;
@@ -231,9 +231,9 @@ this._size--;
 }
 
 
-void remove(int value) {
-ListIteratorInt it1, it2;
-ListElemInt elem;
+void remove(point value) {
+ListIteratorPoint it1, it2;
+ListElemPoint elem;
 
 if (this.empty()) {
 return;
@@ -258,9 +258,9 @@ it2.shift();
 }
 }
 
-void remove_if(UnaryPredicateInt pred) {
-ListIteratorInt it1, it2;
-ListElemInt elem;
+void remove_if(UnaryPredicatePoint pred) {
+ListIteratorPoint it1, it2;
+ListElemPoint elem;
 
 if (this.empty()) {
 return;
@@ -294,8 +294,8 @@ void sort() {
 }
 }
 
-public ListIteratorInt list_find(ListIteratorInt first, ListIteratorInt last, int value) {
-ListIteratorInt it;
+public ListIteratorPoint list_find(ListIteratorPoint first, ListIteratorPoint last, point value) {
+ListIteratorPoint it;
 
 for (it = first.copy(); not it.equal(last); it.shift()) {
 if (it.value() == value) {
@@ -303,11 +303,11 @@ return it;
 }
 }
 
-return new ListIteratorInt(null);
+return new ListIteratorPoint(null);
 }
 
-public ListIteratorInt list_find_if(ListIteratorInt first, ListIteratorInt last, UnaryPredicateInt pred) {
-ListIteratorInt it;
+public ListIteratorPoint list_find_if(ListIteratorPoint first, ListIteratorPoint last, UnaryPredicatePoint pred) {
+ListIteratorPoint it;
 
 for (it = first.copy(); not it.equal(last); it.shift()) {
 if (pred._(it.value())) {
@@ -315,8 +315,8 @@ return it;
 }
 }
 
-return new ListIteratorInt(null);
+return new ListIteratorPoint(null);
 }
 
-extern void Library_ListInt() {
+extern void Library_ListPoint() {
 }

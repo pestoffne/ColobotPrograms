@@ -1,21 +1,11 @@
 
-public /*abstract*/ class TEMPLATE(UnaryPredicate) {
+public class TEMPLATE(UnaryPredicate) {
+	void TEMPLATE(UnaryPredicate)() {
+		nan * 0;  // abstract class
+	}
+	
 	bool _(TYPE value) {
 		return true;
-	}
-}
-
-public class TEMPLATE(UnaryPredicateMore) extends TEMPLATE(UnaryPredicate) {
-	private TYPE _value;
-	
-	// constructor
-	void TEMPLATE(UnaryPredicateMore)(TYPE value) {
-		this._value = value;
-	}
-	
-	// calculates predicate for specified value
-	bool _(TYPE value) {
-		return value > this._value;
 	}
 }
 
@@ -38,7 +28,11 @@ public class TEMPLATE(ListIterator) {
 		this._elem = elem;
 	}
 	
-	bool equals(TEMPLATE(ListIterator) that) {
+	TEMPLATE(ListIterator) copy() {
+		return new TEMPLATE(ListIterator)(this._elem);
+	}
+	
+	bool equal(TEMPLATE(ListIterator) that) {
 		return this._elem == that._elem;
 	}
 	
@@ -46,53 +40,40 @@ public class TEMPLATE(ListIterator) {
 		return this._elem;
 	}
 	
+	bool is_null() {
+		return this._elem == null;
+	}
+	
 	TYPE value() {
 		return this._elem.value;
 	}
 	
 	TEMPLATE(ListIterator) shift() {
+		this._elem = this._elem.next;
 		return this;
-	}
-	
-	TEMPLATE(ListIterator) copy() {
-		return new TEMPLATE(ListIterator)(this._elem);
-	}
-}
-
-public class TEMPLATE(ListForwardIterator) extends TEMPLATE(ListIterator) {
-	void TEMPLATE(ListForwardIterator)(TEMPLATE(ListElem) elem) {
-		this._elem = elem;
-	}
-	
-	TEMPLATE(ListForwardIterator) shift() {
-		this._elem = _elem.next;
-		return this;
-	}
-	
-	TEMPLATE(ListForwardIterator) copy() {
-		return new TEMPLATE(ListForwardIterator)(this._elem);
-	}
+	}	
 }
 
 public class TEMPLATE(ListBackwardIterator) extends TEMPLATE(ListIterator) {
 	void TEMPLATE(ListBackwardIterator)(TEMPLATE(ListElem) elem) {
-		this._elem = elem;
-	}
-	
-	TEMPLATE(ListBackwardIterator) shift() {
-		this._elem = _elem.prev;
-		return this;
+		super._elem = elem;
 	}
 	
 	TEMPLATE(ListBackwardIterator) copy() {
 		return new TEMPLATE(ListBackwardIterator)(this._elem);
 	}
+	
+	TEMPLATE(ListIterator) shift() {
+		this._elem = this._elem.prev;
+		return this;
+	}	
 }
 
 // Linked list like std::list<TYPE>
 public class TEMPLATE(List) {
 	private TEMPLATE(ListElem) _back = null;
 	private TEMPLATE(ListElem) _front = null;
+	private int _size = 0;
 	
 	void TEMPLATE(~List)() {
 		this.clear();
@@ -116,19 +97,19 @@ public class TEMPLATE(List) {
 		return this._front.value;
 	}
 	
-	TEMPLATE(ListForwardIterator) begin() {
-		return new TEMPLATE(ListForwardIterator)(this._front);
+	TEMPLATE(ListIterator) begin() {
+		return new TEMPLATE(ListIterator)(this._front);
 	}
 	
-	TEMPLATE(ListForwardIterator) end() {
-		return new TEMPLATE(ListForwardIterator)(null);
+	TEMPLATE(ListIterator) end() {
+		return new TEMPLATE(ListIterator)(null);
 	}
 	
-	TEMPLATE(ListBackwardIterator) rbegin() {
+	TEMPLATE(ListIterator) rbegin() {
 		return new TEMPLATE(ListBackwardIterator)(this._back);
 	}
 	
-	TEMPLATE(ListBackwardIterator) rend() {
+	TEMPLATE(ListIterator) rend() {
 		return new TEMPLATE(ListBackwardIterator)(null);
 	}
 	
@@ -137,15 +118,17 @@ public class TEMPLATE(List) {
 	}
 	
 	int size() {
+		return this._size;
+		/*  // calculate size
 		TEMPLATE(ListIterator) it; int count;
 		
 		count = 0;
 		
-		for (it = this.begin(); not it.equals(this.end()); it.shift()) {
+		for (it = this.begin(); not it.equal(this.end()); it.shift()) {
 			++count;
 		}
 		
-		return count;
+		return count; */
 	}
 	
 	void clear() {
@@ -158,7 +141,7 @@ public class TEMPLATE(List) {
 	TEMPLATE(ListIterator) insert(TEMPLATE(ListIterator) pos, TYPE value) {
 		TEMPLATE(ListElem) elem_prev, elem_new, elem_next, front_prev;
 		
-		if (pos.equals(this.end())) {  // if insert at the end or insert first
+		if (pos.equal(this.end())) {  // if insert at the end or insert first
 			// TODO: x.insert(x.rend(), 0) inserts 0 into back, but expect 0 in front
 			this.push_back(value);
 			return new TEMPLATE(ListIterator)(this._back);
@@ -175,6 +158,7 @@ public class TEMPLATE(List) {
 			elem_prev.next = elem_new;
 		}
 		
+		this._size++;
 		return new TEMPLATE(ListIterator)(elem_new);
 	}
 	
@@ -186,6 +170,8 @@ public class TEMPLATE(List) {
 		} else {
 			this._back.prev.next = this._back;
 		}
+		
+		this._size++;
 	}
 	
 	void pop_back() {
@@ -200,6 +186,7 @@ public class TEMPLATE(List) {
 		}
 		
 		this._back = elem_prev;
+		this._size--;
 	}
 	
 	void push_front(TYPE value) {
@@ -210,6 +197,8 @@ public class TEMPLATE(List) {
 		} else {
 			_front.next.prev = _front;
 		}
+		
+		this._size++;
 	}
 	
 	void pop_front() {
@@ -224,6 +213,7 @@ public class TEMPLATE(List) {
 		}
 		
 		this._front = elem_next;
+		this._size--;
 	}
 	
 	/*private*/ void _unlink_elem(TEMPLATE(ListElem) elem_curr) {
@@ -245,6 +235,8 @@ public class TEMPLATE(List) {
 			elem_next.prev = elem_prev;
 			elem_curr.next = null;
 		}
+		
+		this._size--;
 	}
 	
 	// removes all elements with value
@@ -266,7 +258,7 @@ public class TEMPLATE(List) {
 				this._unlink_elem(elem);
 			}
 			
-			if (it2.equals(this.end())) {
+			if (it2.equal(this.end())) {
 				return;
 			}
 			
@@ -293,7 +285,7 @@ public class TEMPLATE(List) {
 				this._unlink_elem(elem);
 			}
 			
-			if (it2.equals(this.end())) {
+			if (it2.equal(this.end())) {
 				return;
 			}
 			
@@ -309,6 +301,30 @@ public class TEMPLATE(List) {
 	void sort() {
 		// TODO
 	}
+}
+
+public TEMPLATE(ListIterator) list_find(TEMPLATE(ListIterator) first, TEMPLATE(ListIterator) last, TYPE value) {
+	TEMPLATE(ListIterator) it;
+	
+	for (it = first.copy(); not it.equal(last); it.shift()) {
+		if (it.value() == value) {
+			return it;
+		}
+	}
+	
+	return new TEMPLATE(ListIterator)(null);
+}
+
+public TEMPLATE(ListIterator) list_find_if(TEMPLATE(ListIterator) first, TEMPLATE(ListIterator) last, TEMPLATE(UnaryPredicate) pred) {
+	TEMPLATE(ListIterator) it;
+	
+	for (it = first.copy(); not it.equal(last); it.shift()) {
+		if (pred._(it.value())) {
+			return it;
+		}
+	}
+	
+	return new TEMPLATE(ListIterator)(null);
 }
 
 extern void TEMPLATE(Library_List)() {

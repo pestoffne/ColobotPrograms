@@ -1,43 +1,43 @@
 // This file is generated automaticaly from template. Do not edit.
 
-public class UnaryPredicateInt {
-void UnaryPredicateInt() {
+public class UnaryPredicateGoal {
+void UnaryPredicateGoal() {
 nan * 0;
 }
 
-bool _(int value) {
+bool _(Goal value) {
 return true;
 }
 }
 
-public class ListElemInt {
-int value;
-ListElemInt prev;
-ListElemInt next;
+public class ListElemGoal {
+Goal value;
+ListElemGoal prev;
+ListElemGoal next;
 
-void ListElemInt(int value, ListElemInt prev = null, ListElemInt next = null) {
+void ListElemGoal(Goal value, ListElemGoal prev = null, ListElemGoal next = null) {
 this.value = value;
 this.prev = prev;
 this.next = next;
 }
 }
 
-public class ListIteratorInt {
-protected ListElemInt _elem;
+public class ListIteratorGoal {
+protected ListElemGoal _elem;
 
-void ListIteratorInt(ListElemInt elem) {
+void ListIteratorGoal(ListElemGoal elem) {
 this._elem = elem;
 }
 
-ListIteratorInt copy() {
-return new ListIteratorInt(this._elem);
+ListIteratorGoal copy() {
+return new ListIteratorGoal(this._elem);
 }
 
-bool equal(ListIteratorInt that) {
+bool equal(ListIteratorGoal that) {
 return this._elem == that._elem;
 }
 
-ListElemInt get_elem() {
+ListElemGoal get_elem() {
 return this._elem;
 }
 
@@ -45,73 +45,73 @@ bool is_null() {
 return this._elem == null;
 }
 
-int value() {
+Goal value() {
 return this._elem.value;
 }
 
-ListIteratorInt shift() {
+ListIteratorGoal shift() {
 this._elem = this._elem.next;
 return this;
 }
 }
 
-public class ListBackwardIteratorInt extends ListIteratorInt {
-void ListBackwardIteratorInt(ListElemInt elem) {
+public class ListBackwardIteratorGoal extends ListIteratorGoal {
+void ListBackwardIteratorGoal(ListElemGoal elem) {
 super._elem = elem;
 }
 
-ListBackwardIteratorInt copy() {
-return new ListBackwardIteratorInt(this._elem);
+ListBackwardIteratorGoal copy() {
+return new ListBackwardIteratorGoal(this._elem);
 }
 
-ListIteratorInt shift() {
+ListIteratorGoal shift() {
 this._elem = this._elem.prev;
 return this;
 }
 }
 
 
-public class ListInt {
-private ListElemInt _back = null;
-private ListElemInt _front = null;
+public class ListGoal {
+private ListElemGoal _back = null;
+private ListElemGoal _front = null;
 private int _size = 0;
 
-void ~ListInt() {
+void ~ListGoal() {
 this.clear();
 }
 
 
-int back() {
+Goal back() {
 if (this._back == null) {
-return 0;
+return null;
 }
 
 return this._back.value;
 }
 
 
-int front() {
+Goal front() {
 if (this._front == null) {
-return 0;
+return null;
 }
 
 return this._front.value;
 }
 
-ListIteratorInt begin() {
-return new ListIteratorInt(this._front);
+ListIteratorGoal begin() {
+return new ListIteratorGoal(this._front);
 }
 
-ListIteratorInt end() {
-return new ListIteratorInt(null);
+ListIteratorGoal end() {
+return new ListIteratorGoal(null);
 }
 
-ListIteratorInt rbegin() {
-return new ListBackwardIteratorInt(this._back);
+ListIteratorGoal rbegin() {
+return new ListBackwardIteratorGoal(this._back);
 }
 
-ListIteratorInt rend() {
-return new ListBackwardIteratorInt(null);
+ListIteratorGoal rend() {
+return new ListBackwardIteratorGoal(null);
 }
 
 bool empty() {
@@ -129,18 +129,18 @@ this.pop_back();
 }
 
 
-ListIteratorInt insert(ListIteratorInt pos, int value) {
-ListElemInt elem_prev, elem_new, elem_next, front_prev;
+ListIteratorGoal insert(ListIteratorGoal pos, Goal value) {
+ListElemGoal elem_prev, elem_new, elem_next, front_prev;
 
 if (pos.equal(this.end())) {
 
 this.push_back(value);
-return new ListIteratorInt(this._back);
+return new ListIteratorGoal(this._back);
 }
 
 elem_next = pos.get_elem();
 elem_prev = elem_next.prev;
-elem_new = new ListElemInt(value, elem_prev, elem_next);
+elem_new = new ListElemGoal(value, elem_prev, elem_next);
 elem_next.prev = elem_new;
 
 if (elem_prev == null) {
@@ -150,11 +150,11 @@ elem_prev.next = elem_new;
 }
 
 this._size++;
-return new ListIteratorInt(elem_new);
+return new ListIteratorGoal(elem_new);
 }
 
-void push_back(int value) {
-this._back = new ListElemInt(value, _back, null);
+void push_back(Goal value) {
+this._back = new ListElemGoal(value, _back, null);
 
 if (this._front == null) {
 this._front = this._back;
@@ -166,7 +166,7 @@ this._size++;
 }
 
 void pop_back() {
-ListElemInt elem_prev;
+ListElemGoal elem_prev;
 
 elem_prev = this._back.prev;
 
@@ -180,8 +180,8 @@ this._back = elem_prev;
 this._size--;
 }
 
-void push_front(int value) {
-_front = new ListElemInt(value, null, _front);
+void push_front(Goal value) {
+_front = new ListElemGoal(value, null, _front);
 
 if (_back == null) {
 _back = _front;
@@ -193,7 +193,7 @@ this._size++;
 }
 
 void pop_front() {
-ListElemInt elem_next;
+ListElemGoal elem_next;
 
 elem_next = this._front.next;
 
@@ -207,8 +207,8 @@ this._front = elem_next;
 this._size--;
 }
 
-void _unlink_elem(ListElemInt elem_curr) {
-ListElemInt elem_prev, elem_next;
+void _unlink_elem(ListElemGoal elem_curr) {
+ListElemGoal elem_prev, elem_next;
 
 elem_prev = elem_curr.prev;
 elem_next = elem_curr.next;
@@ -231,9 +231,9 @@ this._size--;
 }
 
 
-void remove(int value) {
-ListIteratorInt it1, it2;
-ListElemInt elem;
+void remove(Goal value) {
+ListIteratorGoal it1, it2;
+ListElemGoal elem;
 
 if (this.empty()) {
 return;
@@ -258,9 +258,9 @@ it2.shift();
 }
 }
 
-void remove_if(UnaryPredicateInt pred) {
-ListIteratorInt it1, it2;
-ListElemInt elem;
+void remove_if(UnaryPredicateGoal pred) {
+ListIteratorGoal it1, it2;
+ListElemGoal elem;
 
 if (this.empty()) {
 return;
@@ -294,8 +294,8 @@ void sort() {
 }
 }
 
-public ListIteratorInt list_find(ListIteratorInt first, ListIteratorInt last, int value) {
-ListIteratorInt it;
+public ListIteratorGoal list_find(ListIteratorGoal first, ListIteratorGoal last, Goal value) {
+ListIteratorGoal it;
 
 for (it = first.copy(); not it.equal(last); it.shift()) {
 if (it.value() == value) {
@@ -303,11 +303,11 @@ return it;
 }
 }
 
-return new ListIteratorInt(null);
+return new ListIteratorGoal(null);
 }
 
-public ListIteratorInt list_find_if(ListIteratorInt first, ListIteratorInt last, UnaryPredicateInt pred) {
-ListIteratorInt it;
+public ListIteratorGoal list_find_if(ListIteratorGoal first, ListIteratorGoal last, UnaryPredicateGoal pred) {
+ListIteratorGoal it;
 
 for (it = first.copy(); not it.equal(last); it.shift()) {
 if (pred._(it.value())) {
@@ -315,8 +315,8 @@ return it;
 }
 }
 
-return new ListIteratorInt(null);
+return new ListIteratorGoal(null);
 }
 
-extern void Library_ListInt() {
+extern void Library_ListGoal() {
 }

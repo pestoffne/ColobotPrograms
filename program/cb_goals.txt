@@ -1,6 +1,6 @@
 public class CodeBattleBoost extends EBoost {
-	static TaskList task_list;
-	static BuildPositions build_positions;
+	public static TaskList task_list;
+	public static BuildPositions build_positions;
 	
 	int goto_build(int cat) {
 		return 0 +
@@ -18,78 +18,72 @@ public class CodeBattleBoost extends EBoost {
 	}
 	
 	void setup() {
-		task_list.push(new GoalPowerPlant());
+		task_list.push_back(new GoalPowerPlant());
 	}
 	
 	void loop() {
-		Goal goal;
+		Goal goal; ListIteratorGoal it;
 		
-		goal = task_list.get();
+		for (it = task_list.rbegin();; it.shift()) {
+			if (it.is_null()) {
+				log("There is no more tasks in the list");
+				wait(1);
+				return;
+			}
+			
+			goal = it.value();
+			goal.assign(actor);
+			goal.change_state(new TaskStateInInvestigation());
+			
+			if (goal.check_prerequirements()) {
+				break;
+			}
+			
+			goal.change_state(new TaskStateProposed());
+		}
 		
-		if (goal == null) {
-			log("Task list is empty");
-			wait(1);
+		goal.change_state(new TaskStateActive());  
+		
+		if (goal.make() == 0) {
+			goal.change_state(new TaskStateResolved());
 			return;
 		}
 		
-		log("get " + goal.to_str());
-		goal.assign(actor);
-		
-		if (not goal.check_prerequirements()) {
-			log("false preqs");
-			return;
-		}
-		
-		log("true preqs");
-		
-		if (goal.make() != 0) {
-			log("make not ok");
-			return;
-		}
-		
-		log("pop");
-		task_list.pop();
+		goal.change_state(new TaskStateFailed());
 		wait(1);
 	}
 }
 
-public class Goal {
+public class GoalCodeBattle extends Goal {
 	/*protected*/ CodeBattleBoost cb = new CodeBattleBoost();
 	/*protected Goal[] depends; // unused */
+	private TaskState _state = null;
 	
 	public void assign(object actor) {
 		cb.actor = actor;
+		
+		if (this._state == null) {
+			this._state = new TaskStateProposed();
+		}
 	}
 	
-	public bool check_prerequirements() {
-		return false;
+	public void change_state(TaskState state) {
+		cb.log("Task's state changed from " + this._state.to_str() + " to " + state.to_str());
+		this._state = state;
+		// super.change_state(state);
 	}
 	
-	// Makes some to archieve goal
-	// return: 0 if goal achieved, 1 on error
-	public int make() {
-		return 2;
-	}
-	
-	public float get_resolve_time() {
-		return 0;
-	}
-	
-	public float get_close_time() {
-		return get_resolve_time();
+	public TaskState get_state() {
+		return this._state;
 	}
 	
 	public string to_str() {
-		return "Goal";
-	}
-	
-	public bool equals(Goal goal) {
-		return to_str() == goal.to_str();
+		return "CodeBattleGoal";
 	}
 	
 	/*protected*/ bool _add_goal(bool flag, Goal goal) {
 		if (not flag) {
-			cb.task_list.push_uniq(goal);
+			cb.task_list.push_back_uniq(goal);
 		}
 		
 		return flag;
@@ -113,7 +107,7 @@ public class Goal {
 	}
 }
 
-public class GoalResource extends Goal {
+public class GoalResource extends GoalCodeBattle {
 	public string to_str() {
 		return "GoalResource";
 	}
@@ -174,7 +168,7 @@ public class GoalPowerCell extends GoalResource {
 	}
 } 
 
-public class GoalStructure extends Goal {
+public class GoalStructure extends GoalCodeBattle {
 	protected int cat;
 	
 	void GoalStructure(int cat) {
@@ -228,97 +222,57 @@ public class GoalPowerPlant extends GoalStructure {
 	}
 }
 
-public class TaskList {
+public class UnaryPredicateEqualGoal extends UnaryPredicateGoal {
+	private Goal _value;
+	
+	void UnaryPredicateEqualGoal(Goal value) {
+		this._value = value;
+	}
+	
+	bool _(Goal value) {
+		return this._value.equal(value);
+	}
+}
+
+public class TaskList extends ListGoal {
 	static CodeBattleBoost cb;
-	Goal[] task_list_;
-	int task_index_ = 0;
-	private object exit_ = null;
 	
 	public void log_task_list() {
-		file handler; int i;
+		file handler; int i; ListIteratorGoal it;
 		
 		handler = new file();
 		handler.open(cb.logfile, "a");
 		
-		for (i = 0; i < sizeof(task_list_); ++i) {
-			handler.writeln(i + " " + task_list_[i]);
+		for (it = super.begin(), i = 0; not it.is_null(); it.shift(), ++i) {
+			handler.writeln(i + " " + it.value().to_str());
 		}
 		
 		handler.close();
-		
-		/*for (int i = 0; i < sizeof(task_list_); ++i) {
-			cb.log(i + " " + task_list_[i]);
-		}*/
 	}
 	
-	public void push_uniq(Goal goal) {
-		int i;
-		
-		if (task_index_ > 30) {
+	/*private*/ void _exit_on_overflow() {
+		if (super.size() > 30) {
 			cb.log("Task list is overflow. Exit program");
-			log_task_list();
-			exit_.id;
-		}
-		
-		for (i = 1;; ++i) {
-			if (i >= task_index_) {
-				cb.log("push_uniq " + task_index_ + " " + goal.to_str());
-				task_list_[task_index_++] = goal;
-				return;
-			}
-			
-			if (task_list_[i - 1].equals(goal)) {
-				break;
-			}
-		}
-		
-		for (;i < task_index_; ++i) {
-			task_list_[i - 1] = task_list_[i];
-		}
-		
-		cb.log("push_uniq " + (task_index_ - 1) + " " + goal.to_str());
-		task_list_[task_index_ - 1] = goal;
-	}
-	
-	public void push(Goal goal) {
-		if (task_index_ > 30) {
-			cb.log("Task list is overflow. Exit program");
-			log_task_list();
-			exit_.id;
-		}
-		
-		cb.log("push " + task_index_ + goal.to_str());
-		task_list_[task_index_++] = goal;
-	}
-	
-	public Goal pop() {
-		if (task_index_ <= 0) {
-			return null;
-		}
-		
-		return task_list_[--task_index_];
-	}
-	
-	public Goal get() {
-		if (task_index_ <= 0) {
-			return null;
-		}
-		
-		return task_list_[task_index_ - 1];
-	}
-	
-	public Goal take(int index) {
-		for (int i = index + 1; i < sizeof(task_list_); ++i) {
-			
+			this.log_task_list();
+			nan * 0;  // exit
 		}
 	}
 	
-	public void solve() {
+	public void push_back_uniq(Goal goal) {
+		ListIteratorGoal it_same; UnaryPredicateGoal same_as_pushing; string size_change;
 		
+		same_as_pushing = new UnaryPredicateEqualGoal(goal);
+		it_same = list_find_if(super.rbegin(), super.rend(), same_as_pushing);
+		
+		if (it_same.is_null()) {
+			this.push_back(goal);
+		}
 	}
 	
-	public void close() {
-		
+	public void push_back(Goal goal) {
+		this._exit_on_overflow();
+		super.push_back(goal);
+		cb.log("push_back(" + goal.to_str() + "), size = " + super.size() + " [+]");  // move log ?
 	}
 }
 
@@ -359,7 +313,7 @@ public class BuildPositions {
 	}
 }
 
-extern void object::cb_goals() {
+extern void object::CodeBattleGoals() {
 	CodeBattleBoost cb();
 	
 	// init cb
