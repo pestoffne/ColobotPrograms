@@ -26,17 +26,32 @@ public class CodeBattleBoost extends EBoost {
 		return item.position.y * actor.position.y > 0;
 	}
 	
-	void setup() {
+	/*private*/ void _wait_until(float time_goal) {
+		float time_curr;
+		
+		time_curr = abstime();
+		
+		if (time_curr > time_goal) {
+			return;
+		}
+		
+		wait(time_goal - time_curr);
+	}
+	
+	public void setup() {
 		task_list.push_back(new GoalPowerPlant());
 	}
 	
-	void loop() {
-		Goal goal; ListIteratorGoal it;
+	// Where task should Resolved -> Closed ?
+	public void loop() {
+		Goal goal; ListIteratorGoal it; float iter_start_time;
+		
+		iter_start_time = abstime();
 		
 		for (it = task_list.rbegin();; it.shift()) {
 			if (it.is_null()) {
 				log("There is no more tasks in the list");
-				wait(1);
+				this._wait_until(iter_start_time + 1.0);
 				return;
 			}
 			
@@ -60,7 +75,7 @@ public class CodeBattleBoost extends EBoost {
 		}
 		
 		goal.change_state(new TaskStateFailed());
-		wait(1);
+		this._wait_until(iter_start_time + 1.0);
 	}
 }
 
@@ -78,7 +93,7 @@ public class GoalCodeBattle extends Goal {
 	}
 	
 	public void change_state(TaskState state) {
-		cb.log("Task's state changed from " + this._state.to_str() + " to " + state.to_str());
+		cb.log("info change_state (" + this.to_str() + ") from " + this._state.to_str() + " to " + state.to_str());
 		this._state = state;
 		// super.change_state(state);
 	}
@@ -131,11 +146,23 @@ public class GoalTitanium extends GoalResource {
 	}
 	
 	public int make() {
-		return 0 +
-		cb.goto_grab(TitaniumOre) +
-		cb.goto_radar_position(new RadarArgs(Converter)) +
-		drop() +
-		move(-2.5);
+		if (cb.goto_grab(TitaniumOre) != 0) {
+			return 1;
+		}
+		
+		if (cb.goto_radar_position(new RadarArgs(Converter)) != 0) {
+			return 1;
+		}
+		
+		if (drop() != 0) {
+			return 1;
+		}
+		
+		if (move(-2.5) != 0) {
+			return 1;
+		}
+		
+		return 0;
 	}
 	
 	public float get_resolve_time() {
@@ -317,7 +344,7 @@ public class BuildPositions {
 			}
 		} else if (cat == PowerPlant) {
 			point[] power_plants;
-			power_plants[0] = team_transform(new point(5, -44, 10));
+			power_plants[0] = team_transform(new point(15, -205, 0));
 			if (power_plants_index > 0) {
 				return power_plants[--power_plants_index];
 			}

@@ -431,16 +431,18 @@ public class EBoost {
 		pos.x -= cos(direct) * dist;
 		pos.y -= sin(direct) * dist;
 		log("info goto_pp (pos = " + pos.x + ";" + pos.y + ")");
-		goto(pos);
+		
+		if (distance2d(actor.position, pos) >= 8.0) {
+			goto(pos);
+		}
+		
 		dist_to_pos = distance2d(actor.position, pos);
 		
 		if (dist_to_pos > 0.1 and dist_to_pos < 10.0) {
 			goto_straight(pos, 0);  // to more precise position
 		}
 		
-		dist_to_pos = distance2d(actor.position, pos);
-		
-		if (dist_to_pos >= 0.5) {
+		if (distance2d(actor.position, pos) >= 0.5) {
 			log("warning goto_pp failed (distance = " + dist_to_pos + ")");
 			return 1;
 		}
@@ -451,7 +453,7 @@ public class EBoost {
 	}
 	
 	int goto_8(point pos) {
-		float angle;
+		/*float angle;
 		
 		angle = inverse_direction(pos);
 		
@@ -464,7 +466,8 @@ public class EBoost {
 		}
 		
 		log("info goto_8 (pos = " + pos.x + ";" + pos.y + ") ok");
-		return 1;
+		return 1;*/
+		return goto_o(pos);
 	}
 	
 	int goto_radar_item_position(RadarArgs a, bool grab_ground=true, bool grab_slots=true, bool grab_load=false) {
@@ -484,6 +487,7 @@ public class EBoost {
 	int goto_radar_position(RadarArgs a) {
 		object item;
 		
+		log("info goto_radar_position run");
 		item = radar_(a);
 		
 		if (item == null) {
@@ -491,7 +495,13 @@ public class EBoost {
 			return 1;
 		}
 		
-		return goto_8(item.position);
+		if (goto_8(item.position) != 0) {
+			log("warning goto_radar_position failed on goto_8");
+			return 1;
+		}
+		
+		log("info goto_radar_position ok");
+		return 0;
 	}
 	
 	void goto_straight(point pos, float dist=1.5) {
@@ -511,6 +521,8 @@ public class EBoost {
 	
 	int grab_from_ground(int cat, int oper=InFront, float min_energy=-1, float max_energy=1) {
 		float max_wait; RadarArgs radar_args;
+		
+		log("info grab_from_ground (cat = " + cat + ") run");
 		
 		for (int retries = 3; retries >= 0; --retries) {
 			if (actor.load == null) {
@@ -535,8 +547,7 @@ public class EBoost {
 		
 		for (int retries = 3; retries >= 0; --retries) {
 			if (radar_wait(radar_args) == null) {
-				log("warning grab_from_ground can not find expected object in front -- timeout expired");
-				return 1;
+				break;
 			}
 			
 			grab(oper);
@@ -546,6 +557,7 @@ public class EBoost {
 				continue;
 			} else {
 				if (actor.load.category == cat and actor.load.energyLevel >= min_energy and actor.load.energyLevel <= max_energy) {
+					log("info grab_from_ground (cat = " + cat + ") ok");
 					return 0;
 				}
 			}
@@ -554,6 +566,7 @@ public class EBoost {
 			_drop_out();
 		}
 		
+		log("warning grab_from_ground can not find expected object in front -- timeout expired");
 		return 1;
 	}
 	
