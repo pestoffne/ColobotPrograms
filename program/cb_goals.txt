@@ -3,10 +3,19 @@ public class CodeBattleBoost extends EBoost {
 	public static BuildPositions build_positions;
 	
 	int goto_build(int cat) {
-		return 0 +
-		goto_p(build_positions.get(cat)) +
-		drop() +
-		build(cat);
+		if (goto_p(build_positions.get(cat)) != 0) {
+			return 1;
+		}
+		
+		if (drop() != 0) {
+			return 1;
+		}
+		
+		if (build(cat) != 0) {
+			return 1;
+		}
+		
+		return 0;
 	}
 	
 	bool same_river_side(object item) {
@@ -45,7 +54,8 @@ public class CodeBattleBoost extends EBoost {
 		goal.change_state(new TaskStateActive());  
 		
 		if (goal.make() == 0) {
-			goal.change_state(new TaskStateResolved());
+			// goal.change_state(new TaskStateResolved());
+			this.task_list._unlink_elem(it.get_elem());  // remove task from list instead
 			return;
 		}
 		
@@ -181,11 +191,17 @@ public class GoalStructure extends GoalCodeBattle {
 	}
 	
 	public int make() {
-		cb.log("GoalStructure::make");
+		cb.log("GoalStructure::make " + this.to_str());
 		
-		return 0 +
-		cb.goto_grab(Titanium) +
-		cb.goto_build(cat);
+		if (cb.goto_grab(Titanium) != 0) {
+			return 1;
+		}
+		
+		if (cb.goto_build(cat) != 0) {
+			return 1;
+		}
+		
+		return 0;
 	}
 	
 	public float get_resolve_time() {

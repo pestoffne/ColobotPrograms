@@ -403,10 +403,18 @@ public class EBoost {
 	}
 	
 	int goto_grab(int cat) {  // TODO: grab from slots
-		return 0 +
-		goto_radar_item_position(new RadarArgs(cat), true, false, false) +
-		//goto_radar_position(new RadarArgs(cat)) +
-		grab_from_ground(cat);
+		if (goto_radar_position(new RadarArgs(cat)) != 0) {
+			log("warning goto_grab (cat = " + cat + ") failed on step 1 -- goto_radar_position");
+			return 1;
+		}
+		
+		if (grab_from_ground(cat) != 0) {
+			log("warning goto_grab (cat = " + cat + ") failed on step 2 -- grab_from_ground");
+			return 1;
+		}
+		
+		log("info goto_grab ok");
+		return 0;
 	}
 	
 	int goto_o(point pos, float dist=1.5) {
@@ -422,6 +430,7 @@ public class EBoost {
 		
 		pos.x -= cos(direct) * dist;
 		pos.y -= sin(direct) * dist;
+		log("info goto_pp (pos = " + pos.x + ";" + pos.y + ")");
 		goto(pos);
 		dist_to_pos = distance2d(actor.position, pos);
 		
@@ -431,23 +440,45 @@ public class EBoost {
 		
 		dist_to_pos = distance2d(actor.position, pos);
 		
-		if (dist_to_pos < 0.5) {
-			orient(direct);
+		if (dist_to_pos >= 0.5) {
+			log("warning goto_pp failed (distance = " + dist_to_pos + ")");
+			return 1;
 		}
 		
-		return round(dist_to_pos);
+		orient(direct);
+		log("info goto_pp ok");
+		return 0;
+	}
+	
+	int goto_8(point pos) {
+		float angle;
+		
+		angle = inverse_direction(pos);
+		
+		for (int i = 0; i < 7; ++i) {
+			if (goto_pp(pos, normalize_angle(angle + 45 * i), 2) == 0)  {
+				move(0.5);
+				log("info goto_8 (pos = " + pos.x + ";" + pos.y + ") ok");
+				return 0;
+			}
+		}
+		
+		log("info goto_8 (pos = " + pos.x + ";" + pos.y + ") ok");
+		return 1;
 	}
 	
 	int goto_radar_item_position(RadarArgs a, bool grab_ground=true, bool grab_slots=true, bool grab_load=false) {
-		object item;
+		object item; float angle;
 		
 		item = radar_item(a, grab_ground, grab_slots, grab_load);
 		
 		if (item == null) {
+			log("warning goto_radar_item_position item does not found");
 			return 1;
 		}
 		
-		return goto(item.position);
+		// TODO: use correct orientation to grab from slot
+		return goto_8(item.position);
 	}
 	
 	int goto_radar_position(RadarArgs a) {
@@ -456,10 +487,11 @@ public class EBoost {
 		item = radar_(a);
 		
 		if (item == null) {
+			log("warning goto_radar_position item does not found");
 			return 1;
 		}
 		
-		return goto(item.position);
+		return goto_8(item.position);
 	}
 	
 	void goto_straight(point pos, float dist=1.5) {
