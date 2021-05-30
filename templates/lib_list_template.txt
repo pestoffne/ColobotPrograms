@@ -1,0 +1,315 @@
+
+public /*abstract*/ class TEMPLATE(UnaryPredicate) {
+	bool _(TYPE value) {
+		return true;
+	}
+}
+
+public class TEMPLATE(UnaryPredicateMore) extends TEMPLATE(UnaryPredicate) {
+	private TYPE _value;
+	
+	// constructor
+	void TEMPLATE(UnaryPredicateMore)(TYPE value) {
+		this._value = value;
+	}
+	
+	// calculates predicate for specified value
+	bool _(TYPE value) {
+		return value > this._value;
+	}
+}
+
+public class TEMPLATE(ListElem) {
+	TYPE value;
+	TEMPLATE(ListElem) prev;
+	TEMPLATE(ListElem) next;
+	
+	void TEMPLATE(ListElem)(TYPE value, TEMPLATE(ListElem) prev = null, TEMPLATE(ListElem) next = null) {
+		this.value = value;
+		this.prev = prev;
+		this.next = next;
+	}
+}
+
+public class TEMPLATE(ListIterator) {
+	protected TEMPLATE(ListElem) _elem;
+	
+	void TEMPLATE(ListIterator)(TEMPLATE(ListElem) elem) {
+		this._elem = elem;
+	}
+	
+	bool equals(TEMPLATE(ListIterator) that) {
+		return this._elem == that._elem;
+	}
+	
+	TEMPLATE(ListElem) get_elem() {
+		return this._elem;
+	}
+	
+	TYPE value() {
+		return this._elem.value;
+	}
+	
+	TEMPLATE(ListIterator) shift() {
+		return this;
+	}
+	
+	TEMPLATE(ListIterator) copy() {
+		return new TEMPLATE(ListIterator)(this._elem);
+	}
+}
+
+public class TEMPLATE(ListForwardIterator) extends TEMPLATE(ListIterator) {
+	void TEMPLATE(ListForwardIterator)(TEMPLATE(ListElem) elem) {
+		this._elem = elem;
+	}
+	
+	TEMPLATE(ListForwardIterator) shift() {
+		this._elem = _elem.next;
+		return this;
+	}
+	
+	TEMPLATE(ListForwardIterator) copy() {
+		return new TEMPLATE(ListForwardIterator)(this._elem);
+	}
+}
+
+public class TEMPLATE(ListBackwardIterator) extends TEMPLATE(ListIterator) {
+	void TEMPLATE(ListBackwardIterator)(TEMPLATE(ListElem) elem) {
+		this._elem = elem;
+	}
+	
+	TEMPLATE(ListBackwardIterator) shift() {
+		this._elem = _elem.prev;
+		return this;
+	}
+	
+	TEMPLATE(ListBackwardIterator) copy() {
+		return new TEMPLATE(ListBackwardIterator)(this._elem);
+	}
+}
+
+// Linked list like std::list<TYPE>
+public class TEMPLATE(List) {
+	private TEMPLATE(ListElem) _back = null;
+	private TEMPLATE(ListElem) _front = null;
+	
+	void TEMPLATE(~List)() {
+		this.clear();
+	}
+	
+	// returns last element
+	TYPE back() {
+		if (this._back == null) {
+			return NULL;
+		}
+		
+		return this._back.value;
+	}
+	
+	// returns first element
+	TYPE front() {
+		if (this._front == null) {
+			return NULL;
+		}
+		
+		return this._front.value;
+	}
+	
+	TEMPLATE(ListForwardIterator) begin() {
+		return new TEMPLATE(ListForwardIterator)(this._front);
+	}
+	
+	TEMPLATE(ListForwardIterator) end() {
+		return new TEMPLATE(ListForwardIterator)(null);
+	}
+	
+	TEMPLATE(ListBackwardIterator) rbegin() {
+		return new TEMPLATE(ListBackwardIterator)(this._back);
+	}
+	
+	TEMPLATE(ListBackwardIterator) rend() {
+		return new TEMPLATE(ListBackwardIterator)(null);
+	}
+	
+	bool empty() {
+		return this._back == null;
+	}
+	
+	int size() {
+		TEMPLATE(ListIterator) it; int count;
+		
+		count = 0;
+		
+		for (it = this.begin(); not it.equals(this.end()); it.shift()) {
+			++count;
+		}
+		
+		return count;
+	}
+	
+	void clear() {
+		while (not this.empty()) {
+			this.pop_back();
+		}
+	}
+	
+	// Inserts new element before specified position
+	TEMPLATE(ListIterator) insert(TEMPLATE(ListIterator) pos, TYPE value) {
+		TEMPLATE(ListElem) elem_prev, elem_new, elem_next, front_prev;
+		
+		if (pos.equals(this.end())) {  // if insert at the end or insert first
+			// TODO: x.insert(x.rend(), 0) inserts 0 into back, but expect 0 in front
+			this.push_back(value);
+			return new TEMPLATE(ListIterator)(this._back);
+		}
+		
+		elem_next = pos.get_elem();  // can not be null
+		elem_prev = elem_next.prev;
+		elem_new = new TEMPLATE(ListElem)(value, elem_prev, elem_next);
+		elem_next.prev = elem_new;
+		
+		if (elem_prev == null) {
+			this._front = elem_new;
+		} else {
+			elem_prev.next = elem_new;
+		}
+		
+		return new TEMPLATE(ListIterator)(elem_new);
+	}
+	
+	void push_back(TYPE value) {
+		this._back = new TEMPLATE(ListElem)(value, _back, null);
+		
+		if (this._front == null) {  // if pushes first element
+			this._front = this._back;
+		} else {
+			this._back.prev.next = this._back;
+		}
+	}
+	
+	void pop_back() {
+		TEMPLATE(ListElem) elem_prev;
+		
+		elem_prev = this._back.prev;
+		
+		if (elem_prev != null) {
+			elem_prev.next = null;
+		} else {
+			this._front = null;
+		}
+		
+		this._back = elem_prev;
+	}
+	
+	void push_front(TYPE value) {
+		_front = new TEMPLATE(ListElem)(value, null, _front);
+		
+		if (_back == null) {  // if pushes first element
+			_back = _front;
+		} else {
+			_front.next.prev = _front;
+		}
+	}
+	
+	void pop_front() {
+		TEMPLATE(ListElem) elem_next;
+		
+		elem_next = this._front.next;
+		
+		if (elem_next != null) {
+			elem_next.prev = null;
+		} else {
+			this._back = null;
+		}
+		
+		this._front = elem_next;
+	}
+	
+	/*private*/ void _unlink_elem(TEMPLATE(ListElem) elem_curr) {
+		TEMPLATE(ListElem) elem_prev, elem_next;
+		
+		elem_prev = elem_curr.prev;
+		elem_next = elem_curr.next;
+		
+		if (elem_prev == null) {
+			this._front = elem_next;
+		} else {
+			elem_prev.next = elem_next;
+			elem_curr.prev = null;
+		}
+		
+		if (elem_next == null) {
+			this._back = elem_prev;
+		} else {
+			elem_next.prev = elem_prev;
+			elem_curr.next = null;
+		}
+	}
+	
+	// removes all elements with value
+	void remove(TYPE value) {
+		TEMPLATE(ListIterator) it1, it2;
+		TEMPLATE(ListElem) elem;
+		
+		if (this.empty()) {
+			return;
+		}
+		
+		it1 = this.begin();
+		it2 = this.begin().shift();
+		
+		for (;;) {
+			elem = it1.get_elem();
+			
+			if (elem.value == value) {
+				this._unlink_elem(elem);
+			}
+			
+			if (it2.equals(this.end())) {
+				return;
+			}
+			
+			it1 = it2.copy();
+			it2.shift();
+		}
+	}
+	
+	void remove_if(TEMPLATE(UnaryPredicate) pred) {
+		TEMPLATE(ListIterator) it1, it2;
+		TEMPLATE(ListElem) elem;
+		
+		if (this.empty()) {
+			return;
+		}
+		
+		it1 = this.begin();
+		it2 = this.begin().shift();
+		
+		for (;;) {
+			elem = it1.get_elem();
+			
+			if (pred._(elem.value)) {
+				this._unlink_elem(elem);
+			}
+			
+			if (it2.equals(this.end())) {
+				return;
+			}
+			
+			it1 = it2.copy();
+			it2.shift();
+		}
+	}
+	
+	void unique() {
+		// TODO
+	}
+	
+	void sort() {
+		// TODO
+	}
+}
+
+extern void TEMPLATE(Library_List)() {
+}

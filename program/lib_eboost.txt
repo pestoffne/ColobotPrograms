@@ -968,8 +968,8 @@ public class Message {
 	}
 }
 
-extern void object::EBoostLib() {
-	EBoost e(this);
+extern void Library_EBoost() {
+	EBoost e(null);
 	
 	// Unit Tests
 	e.assert_equal(e.normalize_angle(179), 179).id;

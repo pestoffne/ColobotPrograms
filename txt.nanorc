@@ -23,3 +23,7 @@ color brightyellow ""([^"]|\\")*"" "#[[:space:]]*include[[:space:]]+<[^[:blank:]
 # Comments
 color brightblue "//.*"
 color brightblue start="/\*" end="\*/"
+
+# Templates
+color white,blue "TEMPLATE\((~|_|[[:alpha:]])+\)"
+color white,blue "\<(TYPE|NULL)\>"

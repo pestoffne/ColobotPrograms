@@ -1,0 +1,316 @@
+// This file is generated automaticaly from template. Do not edit.
+
+public class UnaryPredicateInt {
+bool _(int value) {
+return true;
+}
+}
+
+public class UnaryPredicateMoreInt extends UnaryPredicateInt {
+private int _value;
+
+
+void UnaryPredicateMoreInt(int value) {
+this._value = value;
+}
+
+
+bool _(int value) {
+return value > this._value;
+}
+}
+
+public class ListElemInt {
+int value;
+ListElemInt prev;
+ListElemInt next;
+
+void ListElemInt(int value, ListElemInt prev = null, ListElemInt next = null) {
+this.value = value;
+this.prev = prev;
+this.next = next;
+}
+}
+
+public class ListIteratorInt {
+protected ListElemInt _elem;
+
+void ListIteratorInt(ListElemInt elem) {
+this._elem = elem;
+}
+
+bool equals(ListIteratorInt that) {
+return this._elem == that._elem;
+}
+
+ListElemInt get_elem() {
+return this._elem;
+}
+
+int value() {
+return this._elem.value;
+}
+
+ListIteratorInt shift() {
+return this;
+}
+
+ListIteratorInt copy() {
+return new ListIteratorInt(this._elem);
+}
+}
+
+public class ListForwardIteratorInt extends ListIteratorInt {
+void ListForwardIteratorInt(ListElemInt elem) {
+this._elem = elem;
+}
+
+ListForwardIteratorInt shift() {
+this._elem = _elem.next;
+return this;
+}
+
+ListForwardIteratorInt copy() {
+return new ListForwardIteratorInt(this._elem);
+}
+}
+
+public class ListBackwardIteratorInt extends ListIteratorInt {
+void ListBackwardIteratorInt(ListElemInt elem) {
+this._elem = elem;
+}
+
+ListBackwardIteratorInt shift() {
+this._elem = _elem.prev;
+return this;
+}
+
+ListBackwardIteratorInt copy() {
+return new ListBackwardIteratorInt(this._elem);
+}
+}
+
+
+public class ListInt {
+private ListElemInt _back = null;
+private ListElemInt _front = null;
+
+void ~ListInt() {
+this.clear();
+}
+
+
+int back() {
+if (this._back == null) {
+return 0;
+}
+
+return this._back.value;
+}
+
+
+int front() {
+if (this._front == null) {
+return 0;
+}
+
+return this._front.value;
+}
+
+ListForwardIteratorInt begin() {
+return new ListForwardIteratorInt(this._front);
+}
+
+ListForwardIteratorInt end() {
+return new ListForwardIteratorInt(null);
+}
+
+ListBackwardIteratorInt rbegin() {
+return new ListBackwardIteratorInt(this._back);
+}
+
+ListBackwardIteratorInt rend() {
+return new ListBackwardIteratorInt(null);
+}
+
+bool empty() {
+return this._back == null;
+}
+
+int size() {
+ListIteratorInt it; int count;
+
+count = 0;
+
+for (it = this.begin(); not it.equals(this.end()); it.shift()) {
+++count;
+}
+
+return count;
+}
+
+void clear() {
+while (not this.empty()) {
+this.pop_back();
+}
+}
+
+
+ListIteratorInt insert(ListIteratorInt pos, int value) {
+ListElemInt elem_prev, elem_new, elem_next, front_prev;
+
+if (pos.equals(this.end())) {
+
+this.push_back(value);
+return new ListIteratorInt(this._back);
+}
+
+elem_next = pos.get_elem();
+elem_prev = elem_next.prev;
+elem_new = new ListElemInt(value, elem_prev, elem_next);
+elem_next.prev = elem_new;
+
+if (elem_prev == null) {
+this._front = elem_new;
+} else {
+elem_prev.next = elem_new;
+}
+
+return new ListIteratorInt(elem_new);
+}
+
+void push_back(int value) {
+this._back = new ListElemInt(value, _back, null);
+
+if (this._front == null) {
+this._front = this._back;
+} else {
+this._back.prev.next = this._back;
+}
+}
+
+void pop_back() {
+ListElemInt elem_prev;
+
+elem_prev = this._back.prev;
+
+if (elem_prev != null) {
+elem_prev.next = null;
+} else {
+this._front = null;
+}
+
+this._back = elem_prev;
+}
+
+void push_front(int value) {
+_front = new ListElemInt(value, null, _front);
+
+if (_back == null) {
+_back = _front;
+} else {
+_front.next.prev = _front;
+}
+}
+
+void pop_front() {
+ListElemInt elem_next;
+
+elem_next = this._front.next;
+
+if (elem_next != null) {
+elem_next.prev = null;
+} else {
+this._back = null;
+}
+
+this._front = elem_next;
+}
+
+void _unlink_elem(ListElemInt elem_curr) {
+ListElemInt elem_prev, elem_next;
+
+elem_prev = elem_curr.prev;
+elem_next = elem_curr.next;
+
+if (elem_prev == null) {
+this._front = elem_next;
+} else {
+elem_prev.next = elem_next;
+elem_curr.prev = null;
+}
+
+if (elem_next == null) {
+this._back = elem_prev;
+} else {
+elem_next.prev = elem_prev;
+elem_curr.next = null;
+}
+}
+
+
+void remove(int value) {
+ListIteratorInt it1, it2;
+ListElemInt elem;
+
+if (this.empty()) {
+return;
+}
+
+it1 = this.begin();
+it2 = this.begin().shift();
+
+for (;;) {
+elem = it1.get_elem();
+
+if (elem.value == value) {
+this._unlink_elem(elem);
+}
+
+if (it2.equals(this.end())) {
+return;
+}
+
+it1 = it2.copy();
+it2.shift();
+}
+}
+
+void remove_if(UnaryPredicateInt pred) {
+ListIteratorInt it1, it2;
+ListElemInt elem;
+
+if (this.empty()) {
+return;
+}
+
+it1 = this.begin();
+it2 = this.begin().shift();
+
+for (;;) {
+elem = it1.get_elem();
+
+if (pred._(elem.value)) {
+this._unlink_elem(elem);
+}
+
+if (it2.equals(this.end())) {
+return;
+}
+
+it1 = it2.copy();
+it2.shift();
+}
+}
+
+void unique() {
+
+}
+
+void sort() {
+
+}
+}
+
+extern void Library_ListInt() {
+}
