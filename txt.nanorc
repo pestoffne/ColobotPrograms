@@ -30,4 +30,5 @@ color blue start="/\*" end="\*/"
 
 # Templates
 color white,blue "TEMPLATE\((~|_|[[:alpha:]])+\)"
-color white,blue "\<(TYPE|NULL)\>"
+color white,blue "CMP\(.*,.*\)"
+color white,blue "\<(TYPE|KEY|VALUE|NULL|KEY_NULL|VALUE_NULL)\>"

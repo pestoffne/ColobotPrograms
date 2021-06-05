@@ -1,0 +1,87 @@
+public class TEMPLATE(TreeNode) {
+	public KEY key = KEY_NULL;
+	public VALUE value = VALUE_NULL;
+	public TEMPLATE(TreeNode) less = null;
+	public TEMPLATE(TreeNode) more = null;
+	
+	public void init(KEY key, VALUE value) {
+		this.key = key;
+		this.value = value;
+	}
+}
+
+public class TEMPLATE(SortedTree) {
+	public TEMPLATE(TreeNode) root = null;
+	private int _size = 0;
+	
+	/*private*/ TEMPLATE(TreeNode) _create_subtree(int size) {
+		TEMPLATE(TreeNode) pointer;
+		
+		if (0 == size) {
+			return null;
+		}
+		
+		pointer = new TEMPLATE(TreeNode)();
+		--size;
+		pointer.less = this._create_subtree(size - size / 2);
+		pointer.more = this._create_subtree(size / 2);
+		return pointer;
+	}
+	
+	public void TEMPLATE(SortedTree)(int size) {
+		this._size = size;
+		this.root = this._create_subtree(size);
+	}
+	
+	public VALUE get(KEY key) {
+		TEMPLATE(TreeNode) pointer; int cmp;
+		
+		pointer = this.root;
+		
+		for (;;) {
+			cmp = CMP(pointer.key, key);
+			
+			if (cmp > 0) {
+				pointer = pointer.less;
+			} else if (cmp < 0) {
+				pointer = pointer.more;
+			} else {
+				return pointer.value;
+			}
+		}
+		
+		return VALUE_NULL;
+	}
+	
+	/*private*/ TEMPLATE(TreeNode) _at_index_helper(TEMPLATE(TreeNode) node, int min_index, int max_index, int target_index) {
+		int current_index;
+		
+		current_index = (max_index - min_index) / 2 + min_index;
+		
+		if (target_index == current_index) {
+			return node;
+		}
+		
+		if (target_index > current_index) {
+			return this._at_index_helper(node.more, current_index + 1, max_index, target_index);
+		}
+		
+		return this._at_index_helper(node.less, min_index, current_index - 1, target_index);
+	}
+	
+	public TEMPLATE(TreeNode) at_index(int index) {
+		return this._at_index_helper(this.root, 0, this._size, index);
+	}
+	
+	public int size() {
+		return this._size;
+	}
+}
+
+extern void TEMPLATE(LibSortedTree)() {
+}
+
+//               06
+//       03              11
+//   01      05      08      13
+// 00  02  04      07      12

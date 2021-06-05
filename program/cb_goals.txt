@@ -1,9 +1,15 @@
 public class CodeBattleBoost extends EBoost {
 	public static TaskList task_list;
-	public static BuildPositions build_positions;
+	public static SortedTreeIntListPoint build_positions;
 	
 	int goto_build(int cat) {
-		if (goto_p(build_positions.get(cat)) != 0) {
+		ListPoint list; point pos;
+		
+		list = build_positions.get(cat);
+		pos = list.back();
+		list.pop_back();
+		
+		if (goto_p(pos) != 0) {
 			return 1;
 		}
 		
@@ -38,7 +44,27 @@ public class CodeBattleBoost extends EBoost {
 		wait(time_goal - time_curr);
 	}
 	
+	public ListPoint list_point_1(float ax, float ay, float az) {
+		ListPoint list;
+		
+		list = new ListPoint();
+		list.push_back(new point(ax, ay, az));
+		
+		return list;
+	}
+	
+	public ListPoint list_point_2(float ax, float ay, float az, float bx, float by, float bz) {
+		ListPoint list;
+		
+		list = new ListPoint();
+		list.push_back(new point(ax, ay, az));
+		list.push_back(new point(bx, by, bz));
+		
+		return list;
+	}
+	
 	public void setup() {
+		task_list.push_back(new GoalPowerCell());
 		task_list.push_back(new GoalPowerPlant());
 	}
 	
@@ -141,11 +167,13 @@ public class GoalResource extends GoalCodeBattle {
 public class GoalTitanium extends GoalResource {
 	public bool check_prerequirements() {
 		return true
-		and _add_goal(_required_structure(Converter), new GoalConverter())
-		and _required_item(TitaniumOre);
+		and super._add_goal(super._required_structure(Converter), new GoalConverter())
+		and super._required_item(TitaniumOre);
 	}
 	
 	public int make() {
+		// TODO: first goto Derrick and wait for TitaniumOre and it should not be required
+		
 		if (cb.goto_grab(TitaniumOre) != 0) {
 			return 1;
 		}
@@ -181,15 +209,24 @@ public class GoalTitanium extends GoalResource {
 public class GoalPowerCell extends GoalResource {
 	public bool check_prerequirements() {
 		return true
-		and _add_goal(_required_structure(PowerPlant), new GoalPowerPlant())
-		and _required_item(Titanium);
+		and super._add_goal(super._required_structure(PowerPlant), new GoalPowerPlant())
+		and super._required_item(Titanium);
 	}
 	
 	public int make() {
-		return 0 +
-		cb.goto_grab(Titanium) +
-		cb.goto_radar_position(new RadarArgs(PowerPlant)) +
-		grab();  // grab_from_slot
+		if (cb.goto_grab(Titanium) != 0) {
+			return 1;
+		}
+		
+		if (cb.goto_radar_position(new RadarArgs(PowerPlant)) != 0) {
+			return 1;
+		}
+		
+		if (grab() != 0) {  // grab_from_slot
+			return 1;
+		}
+		
+		return 0;
 	}
 	
 	public float get_resolve_time() {
@@ -208,13 +245,12 @@ public class GoalPowerCell extends GoalResource {
 public class GoalStructure extends GoalCodeBattle {
 	protected int cat;
 	
-	void GoalStructure(int cat) {
-		cb.assert(cb.is_structure(cat)).id;
-		this.cat = cat;
+	void GoalStructure() {
+		nan * 0;  // abstract class
 	}
 	
 	public bool check_prerequirements() {
-		return _add_goal(_required_item(Titanium), new GoalTitanium());
+		return super._add_goal(super._required_item(Titanium), new GoalTitanium());
 	}
 	
 	public int make() {
@@ -236,7 +272,8 @@ public class GoalStructure extends GoalCodeBattle {
 	}
 	
 	public string to_str() {
-		return "GoalStructure";
+		nan * 0;  // abstract mathod
+		return "";
 	}
 }
 
@@ -250,14 +287,31 @@ public class GoalConverter extends GoalStructure {
 	}
 }
 
-public class GoalPowerPlant extends GoalStructure {
-	public void GoalPowerPlant() {
-		super.cat = PowerPlant;
+public class GoalCommonStructure extends GoalStructure {
+	public void GoalCommonStructure() {
+		nan * 0;  // abstract class
 	}
 	
 	public bool check_prerequirements() {
-		return super.check_prerequirements()
+		return true
+		and super.check_prerequirements()
 		and _add_goal(_required_structure(Converter), new GoalConverter());
+	}
+}
+
+public class GoalDerrick extends GoalCommonStructure {
+	public void GoalDerrick() {
+		super.cat = Derrick;
+	}
+	
+	public string to_str() {
+		return "GoalDerrick";
+	}
+}
+
+public class GoalPowerPlant extends GoalCommonStructure {
+	public void GoalPowerPlant() {
+		super.cat = PowerPlant;
 	}
 	
 	public string to_str() {
@@ -319,42 +373,15 @@ public class TaskList extends ListGoal {
 	}
 }
 
-public class BuildPositions {
-	int converters_index = 2;
-	int power_plants_index = 1;
-	int general_index = 1;
-	
-	point team_transform(point p) {
-		/*if (team == 2) {
-			p.x *= -1;
-			p.y *= -1;
-			p.z = 180 + p.z
-		}*/
-		
-		return p;
+/*point team_transform(point p) {
+	if (team == 2) {
+		p.x *= -1;
+		p.y *= -1;
+		p.z = 180 + p.z
 	}
 	
-	point get(int cat) {
-		if (cat == Converter) {
-			if (converters_index > 0) {
-				point[] converters;
-				converters[0] = team_transform(new point(5, -50.5, 315));
-				converters[1] = team_transform(new point(-5, -50.5, 225));
-				return converters[--converters_index];
-			}
-		} else if (cat == PowerPlant) {
-			point[] power_plants;
-			power_plants[0] = team_transform(new point(15, -205, 0));
-			if (power_plants_index > 0) {
-				return power_plants[--power_plants_index];
-			}
-		}
-		
-		point[] general;
-		general[0] = team_transform(new point(-8, -42, 150));
-		return general[--general_index];
-	}
-}
+	return p;
+}*/
 
 extern void object::CodeBattleGoals() {
 	CodeBattleBoost cb();
@@ -365,7 +392,20 @@ extern void object::CodeBattleGoals() {
 	// init static variables
 	cb.task_list = new TaskList();
 	cb.task_list.cb = cb;
-	cb.build_positions = new BuildPositions();
+	cb.build_positions = new SortedTreeIntListPoint(15);
+	
+	cb.build_positions.at_index(0).init(Derrick, null);
+	cb.build_positions.at_index(1).init(BotFactory, null);
+	cb.build_positions.at_index(2).init(PowerStation, null);
+	cb.build_positions.at_index(3).init(Converter, cb.list_point_2(5, -50.5, 315, -5, -50.5, 225));
+	cb.build_positions.at_index(4).init(RepairCenter, null);
+	cb.build_positions.at_index(5).init(DefenseTower, null);
+	cb.build_positions.at_index(6).init(ResearchCenter, null);
+	cb.build_positions.at_index(7).init(PowerPlant, cb.list_point_1(15, -205, 0));
+	cb.build_positions.at_index(8).init(AutoLab, null);
+	cb.build_positions.at_index(9).init(NuclearPlant, null);
+	cb.build_positions.at_index(10).init(ExchangePost, null);
+	cb.build_positions.at_index(11).init(PowerCaptor, null);
 	
 	cb.setup();
 	

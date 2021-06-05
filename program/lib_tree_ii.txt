@@ -1,0 +1,83 @@
+// This file is generated automaticaly from template. Do not edit.
+public class TreeNodeIntInt {
+public int key = 0;
+public int value = 0;
+public TreeNodeIntInt less = null;
+public TreeNodeIntInt more = null;
+
+public void init(int key, int value) {
+this.key = key;
+this.value = value;
+}
+}
+
+public class SortedTreeIntInt {
+public TreeNodeIntInt root = null;
+private int _size = 0;
+
+TreeNodeIntInt _create_subtree(int size) {
+TreeNodeIntInt pointer;
+
+if (0 == size) {
+return null;
+}
+
+pointer = new TreeNodeIntInt();
+--size;
+pointer.less = this._create_subtree(size - size / 2);
+pointer.more = this._create_subtree(size / 2);
+return pointer;
+}
+
+public void SortedTreeIntInt(int size) {
+this._size = size;
+this.root = this._create_subtree(size);
+}
+
+public int get(int key) {
+TreeNodeIntInt pointer; int cmp;
+
+pointer = this.root;
+
+for (;;) {
+cmp = ((pointer.key)-(key));
+
+if (cmp > 0) {
+pointer = pointer.less;
+} else if (cmp < 0) {
+pointer = pointer.more;
+} else {
+return pointer.value;
+}
+}
+
+return 0;
+}
+
+TreeNodeIntInt _at_index_helper(TreeNodeIntInt node, int min_index, int max_index, int target_index) {
+int current_index;
+
+current_index = (max_index - min_index) / 2 + min_index;
+
+if (target_index == current_index) {
+return node;
+}
+
+if (target_index > current_index) {
+return this._at_index_helper(node.more, current_index + 1, max_index, target_index);
+}
+
+return this._at_index_helper(node.less, min_index, current_index - 1, target_index);
+}
+
+public TreeNodeIntInt at_index(int index) {
+return this._at_index_helper(this.root, 0, this._size, index);
+}
+
+public int size() {
+return this._size;
+}
+}
+
+extern void LibSortedTreeIntInt() {
+}
