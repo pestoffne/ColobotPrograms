@@ -24,8 +24,8 @@ return null;
 
 pointer = new TreeNodeIntInt();
 --size;
-pointer.less = this._create_subtree(size - size / 2);
-pointer.more = this._create_subtree(size / 2);
+pointer.less = this._create_subtree(ceil(size / 2));
+pointer.more = this._create_subtree(floor(size / 2));
 return pointer;
 }
 
@@ -54,10 +54,14 @@ return pointer.value;
 return 0;
 }
 
+int _middle_index(int min_index, int max_index) {
+return ceil((max_index - min_index) / 2) + min_index;;
+}
+
 TreeNodeIntInt _at_index_helper(TreeNodeIntInt node, int min_index, int max_index, int target_index) {
 int current_index;
 
-current_index = (max_index - min_index) / 2 + min_index;
+current_index = this._middle_index(min_index, max_index);
 
 if (target_index == current_index) {
 return node;
@@ -71,7 +75,7 @@ return this._at_index_helper(node.less, min_index, current_index - 1, target_ind
 }
 
 public TreeNodeIntInt at_index(int index) {
-return this._at_index_helper(this.root, 0, this._size, index);
+return this._at_index_helper(this.root, 0, this._size - 1, index);
 }
 
 public int size() {
@@ -79,5 +83,5 @@ return this._size;
 }
 }
 
-extern void LibSortedTreeIntInt() {
+extern void Library_TreeIntInt() {
 }

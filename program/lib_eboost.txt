@@ -222,6 +222,64 @@ public class EBoost {
 		return false;
 	}
 	
+	public int drop_to_converter() {
+		// TODO: check Converter is near, check load is TitaniumOre
+		return this.drop_to_ground();
+	}
+	
+	public int drop_to_energy_cell(int slot_cat) {
+		int item_cat, energy_level; object actor_load, slot;
+		
+		actor_load = this.actor.load;
+		
+		if (actor_load == null) {
+			return 1;
+		}
+		
+		item_cat = actor_load.category;
+		energy_level = actor_load.energyLevel;
+		
+		// TODO: check slot before drop
+		
+		if (drop() != 0) {
+			return 1;
+		}
+		
+		slot = radar(slot_cat, 0, 30, 0, 10, FilterFriendly);
+		
+		if (slot == null or slot.energyCell == null) {
+			return 1;
+		}
+		
+		return 0;
+	}
+	
+	int drop_to_ground() {
+		int cat, energy_level; point pos; object item;
+		
+		if (actor.load == null) {
+			return 1;
+		}
+		
+		cat = actor.load.category;
+		energy_level = actor.load.energyLevel;
+		
+		if (drop() != 0) {
+			return 1;
+		}
+		
+		pos.x = actor.position.x + 1.5 * cos(actor.orientation);
+		pos.y = actor.position.y + 1.5 * sin(actor.orientation);
+		
+		item = search(cat, pos);
+		
+		if (item == null or distance2d(pos, item.position) > 0.25 or item.energyLevel != energy_level) {
+			return 1;
+		}
+		
+		return 0;
+	}
+	
 	void drop_to_helix(point p) {
 		int s;
 		
@@ -421,6 +479,13 @@ public class EBoost {
 		return goto_pp(pos, inverse_direction(pos), dist);
 	}
 	
+	int goto_o_behind(point pos, float dist=1.5) {
+		// TODO: failsafe
+		turn(normalize_angle(direction(pos) + 180));
+		move(dist - distance2d(actor.position, pos));
+		return 0;
+	}
+	
 	int goto_p(point pos, float dist=1.5) {
 		return goto_pp(pos, pos.z, dist);
 	}
@@ -517,6 +582,67 @@ public class EBoost {
 		goto(space(actor.position, 3));
 		drop();
 		goto_p(pos);
+	}
+	
+	public int grab_from_energy_cell(int item_cat, int container_cat, float min_energy=0, float max_energy=1) {
+		object container, actor_load; float wait_time;
+		
+		if (this.actor.load != null) {
+			if (this.actor.load.category == item_cat) {
+				log("warning grab_from_energy_cell needed item is already loaded before grab");
+				return 0;
+			} else {
+				log("warning grab_from_energy_cell another item is already loaded before grab");
+				return 1;
+			}
+		}
+		
+		if (container_cat == PowerPlant) {
+			wait_time = 12.5;
+		} else {
+			wait_time = 0.5;
+		}
+		
+		for (;;) {
+			container = radar(container_cat, 0, 30, 0, 10);
+			
+			if (container == null) {
+				log("warning grab_from_energy_cell can not find container grab from");
+				return 1;
+			}
+			
+			if (container.energyCell != null and container.energyCell.category == item_cat) {
+				break;
+			}
+			
+			if (wait_time <= 0) {
+				log("warning grab_from_energy_cell can not find item to grab, timeout expired");
+				return 1;
+			}
+			
+			wait(0.1);
+			wait_time -= 0.1;
+		}
+		
+		grab();
+		actor_load = this.actor.load;
+		
+		if (actor_load == null) {
+			log("warning grab_from_energy_cell load is null after grab");
+			return 1;
+		}
+		
+		if (actor_load.category != item_cat) {
+			log("warning grab_from_energy_cell load.category has unexpected value");
+			return 1;
+		}
+		
+		if (actor_load.energyLevel < min_energy or actor_load.energyLevel > max_energy) {
+			log("warning grab_from_energy_cell expect load.energyLevel in [" + min_energy + ";" + max_energy + "], but actual value is " + actor_load.energyLevel);
+			return 1;
+		}
+		
+		return 0;
 	}
 	
 	int grab_from_ground(int cat, int oper=InFront, float min_energy=-1, float max_energy=1) {

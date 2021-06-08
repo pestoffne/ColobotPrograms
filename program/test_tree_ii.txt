@@ -7,37 +7,68 @@ public class TestSortedTreeIntInt extends EBoost {
 	void cleanup() {
 	}
 	
-	void test_1() {
-		int v_0, v_111, v_222, v_333, v_444, v_555, v_666;
-		//          33:333
-		//  11:111          55:555
-		// 0:0  22:222  44:444  66:666
-		tree = new SortedTreeIntInt(7);
+	void foo(int size) {
+		int v;
+		
+		tree = new SortedTreeIntInt(size);
+		
+		assert_equal(tree.size(), size);
 		
 		for (int i = tree.size() - 1; i >= 0; --i) {
 			tree.at_index(i).init(i * 11, i * 111);
 		}
 		
-		v_0 = tree.get(0);
-		v_111 = tree.get(11);
-		v_222 = tree.get(22);
-		v_333 = tree.get(33);
-		v_444 = tree.get(44);
-		v_555 = tree.get(55);
-		v_666 = tree.get(66);
+		for (int i = tree.size() - 1; i >= 0; --i) {
+			v = tree.get(i * 11);
+			assert_equal(v, i * 111);
+		}
+	}
+	
+	void test_7() {
+		int v;
+		//          33:333
+		//  11:111          55:555
+		// 0:0  22:222  44:444  66:666
+		foo(7);
+	}
+	
+	void test_6() {
+		int v;
+		//          33:333
+		//  11:111          55:555
+		// 0:0  22:222  44:444
+		foo(6);
 		
-		assert_equal(v_0, 0);
-		assert_equal(v_111, 111);
-		assert_equal(v_222, 222);
-		assert_equal(v_333, 333);
-		assert_equal(v_444, 444);
-		assert_equal(v_555, 555);
-		assert_equal(v_666, 666);
+		assert_equal(tree.root.less.less.value, 0);
+		assert_equal(tree.root.less.value, 111);
+		assert_equal(tree.root.less.more.value, 222);
+		assert_equal(tree.root.value, 333);
+		assert_equal(tree.root.more.less.value, 444);
+		assert_equal(tree.root.more.value, 555);
+	}
+	
+	void test_5() {
+		int v;
+		//          22:222
+		//  11:111          55:555
+		// 0:0          44:444
+		foo(5);
+	}
+	
+	void test_4() {
+		int v;
+		//          22:222
+		//  11:111          44:444
+		// 0:0
+		foo(4);
 	}
 }
 
-extern void Test_ListInt() {
+extern void Test_TreeIntInt() {
 	TestSortedTreeIntInt t();
-	t.test_1();
+	t.test_7();
+	t.test_6();
+	t.test_5();
+	t.test_4();
 	message("Tests passed", DisplayInfo);
 }

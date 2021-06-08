@@ -1,0 +1,284 @@
+public class CbVsPl2 extends EBoost {
+	point derrick_out;
+	point converter_1;
+	point converter_2;
+	point power_plant;
+	point bot_factory;
+	point research_center;
+	point titanium_ore;
+	point empty_power_cell;
+	
+	SortedTreeIntListPoint build_positions = null;
+	
+	void CbVsPl2(object actor) {
+		super.actor = actor;
+		errmode(0);
+	} 
+	
+	/*private*/ int _goto_build(int cat) {
+		ListPoint list; point pos;
+		
+		list = build_positions.get(cat);
+		pos = list.back();
+		list.pop_back();
+		
+		if (goto_p(pos) != 0) {
+			return 1;
+		}
+		
+		if (drop() != 0) {
+			return 1;
+		}
+		
+		if (build(cat) != 0) {
+			return 1;
+		}
+		
+		return 0;
+	}
+	
+	/*private*/ int _goto_research(int res_cat) {
+		object item, actor_load;
+		
+		actor_load = super.actor.load;
+		
+		if (actor_load == null or actor_load.category != PowerCell) {
+			log("warning _goto_research PowerCell is not loaded");
+			return 1;
+		}
+		
+		item = super.radar_wait(new RadarArgs(ResearchCenter, 0, 360, 0, 50, 1, FilterFriendly));
+		
+		if (item == null) {
+			log("warning _goto_research ResearchCenter not found");
+			return 1;
+		}
+		
+		super.goto_o(research_center, 4);
+		
+		if (item.energyCell == null) {
+			super.drop_to_energy_cell(ResearchCenter);
+			
+			if (item.research(res_cat) != 0) {
+				super.log("warning _goto_research can not start research");
+				return 1;
+			}
+		} else {
+			super.log("info _goto_research energyCell slot is not empty. replacing");
+			drop(Behind);
+			super.grab_from_energy_cell(PowerCell, ResearchCenter);
+			turn(90);
+			drop();
+			turn(-90);
+			super.grab_from_ground(PowerCell, Behind);
+			drop();
+			
+			if (item.research(res_cat) != 0) {
+				super.log("warning _goto_research can not start research");
+				return 1;
+			}
+			
+			turn(90);
+			super.grab_from_ground(PowerCell);
+			// We do not need to get out of PowerCell if we do just 2 or 3 researchers
+			// get_out_power_cell(g.b.empty_power_cell, 1);
+		}
+		
+		return 0;
+	}
+	
+	/*private*/ ListPoint _list_point_1(float ax, float ay, float az) {
+		ListPoint list;
+		
+		list = new ListPoint();
+		list.push_front(_team_transform(new point(ax, ay, az)));
+		
+		return list;
+	}
+	
+	/*private*/ ListPoint _list_point_2(float ax, float ay, float az, float bx, float by, float bz) {
+		ListPoint list;
+		
+		list = new ListPoint();
+		list.push_front(_team_transform(new point(ax, ay, az)));
+		list.push_front(_team_transform(new point(bx, by, bz)));
+		
+		return list;
+	}
+	
+	/*private*/ void _make_titaniums_1_2() {
+		super.goto_o(derrick_out);
+		super.grab_from_ground(TitaniumOre);
+		super.goto_o(converter_1, 1.7);
+		super.drop_to_ground();
+		super.goto_o(derrick_out, 1.5);
+		super.grab_from_ground(TitaniumOre);
+		super.goto_o(converter_2, 1.7);
+		super.drop_to_ground();
+		super.goto_p(converter_1, 1.5);
+		super.grab_from_ground(Titanium);
+	}
+	
+	/*private*/ point _team_transform(point p) {
+		if (super.actor.team == 2) {
+			p.x *= -1;
+			p.y *= -1;
+			p.z = super.normalize_angle(180 + p.z);
+		}
+		
+		return p;
+	}
+	
+	/*private*/ void _setup_build_positions() {
+		build_positions = new SortedTreeIntListPoint(4);
+		build_positions.at_index(0).init(BotFactory, _list_point_1(-8, -42, 150));
+		build_positions.at_index(1).init(Converter, _list_point_2(5, -50.5, 315,  -5, -50.5, 225));
+		build_positions.at_index(2).init(ResearchCenter, _list_point_1(2, -36, 111));
+		build_positions.at_index(3).init(PowerPlant, _list_point_1(5, -44, 10));
+		
+		this.derrick_out      = _team_transform(new point( 0, -55.5, 270));
+		this.converter_1      = _team_transform(new point( 5, -50.5, 315));
+		this.converter_2      = _team_transform(new point(-5,   -50, 225));
+		this.power_plant      = _team_transform(new point( 5,   -44,  10));
+		this.bot_factory      = _team_transform(new point(-8,   -42, 150));
+		this.research_center  = _team_transform(new point( 2,   -36, 111));
+		this.titanium_ore     = _team_transform(new point( 3, -54.5, 315));
+		this.empty_power_cell = _team_transform(new point( 5,   -39,   0));
+	}
+	
+	public void setup() {
+		object item; point pos;
+		
+		this._setup_build_positions();
+		
+		super.grab_from_ground(Titanium);
+		this._goto_build(Converter);
+		super.log("info setup Converter_1");
+		
+		super.goto_o(derrick_out);
+		super.grab_from_ground(TitaniumOre);
+		super.goto_o(converter_1, 2);
+		super.log("drop_to_ground ret = " + super.drop_to_ground());
+		super.goto_o_behind(derrick_out, 1.5);
+		super.grab_from_ground(TitaniumOre, Behind);
+		super.goto_p(titanium_ore);
+		super.drop_to_ground();
+		super.goto_p(converter_1, 2);
+		super.grab_from_ground(Titanium);
+		this._goto_build(Converter);
+		super.log("info setup Converter_2");
+		
+		this._make_titaniums_1_2();
+		this._goto_build(PowerPlant);
+		super.log("info setup PowerPlant");
+		super.goto_o(converter_2, 2);
+		super.grab_from_ground(Titanium);
+		this._goto_build(BotFactory);
+		super.log("info setup BotFactory");
+		
+		this._make_titaniums_1_2();
+		super.goto_o(power_plant);
+		super.drop_to_ground();
+		super.goto_o(converter_2);
+		super.grab_from_ground(Titanium);
+		this._goto_build(ResearchCenter);
+		super.log("info setup ResearchCenter");
+		super.goto_o(power_plant);
+		super.grab_from_energy_cell(PowerCell, PowerPlant);
+		this._goto_research(ResearchWinged);
+		
+		/*make_titaniums_1_2(275, Behind);
+		goto_q(g.b.power_plant);
+		drop();
+		goto_q(g.b.converter_2);
+		grab_from_ground(Titanium);
+		factory_q(g.b.bot_factory, WingedGrabber, "Sabotage");
+		goto_p(g.b.power_plant);
+		grab(EnergyCell);
+		drop(Behind);
+		grab_from_energy_cell(PowerCell, PowerPlant);
+		drop(EnergyCell);
+		turn(180);
+		grab_from_ground(PowerCell);
+		fill_q(g.b.bot_factory, WingedGrabber);
+		log("info setup WingedGrabber");
+		
+		// --- unsafe line ---
+		
+		make_titaniums_1_2(275, Behind);
+		goto_q(g.b.power_plant);
+		drop();
+		orient(190);
+		move(3);
+		goto_p(g.b.research_center, 4);
+		grab_from_energy_cell(PowerCell, ResearchCenter);
+		turn(-90);
+		drop();
+		goto_q(g.b.power_plant);
+		grab_from_energy_cell(PowerCell, PowerPlant);
+		research_q(ResearchShooter);
+		goto_q(g.b.converter_2);
+		grab_from_ground(Titanium);
+		goto_q(g.b.power_plant);
+		drop();
+		
+		make_titaniums_1_2(340, Behind);
+		factory_q(g.b.bot_factory, WingedShooter, "destroy_enemies");
+		goto_q(g.b.power_plant);
+		grab_from_energy_cell(PowerCell, PowerPlant);
+		fill_q(g.b.bot_factory, WingedShooter);
+		log("info setup WingedShooter 1");
+		goto_q(g.b.converter_2);
+		grab_from_ground(Titanium);
+		goto_q(g.b.power_plant);
+		drop();*/
+	}
+	
+	public void loop() {
+		object item;
+		
+		/*make_titaniums_1_2(275, Behind);
+		goto_q(g.b.power_plant);
+		
+		if (radar(PowerPlant).energyCell != null) {
+			orient(190);
+			drop();
+			turn(direction(g.b.power_plant));
+			grab_from_energy_cell(PowerCell, PowerPlant); // TODO: Any
+			orient(330);
+			drop();
+			orient(190);
+			grab_from_ground(Titanium);
+			goto_q(g.b.power_plant);
+		}
+		
+		drop();
+		goto_q(g.b.converter_2);
+		grab_from_ground(Titanium);
+		factory_q(g.b.bot_factory, WingedShooter, "destroy_enemies");
+		goto_q(g.b.power_plant);
+		
+		if (grab_from_energy_cell(PowerCell, PowerPlant, 1, 1) != 0) {
+			item = radar(PowerCell, 0, 360, 0, 30);
+			
+			if (item != null) {
+				goto(item.position);
+				grab_from_ground(PowerCell);
+			}
+		}
+		
+		fill_q(g.b.bot_factory, WingedShooter);
+		log("info setup WingedShooter " + i);
+		
+		check_energy_cell_wheeled_grabber();*/
+	}
+}
+
+extern void object::RunCbVsPl2() {
+	CbVsPl2 cb(this);
+	cb.setup();
+	
+	for (;;) {
+		cb.loop();
+	}
+}

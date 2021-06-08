@@ -23,8 +23,8 @@ public class TEMPLATE(SortedTree) {
 		
 		pointer = new TEMPLATE(TreeNode)();
 		--size;
-		pointer.less = this._create_subtree(size - size / 2);
-		pointer.more = this._create_subtree(size / 2);
+		pointer.less = this._create_subtree(ceil(size / 2));
+		pointer.more = this._create_subtree(floor(size / 2));
 		return pointer;
 	}
 	
@@ -53,10 +53,14 @@ public class TEMPLATE(SortedTree) {
 		return VALUE_NULL;
 	}
 	
+	/*private*/ int _middle_index(int min_index, int max_index) {
+		return ceil((max_index - min_index) / 2) + min_index;;
+	}
+	
 	/*private*/ TEMPLATE(TreeNode) _at_index_helper(TEMPLATE(TreeNode) node, int min_index, int max_index, int target_index) {
 		int current_index;
 		
-		current_index = (max_index - min_index) / 2 + min_index;
+		current_index = this._middle_index(min_index, max_index);
 		
 		if (target_index == current_index) {
 			return node;
@@ -70,7 +74,7 @@ public class TEMPLATE(SortedTree) {
 	}
 	
 	public TEMPLATE(TreeNode) at_index(int index) {
-		return this._at_index_helper(this.root, 0, this._size, index);
+		return this._at_index_helper(this.root, 0, this._size - 1, index);
 	}
 	
 	public int size() {
@@ -78,7 +82,7 @@ public class TEMPLATE(SortedTree) {
 	}
 }
 
-extern void TEMPLATE(LibSortedTree)() {
+extern void TEMPLATE(Library_Tree)() {
 }
 
 //               06
