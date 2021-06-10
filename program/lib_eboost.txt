@@ -77,6 +77,22 @@ public class EBoost {
 		or cat == LeggedGrabber;
 	}
 	
+	public string cat_name(int cat) {
+		if (cat == BotFactory) { return "BotFactory"; }
+		if (cat == Converter) { return "Converter"; }
+		if (cat == Derrick) { return "Derrick"; }
+		if (cat == DefenseTower) { return "DefenseTower"; }
+		if (cat == PowerPlant) { return "PowerPlant"; }
+		if (cat == PowerStation) { return "PowerStation"; }
+		if (cat == ResearchCenter) { return "ResearchCenter"; }
+		if (cat == WheeledGrabber) { return "WheeledGrabber"; }
+		if (cat == WingedGrabber) { return "WingedGrabber"; }
+		if (cat == WingedShooter) { return "WingedShooter"; }
+		if (cat == Shielder) { return "Shielder"; }
+		// TODO: add other
+		return "" + cat;
+	}
+	
 	float _get_energy_level(object item) {
 		if (item.category == PowerCell) {
 			return item.energyLevel;
@@ -247,7 +263,7 @@ public class EBoost {
 		
 		slot = radar(slot_cat, 0, 30, 0, 10, FilterFriendly);
 		
-		if (slot == null or slot.energyCell == null) {
+		if (slot == null or slot.energyCell == null or this.actor.load != null) {
 			return 1;
 		}
 		
@@ -316,6 +332,66 @@ public class EBoost {
 				p.z += 360;
 			}
 		}
+	}
+	
+	public int factory_bot(int bot_cat, string program) {
+		object item; float wait_time;
+		
+		item = radar_wait(new RadarArgs(BotFactory, 0, 360, 0, 1024, 1, FilterFriendly));
+		
+		if (item == null) {
+			this.log("warning factory_bot BotFactory not found");
+			return 1;
+		}
+		
+		this.goto_pp(item.position, this.normalize_angle(180 + item.orientation), 5.5);
+		move(3.0);
+		this.drop_to_ground();
+		turn(180);
+		move(3.0);
+		
+		wait_time = 60;  // max research time
+		
+		while (item.factory(bot_cat, program) != 0) {
+			wait(0.1);
+			wait_time -= 0.1;
+			
+			if (wait_time <= 0) {
+				this.log("warning factory_bot can not factory, timeout expired");
+				return 1;
+			}
+		}
+		
+		return 0;
+	}
+	
+	public int fill_bot(int bot_cat) {
+		object item;
+		
+		// TODO: assume there is one BotFactory
+		item = this.radar_wait(new RadarArgs(BotFactory, 0, 360, 0, 1024, 1, FilterFriendly));
+		
+		if (item == null) {
+			return 1;
+		}
+		
+		this.goto_pp(item.position, this.normalize_angle(180 + item.orientation), 5.5);
+		item = this.radar_wait(new RadarArgs(bot_cat, 0, 30, 0, 20));
+		
+		if (item == null) {
+			this.log("warning fill_q failed to find Bot, timeout expired");
+			return 1;
+		}
+		
+		goto(item.position);
+		
+		if (this.drop_to_energy_cell(bot_cat) != 0) {
+			this.log("warning fill_q failed to insert PowerCell");
+			return 1;
+		}
+		
+		move(-1.5);
+		return 0;
 	}
 	
 	point fire_position(object item) {
@@ -567,6 +643,18 @@ public class EBoost {
 		
 		log("info goto_radar_position ok");
 		return 0;
+	}
+	
+	public int goto_retries(point pos, int retries=5) {
+		for (;retries > 0; --retries) {
+			if (goto(pos) == 0) {
+				return 0;
+			}
+			
+			wait(1);
+		}
+		
+		return 1;
 	}
 	
 	void goto_straight(point pos, float dist=1.5) {

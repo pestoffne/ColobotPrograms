@@ -34,6 +34,7 @@ public class CbVsPl2 extends EBoost {
 			return 1;
 		}
 		
+		super.log("info _goto_build " + super.cat_name(cat));
 		return 0;
 	}
 	
@@ -129,6 +130,78 @@ public class CbVsPl2 extends EBoost {
 		return p;
 	}
 	
+	public void sabotage() {
+		object items[]; int i;
+		
+		this._wait_leave_factory();
+		
+		// Sabotage A: Block enemy's single Convertor
+		items = radarall(Converter, 0, 360, 0, 1024, 1, FilterEnemy);
+		
+		if (sizeof(items) == 1) {
+			super.goto_retries(items[0].position);
+			grab();  // may be Titanium inside
+			move(1);
+			turn(180);
+		}
+		
+		while (sizeof(items) == 1) {
+			wait(1);
+			items = radarall(Converter, 0, 360, 0, 1024, 1, FilterEnemy);
+		}
+		
+		// Sabotage B: Block enemy's single BotFactory
+		items = radarall(BotFactory, 0, 360, 0, 1024, 1, FilterEnemy);
+		
+		if (sizeof(items) == 1) {
+			super.goto_retries(items[0].position);
+			grab();  // may be Titanium inside
+			// TODO: may be a enemy's Bot inside
+			move(1);
+			turn(180);
+		}
+		
+		while (sizeof(items) == 1) {
+			wait(1);
+			items = radarall(BotFactory, 0, 360, 0, 1024, 1, FilterEnemy);
+		}
+		
+		// Sabotage C: Steal enemy's WheeledGrabber PowerCell
+		for (;;) {
+			if (super.actor.load != null) {
+				break;
+			}
+			
+			items = radarall(WheeledGrabber, 0, 360, 0, 1024, -1, FilterEnemy);
+			
+			if (items == null) {
+				break;
+			}
+			
+			for (int i = sizeof(items) - 1; i >= 0; --i) {
+				if (items[i].energyCell != null and items[i].energyCell.category == PowerCell and items[i].energyCell.energyLevel >= 0) {
+					goto(items[i].position);
+					grab();
+					break;
+				}
+			}
+			
+			super.check_energy_loop();
+		}
+	}
+	
+	/*private*/ void _wait_leave_factory() {
+		while (super.actor.energyCell == null) {
+			wait(0.1);
+		}
+		
+		turn(180);
+		wait(3);
+		move(4);
+		jet(1);
+		wait(1.5);
+	}
+	
 	/*private*/ void _setup_build_positions() {
 		build_positions = new SortedTreeIntListPoint(4);
 		build_positions.at_index(0).init(BotFactory, _list_point_1(-8, -42, 150));
@@ -153,12 +226,11 @@ public class CbVsPl2 extends EBoost {
 		
 		super.grab_from_ground(Titanium);
 		this._goto_build(Converter);
-		super.log("info setup Converter_1");
 		
 		super.goto_o(derrick_out);
 		super.grab_from_ground(TitaniumOre);
 		super.goto_o(converter_1, 2);
-		super.log("drop_to_ground ret = " + super.drop_to_ground());
+		super.drop_to_converter();
 		super.goto_o_behind(derrick_out, 1.5);
 		super.grab_from_ground(TitaniumOre, Behind);
 		super.goto_p(titanium_ore);
@@ -166,15 +238,12 @@ public class CbVsPl2 extends EBoost {
 		super.goto_p(converter_1, 2);
 		super.grab_from_ground(Titanium);
 		this._goto_build(Converter);
-		super.log("info setup Converter_2");
 		
 		this._make_titaniums_1_2();
 		this._goto_build(PowerPlant);
-		super.log("info setup PowerPlant");
 		super.goto_o(converter_2, 2);
 		super.grab_from_ground(Titanium);
 		this._goto_build(BotFactory);
-		super.log("info setup BotFactory");
 		
 		this._make_titaniums_1_2();
 		super.goto_o(power_plant);
@@ -182,47 +251,43 @@ public class CbVsPl2 extends EBoost {
 		super.goto_o(converter_2);
 		super.grab_from_ground(Titanium);
 		this._goto_build(ResearchCenter);
-		super.log("info setup ResearchCenter");
 		super.goto_o(power_plant);
 		super.grab_from_energy_cell(PowerCell, PowerPlant);
 		this._goto_research(ResearchWinged);
 		
-		/*make_titaniums_1_2(275, Behind);
-		goto_q(g.b.power_plant);
-		drop();
-		goto_q(g.b.converter_2);
-		grab_from_ground(Titanium);
-		factory_q(g.b.bot_factory, WingedGrabber, "Sabotage");
-		goto_p(g.b.power_plant);
-		grab(EnergyCell);
-		drop(Behind);
-		grab_from_energy_cell(PowerCell, PowerPlant);
-		drop(EnergyCell);
+		this._make_titaniums_1_2();
+		super.goto_o(power_plant);
+		super.drop_to_energy_cell(PowerPlant);
+		super.goto_o(converter_2);
+		super.grab_from_ground(Titanium);
+		super.factory_bot(WingedGrabber, "RunSabotage");
+		super.goto_o(power_plant);
+		super.switch_cell_quick();
 		turn(180);
-		grab_from_ground(PowerCell);
-		fill_q(g.b.bot_factory, WingedGrabber);
-		log("info setup WingedGrabber");
+		super.grab_from_ground(PowerCell);
+		super.fill_bot(WingedGrabber);
+		super.log("info setup WingedGrabber");
 		
 		// --- unsafe line ---
 		
-		make_titaniums_1_2(275, Behind);
-		goto_q(g.b.power_plant);
-		drop();
-		orient(190);
+		/*this._make_titaniums_1_2();
+		super.goto_o(power_plant);
+		super.drop_to_energy_cell(PowerPlant);
+		super.orient(190);  // TODO: team and base dependend
 		move(3);
-		goto_p(g.b.research_center, 4);
-		grab_from_energy_cell(PowerCell, ResearchCenter);
+		super.goto_o(research_center, 4);
+		super.grab_from_energy_cell(PowerCell, ResearchCenter);
 		turn(-90);
 		drop();
-		goto_q(g.b.power_plant);
+		goto_q(power_plant);
 		grab_from_energy_cell(PowerCell, PowerPlant);
-		research_q(ResearchShooter);
-		goto_q(g.b.converter_2);
+		this._goto_research(ResearchShooter);
+		goto_q(converter_2);
 		grab_from_ground(Titanium);
-		goto_q(g.b.power_plant);
+		goto_q(power_plant);
 		drop();
 		
-		make_titaniums_1_2(340, Behind);
+		/*make_titaniums_1_2(340, Behind);
 		factory_q(g.b.bot_factory, WingedShooter, "destroy_enemies");
 		goto_q(g.b.power_plant);
 		grab_from_energy_cell(PowerCell, PowerPlant);
@@ -272,6 +337,11 @@ public class CbVsPl2 extends EBoost {
 		
 		check_energy_cell_wheeled_grabber();*/
 	}
+}
+
+public void object::RunSabotage() {
+	CbVsPl2 cb(this);
+	cb.sabotage();
 }
 
 extern void object::RunCbVsPl2() {
