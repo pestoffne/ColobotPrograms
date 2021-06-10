@@ -1,0 +1,101 @@
+public class ObjectsIterator {
+	private int _index;
+	private ListUnaryPredicateObject _filters;
+	
+	public void ObjectsIterator(int index=0) {
+		this._index = 0;
+		this._filters = new ListUnaryPredicateObject();
+	}
+	
+	/*public ObjectsIterator copy() {
+		return new ObjectsIterator(this._index);
+	}*/
+	
+	public bool equal(ObjectsIterator that) {
+		return this._index == that._index;
+	}
+	
+	public ObjectsIterator filter(UnaryPredicateObject pred) {
+		this._filters.push_back(pred);
+		return this;
+	}
+	
+	public int get_index() {
+		return this._index;
+	}
+	
+	public object value() {
+		return retobject(this._index);
+	}
+	
+	public ObjectsIterator shift() {
+		object item; ListIteratorUnaryPredicateObject iter;
+		
+		for (;;) {
+			this._index++;
+			item = this.value();
+			
+			if (item == null) {
+				return this;
+			}
+			
+			for (iter = this._filters.begin(); not iter.is_null(); iter.shift()) {
+				if (not iter.value()._(item)) {
+					break;
+				}
+			}
+			
+			if (iter.is_null()) {
+				return this;
+			}
+		}
+		
+		return null;  // never executes
+	} 
+}
+
+public ObjectsIterator new_ObjectsIterator() {
+	return new ObjectsIterator();
+}
+
+public class UnaryPredicateObject {
+	public void UnaryPredicateObject() {
+		nan * 0;  // abstract class
+	}
+	
+	public bool _(object value) {
+		return true;
+	}
+}
+
+public class UnaryPredicateCatObject extends UnaryPredicateObject {
+	private int _cat;
+	
+	public void UnaryPredicateCatObject(int cat) {
+		this._cat = cat;
+	}
+	
+	public bool _(object value) {
+		return value.category == this._cat;
+	}
+}
+
+extern void filters() {
+	ObjectsIterator items; object item; Message msg;
+	
+	msg = new Message();
+	items = new_ObjectsIterator().filter(new UnaryPredicateCatObject(Titanium));
+	
+	for (;;) {
+		items.shift();
+		item = items.value();
+		
+		if (item == null) {
+			break;
+		}
+		
+		msg.add(item.id + " ");
+	}
+	
+	msg.show();
+}
