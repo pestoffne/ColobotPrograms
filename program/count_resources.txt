@@ -46,7 +46,8 @@ extern void object::CountResources() {
 	}
 	
 	// Count current bot's PowerCell or NuclearCell in EnercyCell slot
-	if (energyCell.category == PowerCell) {
+	if (energyCell == null) {
+	} else if (energyCell.category == PowerCell) {
 		power_cells_count++;
 		power_cells_charge_sum += e.max(energyCell.energyLevel, 0);
 	} else if (energyCell.category == NuclearCell) {
