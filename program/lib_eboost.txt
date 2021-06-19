@@ -408,6 +408,35 @@ public class EBoost {
 		return pos;
 	}
 	
+	/*private*/ void _jet_to(float target_z) {
+		float actor_z, diff_z;
+		
+		actor_z = this.actor.position.z;
+		diff_z = target_z - actor_z;
+		
+		if (abs(diff_z) < 0.5) {
+			jet(0);
+		} else {
+			jet(this.min_max(0.1 * diff_z, -0.5, 0.5));
+		}
+	}
+	
+	public void fly_to(point pos) {
+		float angle;
+		
+		while (distance(pos, actor.position) > 3.0) {
+			angle = direction(pos);
+			
+			if (abs(angle) > 1.0) {
+				turn(angle);
+			}
+			
+			this._jet_to(pos.z);
+			motor(1, 1);
+			wait(0.1);
+		}
+	}
+	
 	float get_height(int cat) {
 		float h;
 		
@@ -988,6 +1017,18 @@ public class EBoost {
 		}
 		
 		return b;
+	}
+	
+	public float min_max(float value, float min_value, float max_value) {
+		if (value <= min_value) {
+			return min_value;
+		}
+		
+		if (value >= max_value) {
+			return max_value;
+		}
+		
+		return value;
 	}
 	
 	void orient(float direct) {
