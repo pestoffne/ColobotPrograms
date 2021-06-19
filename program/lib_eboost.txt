@@ -352,7 +352,8 @@ public class EBoost {
 		
 		wait_time = 60;  // max research time
 		
-		while (item.factory(bot_cat, program) != 0) {
+		//while (item.factory(bot_cat, program) != 0) {  // for v0.1
+		while (factory(bot_cat, program, item) != 0) {  // for v0.2
 			wait(0.1);
 			wait_time -= 0.1;
 			
