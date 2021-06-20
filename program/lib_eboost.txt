@@ -58,6 +58,14 @@ public class EBoost {
 		return assert(a == b, "assert(" + a + " == " + b + ") failed");
 	}
 	
+	public float benchmark(FunctionVV func) {
+		float start_time;
+		
+		start_time = abstime();
+		func._();
+		return abstime() - start_time;
+	}
+	
 	bool can_load(int cat) {
 		return false
 		or cat == WheeledGrabber
@@ -409,32 +417,49 @@ public class EBoost {
 	}
 	
 	/*private*/ void _jet_to(float target_z) {
-		float actor_z, diff_z;
+		jet(this.min_max(0.1 * (target_z - this.actor.position.z), -0.5, 0.5));
+	}
+	
+	/*private*/ void _motor(float dir) {
+		float x;
+		dir = this.min_max(dir, -1.0, 1.0);
+		x = 1 - 2 * abs(dir);
 		
-		actor_z = this.actor.position.z;
-		diff_z = target_z - actor_z;
-		
-		if (abs(diff_z) < 0.5) {
-			jet(0);
+		if (dir > 0) {
+			motor(x, 1);
 		} else {
-			jet(this.min_max(0.1 * diff_z, -0.5, 0.5));
+			motor(1, x);
 		}
 	}
 	
 	public void fly_to(point pos) {
-		float angle;
+		float dir; PID pid;
 		
-		while (distance(pos, actor.position) > 3.0) {
-			angle = direction(pos);
+		pid = new PID(0.02, 0.0, 0.0002, 0.05);
+		
+		while (distance(pos, this.actor.position) > 3.0) {
+			dir = pid.compute(direction(pos));
+			this._motor(dir);
+			this._jet_to(pos.z - 0.75);
+			wait(0.05);
+		}
+	}
+	
+	public int fly_ground(float jet_value=-1) {
+		float ground_z; int retries;
+		
+		for (retries = 100; retries >= 0; --retries) {
+			ground_z = topo(actor.position);
 			
-			if (abs(angle) > 1.0) {
-				turn(angle);
+			if (ground_z == actor.position.z) {
+				return 0;
 			}
 			
-			this._jet_to(pos.z);
-			motor(1, 1);
+			jet(jet_value);
 			wait(0.1);
 		}
+		
+		return 1;
 	}
 	
 	float get_height(int cat) {
@@ -1211,6 +1236,48 @@ public class EBoost {
 		if (cat == UraniumOre ) { return 30.5; }
 		return 15.5;  // Build time
 	} 
+}
+
+public class PID {
+	private float _kp;
+	private float _ki;
+	private float _kd;
+	private float _dt;
+	private float _integral = 0;
+	private float _prev_error = nan;
+	
+	public void PID(float kp, float ki, float kd, float dt) {
+		this._kp = kp;
+		this._ki = ki;
+		this._kd = kd;
+		this._dt = dt;
+	}
+	
+	public float compute(float error) {
+		float p_out, i_out, d_out;
+		
+		p_out = this._kp * error;
+		
+		this._integral += error * this._dt;
+		i_out = this._ki * this._integral;
+		
+		if (this._prev_error == nan) {
+			this._prev_error = error;
+		}
+		
+		d_out = this._kd * (error - this._prev_error) / this._dt;
+		
+		this._prev_error = error;
+		return p_out + i_out + d_out;
+	}
+}
+
+// Pointer to function which returns void and get 0 arguments
+public class FunctionVV {
+	// Mathod "_" should be overriden is subclass
+	public void _() {
+		nan * 0;  // abstract method
+	}
 }
 
 public class Message {

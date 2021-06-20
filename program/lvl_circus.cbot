@@ -1,0 +1,34 @@
+public class StraightFlyFunctionVV extends FunctionVV {
+	EBoost e;
+	
+	public void StraightFlyFunctionVV(EBoost e) {
+		this.e = e;
+	}
+	
+	public void _() {
+		object item;
+		
+		for (;;) {
+			item = radar(Target2);
+			
+			if (item == null) {
+				break;
+			}
+			
+			this.e.fly_to(item.position);
+		}
+	}
+}
+
+extern void object::Circus() {
+	float time; point pos;
+	EBoost e(this);
+	
+	time = e.benchmark(new StraightFlyFunctionVV(e));
+	message(time);
+	
+	pos = radar(SpaceShip).position;
+	pos.z += 12.0;
+	e.fly_to(pos);
+}
+
