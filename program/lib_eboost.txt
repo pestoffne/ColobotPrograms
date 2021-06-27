@@ -437,10 +437,58 @@ public class EBoost {
 		
 		pid = new PID(0.02, 0.0, 0.0002, 0.05);
 		
-		while (distance(pos, this.actor.position) > 3.0) {
+		while (distance(pos, this.actor.position) > 5.0) {
 			dir = pid.compute(direction(pos));
 			this._motor(dir);
 			this._jet_to(pos.z - 0.75);
+			wait(0.05);
+		}
+	}
+	
+	public void fly_to(point pos, float angle) {
+		float dir, dist; PID pid; point qos;
+		
+		pid = new PID(0.02, 0.0, 0.0002, 0.05);
+		
+		for (;;) {
+			dist = distance(pos, this.actor.position);
+			
+			if (dist <= 3.0) { // TODO: check angle
+				break;
+			}
+			
+			qos.x = pos.x - cos(angle) * dist * 0.25;
+			qos.y = pos.y - sin(angle) * dist * 0.25;
+			dir = pid.compute(direction(qos));
+			this._motor(dir);
+			this._jet_to(pos.z - 0.75);
+			wait(0.05);
+		}
+	}
+	
+	public void fly_to(object item) {
+		float item_orientation, dir_qos, dir_pid, dist_to_item, koef; PID pid; point item_position, qos;
+		
+		pid = new PID(0.02, 0.0, 0.0002, 0.05);
+		// TODO: check unit is alive
+		
+		for (;;) {
+			item_position = item.position;
+			item_orientation = item.orientation;
+			dist_to_item = distance(item_position, this.actor.position);
+			koef = max(-5, 5 - dist_to_item * 0.25);
+			qos.x = item_position.x + cos(item_orientation) * koef;
+			qos.y = item_position.y + sin(item_orientation) * koef;
+			dir_qos = this.normalize_angle(direction(qos));
+			dir_pid = pid.compute(dir_qos);
+			this._motor(dir_pid);
+			this._jet_to(item_position.z);
+			
+			if (abs(dir_qos) < 5.0 and dist_to_item < 20.0) {
+				fire(0.1);
+				break;
+			}
+			
 			wait(0.05);
 		}
 	}
@@ -482,6 +530,51 @@ public class EBoost {
 		}
 		
 		return h * 0.25;
+	}
+	
+	public point get_next_position_line(object item, float dt) {
+		int item_category; point item_position, item_velocity, next_position;
+		
+		item_category = item.category;
+		item_position = item.position;
+		item_velocity = this.get_velocity(item);
+		
+		// ignore items that could stop item
+		next_position.x = item_position.x + dt * item_velocity.x;
+		next_position.y = item_position.y + dt * item_velocity.y;
+		
+		if (item_category == AlienWasp) {
+			next_position.z = this.max(8.5, 8.5 + topo(next_position));
+		} else if (item_category == WingedGrabber or item_category == WingedSniffer or item_category == WingedShooter
+		        or item_category == WingedOrgaShooter or item_category == WingedBuilder) {
+			// there is maximum z for bots, we ignore it here
+			next_position.z = this.max(item_position.z + dt * item_velocity.z, topo(next_position));
+		} else {
+			// assume item is ground unit
+			next_position.z = topo(next_position) + (item_position.z - topo(item_position));
+		}
+		
+		return next_position;
+	}
+	
+	public point get_velocity(object item) {
+		point item_velocity;
+		
+		item_velocity = item.velocity;
+		
+		if (item_velocity.x == nan) {
+			item_velocity.x = 0.0;
+		}
+		
+		if (item_velocity.y == nan) {
+			item_velocity.y = 0.0;
+		}
+		
+		if (item_velocity.z == nan) {
+			item_velocity.z = 0.0;
+		}
+		
+		return item_velocity;
 	}
 	
 	// return 0 -- PowerCell was recharged
@@ -1060,6 +1153,14 @@ public class EBoost {
 		turn(normalize_angle(direct - actor.orientation));
 	}
 	
+	public string point_2d_to_str(point p) {
+		return "(" + this.round_digits(p.x, 1) + ", " + this.round_digits(p.y, 1) + ")";
+	}
+	
+	public string point_3d_to_str(point p) {
+		return "(" + this.round_digits(p.x, 1) + ", " + this.round_digits(p.y, 1) + ", " + this.round_digits(p.z, 1) + ")";
+	}
+	
 	// TODO: use RadarArgs
 	object radar_best_cell(int angle=0, int focus=360, int min=0, int max=1024) {
 		object[] nuclear_cells; int nuclear_max_index; float nuclear_max_value;
@@ -1217,6 +1318,10 @@ public class EBoost {
 		
 		cat_list[0] = cat;
 		return cat_list;
+	}
+	
+	public string to_str(point p) {
+		return this.point_3d_to_str(p);
 	}
 	
 	point team_transform(point p) {
