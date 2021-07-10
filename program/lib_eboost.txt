@@ -1072,6 +1072,50 @@ public class EBoost {
 		return structs;
 	}
 	
+	int[] list_healable() {
+		int[] a; int i;
+		
+		i = 0;
+		a[i++] = WheeledGrabber;
+		a[i++] = TrackedGrabber;
+		a[i++] = WingedGrabber;
+		a[i++] = LeggedGrabber;
+		a[i++] = WheeledSniffer;
+		a[i++] = TrackedSniffer;
+		a[i++] = WingedSniffer;
+		a[i++] = LeggedSniffer;
+		a[i++] = WheeledShooter;
+		a[i++] = TrackedShooter;
+		a[i++] = WingedShooter;
+		a[i++] = LeggedShooter;
+		a[i++] = WheeledOrgaShooter;
+		a[i++] = TrackedOrgaShooter;
+		a[i++] = WingedOrgaShooter;
+		a[i++] = LeggedOrgaShooter;
+		a[i++] = Subber;
+		a[i++] = Recycler;
+		a[i++] = Shielder;
+		a[i++] = Thumper;
+		a[i++] = PhazerShooter;
+		a[i++] = PracticeBot;
+		a[i++] = TargetBot;
+		a[i++] = BotFactory;
+		a[i++] = ResearchCenter;
+		a[i++] = RadarStation;
+		a[i++] = ExchangePost;
+		a[i++] = RepairCenter;
+		a[i++] = DefenseTower;
+		a[i++] = AutoLab;
+		a[i++] = PowerStation;
+		a[i++] = PowerPlant;
+		a[i++] = NuclearPlant;
+		a[i++] = Converter;
+		a[i++] = Derrick;
+		a[i++] = PowerCaptor;
+		
+		return a;
+	}
+	
 	int[] list_bushes() {
 		int[] cats; int i;
 		

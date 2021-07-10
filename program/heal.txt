@@ -1,0 +1,50 @@
+extern void object::Heal() {
+	int i, state; float min_shield, item_shield, max_dist, item_dist; int[] cats; object[] items; object item; point this_position;
+	EBoost e(this);
+	
+	state = 0;
+	
+	cats = e.list_healable();
+	
+	for (;;) {
+		items = radarall(cats, 0, 360, 0, 25, 1, FilterFriendly | FilterNeutral);
+		min_shield = 1.0;
+		max_dist = 10.0;
+		this_position = this.position;
+		
+		for (int i = sizeof(items) - 1; i >= 0; --i) {
+			item = items[i];
+			item_shield = item.shieldLevel;
+			
+			if (min_shield > item_shield) {
+				min_shield = item_shield;
+			}
+			
+			item_dist = distance(this_position, item.position) + 1.0;
+			
+			if (item_shield < 0.9 and max_dist < item_dist) {
+				max_dist = item_dist;
+			}
+		}
+		
+		if (min_shield > this.shieldLevel) {
+			min_shield = this.shieldLevel;
+		}
+		
+		if (state == 0) {
+			if (min_shield < 0.5) {
+				shield(1, max_dist);
+				state = 1;
+			}
+		} else {
+			if (min_shield >= 0.9) {
+				shield(0, 0);
+				state = 0;
+			} else {
+				shield(1, max_dist);
+			}
+		}
+		
+		wait(0.1);
+	}
+}
