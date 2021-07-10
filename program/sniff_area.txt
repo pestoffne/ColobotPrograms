@@ -49,5 +49,16 @@ void object::sniff_cylinder(point center, float area_r, float flat_r, float half
 }
 
 extern void object::SniffArea3() {
-	sniff_cylinder(radar(PowerCaptor).position, 50.0, 2.5, 5.0, -1);
+	object[] items; int size;
+	EBoost e(this);
+	
+	items = radarall(e.list_bushes());
+	size = sizeof(items);
+	
+	for (int i = 0; i < size; ++i) {
+		message("sniff around brush " + i + " / " + size);
+		sniff_cylinder(items[i].position, 10.0, 2.5, 5.0);
+	}
+	
+	//sniff_cylinder(radar(PowerCaptor).position, 50.0, 2.5, 5.0, -1);
 }
