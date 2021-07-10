@@ -345,7 +345,7 @@ public class EBoost {
 	public int factory_bot(int bot_cat, string program) {
 		object item; float wait_time;
 		
-		item = radar_wait(new RadarArgs(BotFactory, 0, 360, 0, 1024, 1, FilterFriendly));
+		item = radar_wait(new RadarArgs(BotFactory, 0, 360, 0, 1024, 1, FilterFriendly | FilterNeutral));
 		
 		if (item == null) {
 			this.log("warning factory_bot BotFactory not found");
@@ -378,7 +378,7 @@ public class EBoost {
 		object item;
 		
 		// TODO: assume there is one BotFactory
-		item = this.radar_wait(new RadarArgs(BotFactory, 0, 360, 0, 1024, 1, FilterFriendly));
+		item = this.radar_wait(new RadarArgs(BotFactory, 0, 360, 0, 1024, 1, FilterFriendly | FilterNeutral));
 		
 		if (item == null) {
 			return 1;
