@@ -27,16 +27,15 @@ extern void object::CollectTitanium() {
 		goto(item.position);
 		drop();
 		move(-2.5);
-		
 		item = e.radar_wait(new RadarArgs(Titanium, 0, 30, 0, 10));
 		
 		if (item == null) {
-			message("No TitaniumOre near me", DisplayWarning);
+			message("No Titanium near me", DisplayWarning);
 			return;
 		}
 		
 		if (goto(item.position) != 0) {
-			message("Failed going to TitaniumOre", DisplayWarning);
+			message("Failed going to Titanium", DisplayWarning);
 			return;
 		}
 		
