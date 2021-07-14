@@ -41,8 +41,22 @@ public class EBoost {
 		errmode(0);
 	}
 	
-	int another_team() {
-		return 3 - actor.team;
+	public int aim_vertical_center(point target_position) {
+		point actor_position; float ay, bx, by, actor_roll;
+		
+		actor_position = this.actor.position;
+		actor_roll = this.actor.roll;
+		
+		ay = atan((target_position.z - actor_position.z - 1.5)
+		    / distance2d(target_position, actor_position))
+		    - this.actor.pitch;
+		bx = ay * sin(actor_roll);
+		by = ay * cos(actor_roll);
+		return aim(by, bx);
+	}
+	
+	public int another_team() {
+		return 3 - this.actor.team;
 	}
 	
 	object assert(bool value, string text="assertion error") {
@@ -684,6 +698,19 @@ public class EBoost {
 	}
 	
 	int goto_grab(int cat) {  // TODO: grab from slots
+		object item;
+		
+		item = radar(cat);
+		
+		if (item == null) {
+			return 1;
+		}
+		
+		goto(item.position);
+		grab();
+		return 0;
+		
+		/* code above does not work
 		if (goto_radar_position(new RadarArgs(cat)) != 0) {
 			log("warning goto_grab (cat = " + cat + ") failed on step 1 -- goto_radar_position");
 			return 1;
@@ -695,6 +722,7 @@ public class EBoost {
 		}
 		
 		log("info goto_grab ok");
+		*/
 		return 0;
 	}
 	
@@ -931,12 +959,15 @@ public class EBoost {
 		return 1;
 	}
 	
-	point grab_position(float dist=1.5) {
-		point pos;
+	public point grab_position(float dist=1.5) {
+		point ret_pos, actor_position; float actor_orientation;
 		
-		pos.x = actor.position.x + cos(actor.orientation) * dist;
-		pos.y = actor.position.y + sin(actor.orientation) * dist;
-		return pos;
+		actor_position = this.actor.position;
+		actor_orientation = this.actor.orientation;
+		
+		ret_pos.x = actor_position.x + cos(actor_orientation) * dist;
+		ret_pos.y = actor_position.y + sin(actor_orientation) * dist;
+		return ret_pos;
 	}
 	
 	bool has_slot(int cat) {

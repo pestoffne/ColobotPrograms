@@ -1,0 +1,56 @@
+extern void object::HuntStay() {
+	object item; point item_position, next_position; float dt, angle, distance_fire, distance_aim, fire_velocity, next_fire_time, cooldown; int aliens[]; int aim_fails;
+	EBoost e(this);
+	
+	aliens = e.list_aliens();
+	distance_fire = 40.0;
+	distance_aim = 60.0;
+	fire_velocity = 200.0;
+	cooldown = 0.80;
+	
+	next_fire_time = 0;
+	aim_fails = 0;
+	
+	for (;;) {
+		item = radar(aliens, 0, 360, 0, distance_aim);
+		
+		if (item == null) {
+			wait(0.10);
+			continue;
+		}
+		
+		dt = distance(item.position, this.position) / fire_velocity;
+		next_position = e.get_next_position_line(item, dt);
+		
+		angle = direction(next_position);
+		
+		if (abs(angle) > 1.0) {
+			turn(angle);
+		}
+		
+		if (e.aim_vertical_center(next_position) != 0) {
+			if (++aim_fails % 8 == 0) {
+				message("Can not aim", DisplayWarning);
+			}
+			
+			wait(0.10);
+			continue;
+		}
+		
+		aim_fails = 0;
+		
+		if (distance(next_position, this.position) > distance_fire) {
+			wait(0.10);
+			continue;
+		}
+		
+		if (abstime() < next_fire_time) {
+			wait(0.10);
+			continue;
+		}
+		
+		fire(0.07);
+		wait(0.03);
+		next_fire_time = abstime() + cooldown;
+	}
+}
