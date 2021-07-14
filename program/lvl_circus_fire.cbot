@@ -1,0 +1,53 @@
+public class StraightFlyFunctionVV extends FunctionVV {
+	EBoost e;
+	
+	public void StraightFlyFunctionVV(EBoost e) {
+		this.e = e;
+	}
+	
+	public void _() {
+		object item; point pos; float a0, a1, a2, a3;
+		
+		aim(-20, 0);
+		
+		for (;;) {
+			item = radar(Target2);
+			
+			if (item == null) {
+				break;
+			}
+			
+			a0 = e.normalize_angle(direction(item.position));
+			a1 = e.normalize_angle(item.orientation - 90);
+			a2 = e.normalize_angle(item.orientation + 90);
+			a3 = abs(a0 - a1) < abs(a0 - a2) ? a1 : a2;
+			
+			this.e.fly_to(item.position, a3);
+			
+			item = radar(TargetBot);
+			
+			if (item == null) {
+				break;
+			}
+			
+			pos = item.position;
+			pos.z += 3.25;
+			this.e.fly_to(pos);
+			motor(1, 1);
+			fire(0.1);
+		}
+	}
+}
+
+extern void object::CircusFire() {
+	float time; point pos;
+	EBoost e(this);
+	
+	time = e.benchmark(new StraightFlyFunctionVV(e));
+	message(time);
+	
+	pos = radar(SpaceShip).position;
+	pos.z += 12.0;
+	e.fly_to(pos);
+}
+
