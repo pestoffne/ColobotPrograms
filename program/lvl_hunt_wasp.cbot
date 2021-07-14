@@ -18,17 +18,14 @@ public class HuntWaspsFunctionVV extends FunctionVV {
 			}
 			
 			this.e.fly_to(item);
-			motor(1, 1);
-			fire(0.1);
 		}
 	}
 }
 
 extern void object::HuntWasps() {
-	float time; point pos;
+	float time;
 	EBoost e(this);
 	
 	time = e.benchmark(new HuntWaspsFunctionVV(e));
 	e.log("wasp hunt time = " + e.round_digits(time, 1));
 }
-
