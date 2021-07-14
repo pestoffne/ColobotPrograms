@@ -2,7 +2,7 @@
 ## include this file in ~/.config/nano/nanorc to see CBot highlightings in *.txt files
 
 
-syntax c "\.txt$"
+syntax c "\.(cbot|txt)$"
 
 # Numeric constants
 color brightgreen "\<[0-9]+\>"
