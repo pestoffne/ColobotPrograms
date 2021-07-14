@@ -545,8 +545,7 @@ public class EBoost {
 		
 		if (item_category == AlienWasp) {
 			next_position.z = this.max(8.5, 8.5 + topo(next_position));
-		} else if (item_category == WingedGrabber or item_category == WingedSniffer or item_category == WingedShooter
-		        or item_category == WingedOrgaShooter or item_category == WingedBuilder) {
+		} else if (this.is_winged_bot(item_category)) {
 			// there is maximum z for bots, we ignore it here
 			next_position.z = this.max(item_position.z + dt * item_velocity.z, topo(next_position));
 		} else {
@@ -942,6 +941,7 @@ public class EBoost {
 	
 	bool has_slot(int cat) {
 		return is_bot(cat)
+		or cat == AutoLab
 		or cat == DefenseTower
 		or cat == NuclearPlant
 		or cat == PowerPlant
@@ -974,6 +974,12 @@ public class EBoost {
 		or cat == TrackedSniffer
 		or cat == WingedSniffer
 		or cat == LeggedSniffer
+		//* for v0.2
+		or cat == WheeledBuilder
+		or cat == TrackedBuilder
+		or cat == WingedBuilder
+		or cat == LeggedBuilder
+		//*/
 		or cat == WheeledShooter
 		or cat == TrackedShooter
 		or cat == WingedShooter
@@ -1003,76 +1009,64 @@ public class EBoost {
 		or cat == Target2;
 	}
 	
+	// items, which can be grabbed
 	bool is_item(int cat) {
 		return false
 		or cat == TitaniumOre
 		or cat == Titanium
-		or cat == PowerCell;  // TODO
+		or cat == PowerCell
+		or cat == UraniumOre
+		or cat == NuclearCell
+		or cat == OrgaMatter
+		or cat == TNT
+		or cat == KeyA
+		or cat == KeyB
+		or cat == KeyC
+		or cat == KeyD;
 	}
 	
+	// destroyable structures, which can be build
 	bool is_structure(int cat) {
 		return false
+		or cat == AutoLab
 		or cat == BotFactory
 		or cat == Converter
 		or cat == DefenseTower
+		or cat == Derrick
+		or cat == ExchangePost
+		or cat == NuclearPlant
+		or cat == RadarStation
+		or cat == RepairCenter
 		or cat == ResearchCenter
+		or cat == PowerCaptor
 		or cat == PowerPlant
-		or cat == PowerStation;  // TODO
+		or cat == PowerStation;
+	}
+	
+	bool is_winged_bot(int cat) {
+		return false
+		or cat == WingedGrabber
+		or cat == WingedSniffer
+		//* for v0.2
+		or cat == WingedBuilder
+		//*/
+		or cat == WingedShooter
+		or cat == WingedOrgaShooter;
+	}
+	
+	int[] list_aliens() {
+		int[] a; int i;
+		
+		i = 0;
+		a[i++] = AlienAnt;
+		a[i++] = AlienSpider;
+		a[i++] = AlienWasp;
+		a[i++] = AlienWorm;
+		
+		return a;
 	}
 	
 	int[] list_bots() {
-		int[] bots; int i;
-		
-		i = 0;
-		bots[i++] = WheeledGrabber;
-		bots[i++] = TrackedGrabber;
-		bots[i++] = WingedGrabber;
-		bots[i++] = LeggedGrabber;
-		bots[i++] = WheeledSniffer;
-		bots[i++] = TrackedSniffer;
-		bots[i++] = WingedSniffer;
-		bots[i++] = LeggedSniffer;
-		bots[i++] = WheeledShooter;
-		bots[i++] = TrackedShooter;
-		bots[i++] = WingedShooter;
-		bots[i++] = LeggedShooter;
-		bots[i++] = WheeledOrgaShooter;
-		bots[i++] = TrackedOrgaShooter;
-		bots[i++] = WingedOrgaShooter;
-		bots[i++] = LeggedOrgaShooter;
-		bots[i++] = Subber;
-		bots[i++] = Recycler;
-		bots[i++] = Shielder;
-		bots[i++] = Thumper;
-		bots[i++] = PhazerShooter;
-		bots[i++] = PracticeBot;
-		bots[i++] = TargetBot;
-		
-		return bots;
-	}
-	
-	int[] list_buildable() {
-		int[] structs; int i;
-		
-		i = 0;
-		structs[i++] = BotFactory;
-		structs[i++] = ResearchCenter;
-		structs[i++] = RadarStation;
-		structs[i++] = ExchangePost;
-		structs[i++] = RepairCenter;
-		structs[i++] = DefenseTower;
-		structs[i++] = AutoLab;
-		structs[i++] = PowerStation;
-		structs[i++] = PowerPlant;
-		structs[i++] = NuclearPlant;
-		structs[i++] = Converter;
-		structs[i++] = Derrick;
-		structs[i++] = PowerCaptor;
-		
-		return structs;
-	}
-	
-	int[] list_healable() {
 		int[] a; int i;
 		
 		i = 0;
@@ -1084,6 +1078,12 @@ public class EBoost {
 		a[i++] = TrackedSniffer;
 		a[i++] = WingedSniffer;
 		a[i++] = LeggedSniffer;
+		//* for v0.2
+		a[i++] = WheeledBuilder;
+		a[i++] = TrackedBuilder;
+		a[i++] = WingedBuilder;
+		a[i++] = LeggedBuilder;
+		//*/
 		a[i++] = WheeledShooter;
 		a[i++] = TrackedShooter;
 		a[i++] = WingedShooter;
@@ -1099,47 +1099,78 @@ public class EBoost {
 		a[i++] = PhazerShooter;
 		a[i++] = PracticeBot;
 		a[i++] = TargetBot;
-		a[i++] = BotFactory;
-		a[i++] = ResearchCenter;
-		a[i++] = RadarStation;
-		a[i++] = ExchangePost;
-		a[i++] = RepairCenter;
-		a[i++] = DefenseTower;
+		
+		return a;
+	}
+	
+	int[] list_buildable() {
+		int[] a; int i;
+		
+		i = 0;
 		a[i++] = AutoLab;
+		a[i++] = BotFactory;
+		a[i++] = Converter;
+		a[i++] = DefenseTower;
+		a[i++] = Derrick;
+		a[i++] = ExchangePost;
+		a[i++] = NuclearPlant;
 		a[i++] = PowerStation;
 		a[i++] = PowerPlant;
-		a[i++] = NuclearPlant;
-		a[i++] = Converter;
-		a[i++] = Derrick;
 		a[i++] = PowerCaptor;
+		a[i++] = RadarStation;
+		a[i++] = RepairCenter;
+		a[i++] = ResearchCenter;
 		
 		return a;
 	}
 	
 	int[] list_bushes() {
-		int[] cats; int i;
+		int[] a; int i;
 		
 		i = 0;
-		cats[i++] = 70;
-		cats[i++] = 71;
-		cats[i++] = 72;
-		cats[i++] = 73;
-		cats[i++] = 74;
+		a[i++] = 70;
+		a[i++] = 71;
+		a[i++] = 72;
+		a[i++] = 73;
+		a[i++] = 74;
 		
-		return cats;
+		return a;
+	}
+	
+	int[] list_healable() {
+		int[] a; int i;
+		
+		a = this.list_bots();
+		i = sizeof(a);
+		a[i++] = AutoLab;
+		a[i++] = BotFactory;
+		a[i++] = Converter;
+		a[i++] = DefenseTower;
+		a[i++] = Derrick;
+		a[i++] = ExchangePost;
+		a[i++] = NuclearPlant;
+		a[i++] = PowerStation;
+		a[i++] = PowerPlant;
+		a[i++] = PowerCaptor;
+		a[i++] = RadarStation;
+		a[i++] = RepairCenter;
+		a[i++] = ResearchCenter;
+		
+		return a;
 	}
 	
 	int[] list_objects_with_slot() {
-		int[] cats; int i;
+		int[] a; int i;
 		
-		cats = list_bots();
-		i = sizeof(cats);
-		cats[i++] = PowerPlant;
-		cats[i++] = NuclearPlant;
-		cats[i++] = ResearchCenter;
-		cats[i++] = DefenseTower;
+		a = list_bots();
+		i = sizeof(a);
+		a[i++] = AutoLab;
+		a[i++] = DefenseTower;
+		a[i++] = NuclearPlant;
+		a[i++] = PowerPlant;
+		a[i++] = ResearchCenter;
 		
-		return cats;
+		return a;
 	}
 	
 	int[] list_recyclable() {
