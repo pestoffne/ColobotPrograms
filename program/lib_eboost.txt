@@ -1259,12 +1259,17 @@ public class EBoost {
 		turn(normalize_angle(direct - actor.orientation));
 	}
 	
-	public string point_2d_to_str(point p) {
-		return "(" + this.round_digits(p.x, 1) + ", " + this.round_digits(p.y, 1) + ")";
+	public string point_2d_to_str(point p, int digits=1) {
+		return "("
+		+ this.round_digits(p.x, digits) + ", "
+		+ this.round_digits(p.y, digits) + ")";
 	}
 	
-	public string point_3d_to_str(point p) {
-		return "(" + this.round_digits(p.x, 1) + ", " + this.round_digits(p.y, 1) + ", " + this.round_digits(p.z, 1) + ")";
+	public string point_3d_to_str(point p, int digits=1) {
+		return "("
+		+ this.round_digits(p.x, digits) + ", "
+		+ this.round_digits(p.y, digits) + ", "
+		+ this.round_digits(p.z, digits) + ")";
 	}
 	
 	// TODO: use RadarArgs
