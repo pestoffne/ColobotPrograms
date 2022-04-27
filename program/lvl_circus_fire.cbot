@@ -1,7 +1,7 @@
-public class StraightFlyFunctionVV extends FunctionVV {
+public class FlyToTargetAndFireFunctionVV extends FunctionVV {
 	EBoost e;
 	
-	public void StraightFlyFunctionVV(EBoost e) {
+	public void FlyToTargetAndFireFunctionVV(EBoost e) {
 		this.e = e;
 	}
 	
@@ -43,11 +43,10 @@ extern void object::CircusFire() {
 	float time; point pos;
 	EBoost e(this);
 	
-	time = e.benchmark(new StraightFlyFunctionVV(e));
+	time = e.benchmark(new FlyToTargetAndFireFunctionVV(e));
 	message(time);
 	
-	pos = radar(SpaceShip).position;
-	pos.z += 12.0;
+	pos = e.get_ship_slot_position(4);
 	e.fly_to(pos);
+	e.goto_straight(pos);
 }
-

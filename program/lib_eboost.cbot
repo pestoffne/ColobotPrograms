@@ -570,6 +570,31 @@ public class EBoost {
 		return next_position;
 	}
 	
+	//              | 7 8 9 |            | -1 0 1 |            |  1  1  1 |
+	// slot_index = | 4 5 6 | , sign_x = | -1 0 1 | , sign_y = |  0  0  0 |
+	//              | 1 2 3 |            | -1 0 1 |            | -1 -1 -1 |
+	public point get_ship_slot_position(int slot_index) {
+		int slot_index_p_2, sign_x, sign_y;
+		
+		slot_index_p_2 = slot_index + 2;
+		sign_x = slot_index_p_2 % 3 - 1;
+		sign_y = slot_index_p_2 / 3 - 2;
+		
+		return get_ship_slot_position(sign_x, sign_y);
+	}
+	
+	public point get_ship_slot_position(int sign_x, int sign_y) {
+		point ship_pos;
+		
+		ship_pos = radar(SpaceShip).position;
+		
+		return new point(
+		ship_pos.x + sign_x * 3.25,
+		ship_pos.y + sign_y * 3.25,
+		ship_pos.z + 7.5
+		);
+	}
+	
 	public point get_velocity(object item) {
 		point item_velocity;
 		
