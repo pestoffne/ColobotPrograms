@@ -1,0 +1,94 @@
+public class MoveStraightFunctionVV extends FunctionVV {
+	private EBoost e;
+	
+	public void MoveStraightFunctionVV(EBoost e) {
+		this.e = e;
+	}
+	
+	public void _() {
+		e.goto_straight(new point(107, -82.5), 0);
+		e.goto_straight(new point(107, -63), 0);
+		e.goto_straight(new point(102, -63), 0);
+		e.goto_straight(new point(102, -58), 0);
+		e.goto_straight(new point(82, -58), 0);
+		e.goto_straight(new point(82, -73), 0);
+		e.goto_straight(new point(74.5, -73), 0);
+	}
+}
+
+public class MoveSmoothFunctionVV extends FunctionVV {
+	private EBoost e;
+	
+	public void MoveSmoothFunctionVV(EBoost e) {
+		this.e = e;
+	}
+	
+	private void turn_left_smooth() {
+		motor(0.5, 1.0);
+		wait(1.0);
+	}
+	
+	private void turn_right_smooth() {
+		motor(1.0, 0.5);
+		wait(1.0);
+	}
+	
+	public void _() {
+		e.goto_straight(new point(107, -85.5), 2.5);
+		turn_left_smooth();
+		e.goto_straight(new point(107, -63), 2.5);
+		turn_left_smooth();
+		e.goto_straight(new point(102, -63), 2.5);
+		turn_right_smooth();
+		e.goto_straight(new point(102, -58), 2.5);
+		turn_left_smooth();
+		e.goto_straight(new point(82, -58), 2.5);
+		turn_left_smooth();
+		e.goto_straight(new point(82, -73), 2.5);
+		turn_right_smooth();
+		e.goto_straight(new point(74.5, -73), 2.5);
+	}
+}
+
+public class MoveNonStopFunctionVV extends FunctionVV {
+	private EBoost e;
+	
+	public void MoveNonStopFunctionVV(EBoost e) {
+		this.e = e;
+	}
+	
+	public void fly_to(point pos) {
+		float dir; PID pid;
+		
+		pid = new PID(0.02, 0.0, 0.0002, 0.05);
+		
+		while (distance2d(pos, e.actor.position) > 2.0) {
+			dir = pid.compute(direction(pos));
+			e._motor(dir);
+			//this._jet_to(pos.z - 0.75);
+			wait(0.05);
+		}
+	}
+	
+	public void _() {
+		fly_to(new point(107, -82.5));
+		fly_to(new point(107, -63));
+		fly_to(new point(102, -63));
+		fly_to(new point(102, -58));
+		fly_to(new point(82, -58));
+		fly_to(new point(82, -73));
+		fly_to(new point(74.5, -73));
+	}
+}
+
+extern void object::MoveLabirint()
+{
+	float time;
+	EBoost e(this);
+	
+	//time = e.benchmark(new MoveStraightFunctionVV(e));  // 27 seconds
+	//time = e.benchmark(new MoveSmoothFunctionVV(e));  // 22.68 seconds
+	time = e.benchmark(new MoveNonStopFunctionVV(e));  // 20.97 seconds
+	
+	message(e.round_digits(time, 2));
+}
