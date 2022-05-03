@@ -1,3 +1,84 @@
+public class PathLine extends PathPart {
+	private float _x1;
+	private float _y1;
+	private float _x2;
+	private float _y2;
+	
+	public void PathLine(float x1, float y1, float x2, float y2) {
+		this._x1 = x1;
+		this._y1 = y1;
+		this._x2 = x2;
+		this._y2 = y2;
+	}
+	
+	public void go() {
+		
+	}
+}
+
+public class PathArc extends PathPart {
+	private float _xc;
+	private float _yc;
+	private float _r;
+	private float _a1;
+	private float _a2;
+	
+	public void PathArc(float xc, float yc, float r, float a1, float a2) {
+		this._xc = xc;
+		this._yc = yc;
+		this._r = r;
+		this._a1 = a1;
+		this._a2 = a2;
+	}
+	
+	public void go() {
+		
+	}
+}
+
+public class Path {
+	private EBoost _e;
+	private ListPathPart _list;
+	
+	public void Path(EBoost e) {
+		this._e = e;
+		this._list = new ListPathPart();
+	}
+	
+	public Path line(float x, float y) {
+		return this;
+	}
+	
+	public Path arc(float r) {
+		return this;
+	}
+	
+	public void compile() {
+		
+	}
+	
+	public float predict_time() {
+		return 0;
+	}
+	
+	public void go() {
+		
+	}
+}
+
+public class MoveArcFunctionVV extends FunctionVV {
+	private EBoost e;
+	
+	public void MoveArcFunctionVV(EBoost e) {
+		this.e = e;
+	}
+	
+	public void _() {
+		// start point (84.25, -85.5)
+		
+	}
+}
+
 public class MoveStraightFunctionVV extends FunctionVV {
 	private EBoost e;
 	
@@ -39,7 +120,7 @@ public class MoveSmoothFunctionVV extends FunctionVV {
 		start_pos = e.actor.position;
 		motor(1, 1);
 		wait(dist / 5);
-		message(distance2d(start_pos, e.actor.position));
+		//message(distance2d(start_pos, e.actor.position));
 	}
 	
 	public void _() {
@@ -130,7 +211,8 @@ extern void object::MoveLabirint()
 	pendown(4, 0.1);
 	//time = e.benchmark(new MoveStraightFunctionVV(e));  // 27 seconds
 	//time = e.benchmark(new MoveSmoothFunctionVV_old(e));  // 22.68 seconds
-	time = e.benchmark(new MoveNonStopFunctionVV(e));  // 19.15 seconds
+	//time = e.benchmark(new MoveNonStopFunctionVV(e));  // 19.15 seconds
+	time = e.benchmark(new MoveArcFunctionVV(e));  // ?? seconds
 	
 	message(e.round_digits(time, 2));
 	penup();

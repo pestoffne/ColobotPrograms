@@ -35,6 +35,7 @@ public class RadarArgs {
 public class EBoost {
 	object actor;
 	static string logfile = "common_logs.txt";
+	static float pi = 3.14159265;
 	
 	void EBoost(object actor) {
 		this.actor = actor;
@@ -58,7 +59,7 @@ public class EBoost {
 	public int another_team() {
 		return 3 - this.actor.team;
 	}
-	
+
 	object assert(bool value, string text="assertion error") {
 		if (value) {
 			return retobject(0);
@@ -1280,6 +1281,12 @@ public class EBoost {
 		return value;
 	}
 	
+	// like move, but doesn't stop in the end
+	public void move_fast(float dist) {
+		motor(1, 1);
+		wait(dist / 5);
+	}
+	
 	void orient(float direct) {
 		turn(normalize_angle(direct - actor.orientation));
 	}
@@ -1440,7 +1447,17 @@ public class EBoost {
 		grab(Behind);
 		drop();
 	}
-	
+
+	point team_transform(point p) {
+		if (actor.team == 2) {
+			p.x *= -1;
+			p.y *= -1;
+			p.z = 180 + p.z;
+		}
+		
+		return p;
+	}
+		
 	int to_int(bool flag) {
 		if (flag) {
 			return 1;
@@ -1459,15 +1476,33 @@ public class EBoost {
 	public string to_str(point p) {
 		return this.point_3d_to_str(p);
 	}
+
+	/*private*/ float _radius_to_motor_value(float radius) {
+		return 1 - 2 / (radius + 1);
+	}
 	
-	point team_transform(point p) {
-		if (actor.team == 2) {
-			p.x *= -1;
-			p.y *= -1;
-			p.z = 180 + p.z;
+	/*private*/ float _predict_velocity(float motor_left, float motor_right) {
+		return (motor_left + motor_right) * 2.5;
+	}
+
+	/*private*/ float _arc_length(float angle, float radius) {
+		return this.pi * angle * radius / 180;
+	}
+	
+	public void turn_arc(float angle, float radius) {
+		float motor_value, motor_time, arc_length, predict_velocity;
+		
+		motor_value = this._radius_to_motor_value(radius);
+		motor_time = this._arc_length(angle, radius)
+		/ this._predict_velocity(motor_value, 1);
+		
+		if (angle > 0) {
+			motor(motor_value, 1);  // turn left
+		} else {
+			motor(1, motor_value);  // turn right
 		}
 		
-		return p;
+		wait(motor_time);
 	}
 	
 	float wait_for_cat(int cat) {
@@ -1511,6 +1546,25 @@ public class PID {
 		this._prev_error = error;
 		return p_out + i_out + d_out;
 	}
+}
+
+public class CoordinateSystem {
+	private float _x0;
+	private float _y0;
+	private float _z0;
+	
+	public void CoordinateSystem(point p0) {
+		this._x0 = p0.x;
+		this._y0 = p0.y;
+		this._z0 = p0.z;
+	}
+	
+	public point _(point p) {
+		p.x += _x0;
+		p.y += _y0;
+		p.z += _z0;
+		return p;
+	}	
 }
 
 // Pointer to function which returns void and get 0 arguments
@@ -1682,5 +1736,10 @@ extern void Library_EBoost() {
 	e.assert_equal(e.round_cell(0.1), 2.5).id;
 	e.assert_equal(e.round_cell(4.9), 2.5).id;
 	e.assert_equal(e.round_cell(5.1), 7.5).id;
+
+	/*point p1 = new point(1, 2, 3);
+	point p2 = new point(1.1, 1.2, 1.3);
+	CoordinateSystem c = new CoordinateSustem(p1);
+	point p3 = c._();*/
 	message("Tests passed", DisplayInfo);
 }

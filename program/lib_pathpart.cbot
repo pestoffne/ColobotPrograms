@@ -1,0 +1,14 @@
+public class PathPart {
+	public void PathPart() {
+		nan * 0;  // abstract class
+	}
+	
+	public void go() {
+		nan * 0;  // abstract method
+	}
+}
+
+extern void object::Library_PathPart()
+{
+	
+}
