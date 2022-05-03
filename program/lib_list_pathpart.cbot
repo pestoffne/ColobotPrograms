@@ -1,0 +1,322 @@
+// This file is generated automaticaly from template. Do not edit.
+
+public class UnaryPredicatePathPart {
+void UnaryPredicatePathPart() {
+nan * 0;
+}
+
+bool _(PathPart value) {
+return true;
+}
+}
+
+public class ListElemPathPart {
+PathPart value;
+ListElemPathPart prev;
+ListElemPathPart next;
+
+void ListElemPathPart(PathPart value, ListElemPathPart prev = null, ListElemPathPart next = null) {
+this.value = value;
+this.prev = prev;
+this.next = next;
+}
+}
+
+public class ListIteratorPathPart {
+protected ListElemPathPart _elem;
+
+void ListIteratorPathPart(ListElemPathPart elem) {
+this._elem = elem;
+}
+
+ListIteratorPathPart copy() {
+return new ListIteratorPathPart(this._elem);
+}
+
+bool equal(ListIteratorPathPart that) {
+return this._elem == that._elem;
+}
+
+ListElemPathPart get_elem() {
+return this._elem;
+}
+
+bool is_null() {
+return this._elem == null;
+}
+
+PathPart value() {
+return this._elem.value;
+}
+
+ListIteratorPathPart shift() {
+this._elem = this._elem.next;
+return this;
+}
+}
+
+public class ListBackwardIteratorPathPart extends ListIteratorPathPart {
+void ListBackwardIteratorPathPart(ListElemPathPart elem) {
+super._elem = elem;
+}
+
+ListBackwardIteratorPathPart copy() {
+return new ListBackwardIteratorPathPart(this._elem);
+}
+
+ListIteratorPathPart shift() {
+this._elem = this._elem.prev;
+return this;
+}
+}
+
+
+public class ListPathPart {
+private ListElemPathPart _back = null;
+private ListElemPathPart _front = null;
+private int _size = 0;
+
+void ~ListPathPart() {
+this.clear();
+}
+
+
+PathPart back() {
+if (this._back == null) {
+return null;
+}
+
+return this._back.value;
+}
+
+
+PathPart front() {
+if (this._front == null) {
+return null;
+}
+
+return this._front.value;
+}
+
+ListIteratorPathPart begin() {
+return new ListIteratorPathPart(this._front);
+}
+
+ListIteratorPathPart end() {
+return new ListIteratorPathPart(null);
+}
+
+ListIteratorPathPart rbegin() {
+return new ListBackwardIteratorPathPart(this._back);
+}
+
+ListIteratorPathPart rend() {
+return new ListBackwardIteratorPathPart(null);
+}
+
+bool empty() {
+return this._back == null;
+}
+
+int size() {
+return this._size;
+}
+
+void clear() {
+while (not this.empty()) {
+this.pop_back();
+}
+}
+
+
+ListIteratorPathPart insert(ListIteratorPathPart pos, PathPart value) {
+ListElemPathPart elem_prev, elem_new, elem_next, front_prev;
+
+if (pos.equal(this.end())) {
+
+this.push_back(value);
+return new ListIteratorPathPart(this._back);
+}
+
+elem_next = pos.get_elem();
+elem_prev = elem_next.prev;
+elem_new = new ListElemPathPart(value, elem_prev, elem_next);
+elem_next.prev = elem_new;
+
+if (elem_prev == null) {
+this._front = elem_new;
+} else {
+elem_prev.next = elem_new;
+}
+
+this._size++;
+return new ListIteratorPathPart(elem_new);
+}
+
+void push_back(PathPart value) {
+this._back = new ListElemPathPart(value, _back, null);
+
+if (this._front == null) {
+this._front = this._back;
+} else {
+this._back.prev.next = this._back;
+}
+
+this._size++;
+}
+
+void pop_back() {
+ListElemPathPart elem_prev;
+
+elem_prev = this._back.prev;
+
+if (elem_prev != null) {
+elem_prev.next = null;
+} else {
+this._front = null;
+}
+
+this._back = elem_prev;
+this._size--;
+}
+
+void push_front(PathPart value) {
+_front = new ListElemPathPart(value, null, _front);
+
+if (_back == null) {
+_back = _front;
+} else {
+_front.next.prev = _front;
+}
+
+this._size++;
+}
+
+void pop_front() {
+ListElemPathPart elem_next;
+
+elem_next = this._front.next;
+
+if (elem_next != null) {
+elem_next.prev = null;
+} else {
+this._back = null;
+}
+
+this._front = elem_next;
+this._size--;
+}
+
+void _unlink_elem(ListElemPathPart elem_curr) {
+ListElemPathPart elem_prev, elem_next;
+
+elem_prev = elem_curr.prev;
+elem_next = elem_curr.next;
+
+if (elem_prev == null) {
+this._front = elem_next;
+} else {
+elem_prev.next = elem_next;
+elem_curr.prev = null;
+}
+
+if (elem_next == null) {
+this._back = elem_prev;
+} else {
+elem_next.prev = elem_prev;
+elem_curr.next = null;
+}
+
+this._size--;
+}
+
+
+void remove(PathPart value) {
+ListIteratorPathPart it1, it2;
+ListElemPathPart elem;
+
+if (this.empty()) {
+return;
+}
+
+it1 = this.begin();
+it2 = this.begin().shift();
+
+for (;;) {
+elem = it1.get_elem();
+
+if (elem.value == value) {
+this._unlink_elem(elem);
+}
+
+if (it2.equal(this.end())) {
+return;
+}
+
+it1 = it2.copy();
+it2.shift();
+}
+}
+
+void remove_if(UnaryPredicatePathPart pred) {
+ListIteratorPathPart it1, it2;
+ListElemPathPart elem;
+
+if (this.empty()) {
+return;
+}
+
+it1 = this.begin();
+it2 = this.begin().shift();
+
+for (;;) {
+elem = it1.get_elem();
+
+if (pred._(elem.value)) {
+this._unlink_elem(elem);
+}
+
+if (it2.equal(this.end())) {
+return;
+}
+
+it1 = it2.copy();
+it2.shift();
+}
+}
+
+void unique() {
+
+}
+
+void sort() {
+
+}
+}
+
+public ListIteratorPathPart list_find(ListIteratorPathPart first, ListIteratorPathPart last, PathPart value) {
+ListIteratorPathPart it;
+
+for (it = first.copy(); not it.equal(last); it.shift()) {
+if (it.value() == value) {
+return it;
+}
+}
+
+return new ListIteratorPathPart(null);
+}
+
+public ListIteratorPathPart list_find_if(ListIteratorPathPart first, ListIteratorPathPart last, UnaryPredicatePathPart pred) {
+ListIteratorPathPart it;
+
+for (it = first.copy(); not it.equal(last); it.shift()) {
+if (pred._(it.value())) {
+return it;
+}
+}
+
+return new ListIteratorPathPart(null);
+}
+
+extern void Library_ListPathPart() {
+}
