@@ -1,0 +1,322 @@
+// This file is generated automaticaly from template. Do not edit.
+
+public class UnaryPredicateUnaryPredicateObject {
+void UnaryPredicateUnaryPredicateObject() {
+nan * 0;
+}
+
+bool _(UnaryPredicateObject value) {
+return true;
+}
+}
+
+public class ListElemUnaryPredicateObject {
+UnaryPredicateObject value;
+ListElemUnaryPredicateObject prev;
+ListElemUnaryPredicateObject next;
+
+void ListElemUnaryPredicateObject(UnaryPredicateObject value, ListElemUnaryPredicateObject prev = null, ListElemUnaryPredicateObject next = null) {
+this.value = value;
+this.prev = prev;
+this.next = next;
+}
+}
+
+public class ListIteratorUnaryPredicateObject {
+protected ListElemUnaryPredicateObject _elem;
+
+void ListIteratorUnaryPredicateObject(ListElemUnaryPredicateObject elem) {
+this._elem = elem;
+}
+
+ListIteratorUnaryPredicateObject copy() {
+return new ListIteratorUnaryPredicateObject(this._elem);
+}
+
+bool equal(ListIteratorUnaryPredicateObject that) {
+return this._elem == that._elem;
+}
+
+ListElemUnaryPredicateObject get_elem() {
+return this._elem;
+}
+
+bool is_null() {
+return this._elem == null;
+}
+
+UnaryPredicateObject value() {
+return this._elem.value;
+}
+
+ListIteratorUnaryPredicateObject shift() {
+this._elem = this._elem.next;
+return this;
+}
+}
+
+public class ListBackwardIteratorUnaryPredicateObject extends ListIteratorUnaryPredicateObject {
+void ListBackwardIteratorUnaryPredicateObject(ListElemUnaryPredicateObject elem) {
+super._elem = elem;
+}
+
+ListBackwardIteratorUnaryPredicateObject copy() {
+return new ListBackwardIteratorUnaryPredicateObject(this._elem);
+}
+
+ListIteratorUnaryPredicateObject shift() {
+this._elem = this._elem.prev;
+return this;
+}
+}
+
+
+public class ListUnaryPredicateObject {
+private ListElemUnaryPredicateObject _back = null;
+private ListElemUnaryPredicateObject _front = null;
+private int _size = 0;
+
+void ~ListUnaryPredicateObject() {
+this.clear();
+}
+
+
+UnaryPredicateObject back() {
+if (this._back == null) {
+return null;
+}
+
+return this._back.value;
+}
+
+
+UnaryPredicateObject front() {
+if (this._front == null) {
+return null;
+}
+
+return this._front.value;
+}
+
+ListIteratorUnaryPredicateObject begin() {
+return new ListIteratorUnaryPredicateObject(this._front);
+}
+
+ListIteratorUnaryPredicateObject end() {
+return new ListIteratorUnaryPredicateObject(null);
+}
+
+ListIteratorUnaryPredicateObject rbegin() {
+return new ListBackwardIteratorUnaryPredicateObject(this._back);
+}
+
+ListIteratorUnaryPredicateObject rend() {
+return new ListBackwardIteratorUnaryPredicateObject(null);
+}
+
+bool empty() {
+return this._back == null;
+}
+
+int size() {
+return this._size;
+}
+
+void clear() {
+while (not this.empty()) {
+this.pop_back();
+}
+}
+
+
+ListIteratorUnaryPredicateObject insert(ListIteratorUnaryPredicateObject pos, UnaryPredicateObject value) {
+ListElemUnaryPredicateObject elem_prev, elem_new, elem_next, front_prev;
+
+if (pos.equal(this.end())) {
+
+this.push_back(value);
+return new ListIteratorUnaryPredicateObject(this._back);
+}
+
+elem_next = pos.get_elem();
+elem_prev = elem_next.prev;
+elem_new = new ListElemUnaryPredicateObject(value, elem_prev, elem_next);
+elem_next.prev = elem_new;
+
+if (elem_prev == null) {
+this._front = elem_new;
+} else {
+elem_prev.next = elem_new;
+}
+
+this._size++;
+return new ListIteratorUnaryPredicateObject(elem_new);
+}
+
+void push_back(UnaryPredicateObject value) {
+this._back = new ListElemUnaryPredicateObject(value, _back, null);
+
+if (this._front == null) {
+this._front = this._back;
+} else {
+this._back.prev.next = this._back;
+}
+
+this._size++;
+}
+
+void pop_back() {
+ListElemUnaryPredicateObject elem_prev;
+
+elem_prev = this._back.prev;
+
+if (elem_prev != null) {
+elem_prev.next = null;
+} else {
+this._front = null;
+}
+
+this._back = elem_prev;
+this._size--;
+}
+
+void push_front(UnaryPredicateObject value) {
+_front = new ListElemUnaryPredicateObject(value, null, _front);
+
+if (_back == null) {
+_back = _front;
+} else {
+_front.next.prev = _front;
+}
+
+this._size++;
+}
+
+void pop_front() {
+ListElemUnaryPredicateObject elem_next;
+
+elem_next = this._front.next;
+
+if (elem_next != null) {
+elem_next.prev = null;
+} else {
+this._back = null;
+}
+
+this._front = elem_next;
+this._size--;
+}
+
+void _unlink_elem(ListElemUnaryPredicateObject elem_curr) {
+ListElemUnaryPredicateObject elem_prev, elem_next;
+
+elem_prev = elem_curr.prev;
+elem_next = elem_curr.next;
+
+if (elem_prev == null) {
+this._front = elem_next;
+} else {
+elem_prev.next = elem_next;
+elem_curr.prev = null;
+}
+
+if (elem_next == null) {
+this._back = elem_prev;
+} else {
+elem_next.prev = elem_prev;
+elem_curr.next = null;
+}
+
+this._size--;
+}
+
+
+void remove(UnaryPredicateObject value) {
+ListIteratorUnaryPredicateObject it1, it2;
+ListElemUnaryPredicateObject elem;
+
+if (this.empty()) {
+return;
+}
+
+it1 = this.begin();
+it2 = this.begin().shift();
+
+for (;;) {
+elem = it1.get_elem();
+
+if (elem.value == value) {
+this._unlink_elem(elem);
+}
+
+if (it2.equal(this.end())) {
+return;
+}
+
+it1 = it2.copy();
+it2.shift();
+}
+}
+
+void remove_if(UnaryPredicateUnaryPredicateObject pred) {
+ListIteratorUnaryPredicateObject it1, it2;
+ListElemUnaryPredicateObject elem;
+
+if (this.empty()) {
+return;
+}
+
+it1 = this.begin();
+it2 = this.begin().shift();
+
+for (;;) {
+elem = it1.get_elem();
+
+if (pred._(elem.value)) {
+this._unlink_elem(elem);
+}
+
+if (it2.equal(this.end())) {
+return;
+}
+
+it1 = it2.copy();
+it2.shift();
+}
+}
+
+void unique() {
+
+}
+
+void sort() {
+
+}
+}
+
+public ListIteratorUnaryPredicateObject list_find(ListIteratorUnaryPredicateObject first, ListIteratorUnaryPredicateObject last, UnaryPredicateObject value) {
+ListIteratorUnaryPredicateObject it;
+
+for (it = first.copy(); not it.equal(last); it.shift()) {
+if (it.value() == value) {
+return it;
+}
+}
+
+return new ListIteratorUnaryPredicateObject(null);
+}
+
+public ListIteratorUnaryPredicateObject list_find_if(ListIteratorUnaryPredicateObject first, ListIteratorUnaryPredicateObject last, UnaryPredicateUnaryPredicateObject pred) {
+ListIteratorUnaryPredicateObject it;
+
+for (it = first.copy(); not it.equal(last); it.shift()) {
+if (pred._(it.value())) {
+return it;
+}
+}
+
+return new ListIteratorUnaryPredicateObject(null);
+}
+
+extern void Library_ListUnaryPredicateObject() {
+}
