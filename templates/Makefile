@@ -13,26 +13,26 @@ define generate_sorted_tree
                 grep -v '^#' | awk '{$$1=$$1};1' >> $(1)
 endef
 
-all: $(PROGRAM_DIR)/lib_list_int.txt $(PROGRAM_DIR)/lib_list_goal.txt $(PROGRAM_DIR)/lib_list_object.txt $(PROGRAM_DIR)/lib_list_upo.txt \
-	$(PROGRAN_DIR)/lib_tree_ilp.txt $(PROGRAN_DIR)/lib_tree_ii.txt
+all: $(PROGRAM_DIR)/lib_list_int.cbot $(PROGRAM_DIR)/lib_list_goal.cbot $(PROGRAM_DIR)/lib_list_object.cbot $(PROGRAM_DIR)/lib_list_upo.cbot \
+	$(PROGRAN_DIR)/lib_tree_ilp.cbot $(PROGRAN_DIR)/lib_tree_ii.cbot
 
-$(PROGRAM_DIR)/lib_list_int.txt: lib_list_template.txt
-	$(call generate_from_template,$(PROGRAM_DIR)/lib_list_int.txt,int,Int,0,lib_list_template.txt)
+$(PROGRAM_DIR)/lib_list_int.cbot: lib_list_template.cbot
+	$(call generate_from_template,$(PROGRAM_DIR)/lib_list_int.cbot,int,Int,0,lib_list_template.cbot)
 
-$(PROGRAM_DIR)/lib_list_goal.txt: lib_list_template.txt
-	$(call generate_from_template,$(PROGRAM_DIR)/lib_list_goal.txt,Goal,Goal,null,lib_list_template.txt)
+$(PROGRAM_DIR)/lib_list_goal.cbot: lib_list_template.cbot
+	$(call generate_from_template,$(PROGRAM_DIR)/lib_list_goal.cbot,Goal,Goal,null,lib_list_template.cbot)
 
-$(PROGRAM_DIR)/lib_list_point.txt: lib_list_template.txt
-	$(call generate_from_template,$(PROGRAM_DIR)/lib_list_point.txt,point,Point,new point(400, 400),lib_list_template.txt)
+$(PROGRAM_DIR)/lib_list_point.cbot: lib_list_template.cbot
+	$(call generate_from_template,$(PROGRAM_DIR)/lib_list_point.cbot,point,Point,new point(400, 400),lib_list_template.cbot)
 
-$(PROGRAM_DIR)/lib_list_object.txt: lib_list_template.txt
-	$(call generate_from_template,$(PROGRAM_DIR)/lib_list_object.txt,object,Object,null,lib_list_template.txt)
+$(PROGRAM_DIR)/lib_list_object.cbot: lib_list_template.cbot
+	$(call generate_from_template,$(PROGRAM_DIR)/lib_list_object.cbot,object,Object,null,lib_list_template.cbot)
 
-$(PROGRAM_DIR)/lib_list_upo.txt: lib_list_template.txt
-	$(call generate_from_template,$(PROGRAM_DIR)/lib_list_upo.txt,UnaryPredicateObject,UnaryPredicateObject,null,lib_list_template.txt)
+$(PROGRAM_DIR)/lib_list_upo.cbot: lib_list_template.cbot
+	$(call generate_from_template,$(PROGRAM_DIR)/lib_list_upo.cbot,UnaryPredicateObject,UnaryPredicateObject,null,lib_list_template.cbot)
 
-$(PROGRAN_DIR)/lib_tree_ilp.txt: lib_sorted_tree_template.txt $(PROGRAM_DIR)/lib_list_point.txt
-	$(call generate_sorted_tree,$(PROGRAM_DIR)/lib_tree_ilp.txt,int,ListPoint,Int,ListPoint,0,null,((X)-(Y)),lib_sorted_tree_template.txt)
+$(PROGRAN_DIR)/lib_tree_ilp.cbot: lib_sorted_tree_template.cbot $(PROGRAM_DIR)/lib_list_point.cbot
+	$(call generate_sorted_tree,$(PROGRAM_DIR)/lib_tree_ilp.cbot,int,ListPoint,Int,ListPoint,0,null,((X)-(Y)),lib_sorted_tree_template.cbot)
 
-$(PROGRAN_DIR)/lib_tree_ii.txt: lib_sorted_tree_template.txt
-	$(call generate_sorted_tree,$(PROGRAM_DIR)/lib_tree_ii.txt,int,int,Int,Int,0,0,((X)-(Y)),lib_sorted_tree_template.txt)
+$(PROGRAN_DIR)/lib_tree_ii.cbot: lib_sorted_tree_template.cbot
+	$(call generate_sorted_tree,$(PROGRAM_DIR)/lib_tree_ii.cbot,int,int,Int,Int,0,0,((X)-(Y)),lib_sorted_tree_template.cbot)
