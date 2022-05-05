@@ -1,0 +1,49 @@
+## CBot highligtings for nano editor
+## include this file in ~/.config/nano/nanorc to see CBot highlightings in *.txt files
+
+
+syntax cbot "\.cbot$"
+
+# Numeric constants
+color brightgreen "\<[0-9.]+\>"
+
+# String constants
+color brightgreen ""([^"]|\\")*""
+
+# Keywords
+color green "\<(float|bool|int|object|point|string|void)\>"
+color green "\<(class|public|protected|private|static|synchronized|extends|extern)\>"
+color brightyellow "\<(for|if|while|do|else|case|default|switch|and|or|not|sizeof|try|throw|catch|new)\>"
+color magenta "\<(continue|break|return|this|super)\>"
+
+# Build-in constants
+color brightred "\<(Converter|Power(Plant|Station|Captor)|Derrick|BotFactory|(Repair|Research)Center|DefenseTower|NuclearPlant|RadarStation|ExchangePost|AutoLab)\>"
+color brightred "\<(Titanium|TitaniumOre|PowerCell|UraniumOre|NuclearCell|BlackBox|TNT|Key[A-D])\>"
+color brightred "\<(null|true|false|nan)\>"
+color brightred "\<Research(Tracked|Winged|Shooter|PhazerShooter|Thumper|Shielder|DefenseTower|NuclearPlant|Legged|OrgaShooter|Sniffer|Subber|Recycler)\>"
+color brightred "\<(Wheeled|Tracked|Winged|Legged)(Grabber|Sniffer|Shooter|OrgaShooter|Builder)\>"
+color brightred "\<(Subber|Recycler|Me|PracticeBot|TargetBot|Shielder|PhazerShooter|Thumper|Mine|Barrier|Wreck|Ruin)\>"
+color brightred "\<Alien(Ant|Egg|Spider|Worm|Wasp|Nest|Queen)\>"
+color brightred "\<Display(Info|Warning|Error)\>"
+color brightred "\<((Blue|Red|Green|Yellow|Violet)Flag|WayPoint|Target2|(Power|Titanium|Uranium)Spot)\>"
+
+# Build-in functions
+color brightyellow "\<(detect|radar|radarall|search|direction|distance|distance2d|wait|move|turn|goto|motor|jet|message|retobject|errmode|abstime)\>"
+color brightyellow "\<(pen(down|up|color|width)|canresearch|researched|space|flatspace|topo|flatground)\>"
+color brightyellow "\<(grub|drop|sniff|thump|recycle|shield|fire|aim|build|canbuild|buildingenabled|factory|research|takeoff|busy)\>"
+color brightyellow "\<(receive|send|(test|delete)info)|str(len|left|right|mid|find|val|upper|lower)|open|close|writeln|readln|eof|deletefile\>"
+color brightyellow "\<(rand|pow|sqrt|floor|ceil|round|ceil|round|trunc|sin|cos|tan|asin|acos|atan|atan2)\>"
+
+# Comments
+color blue "//.*"
+color blue start="/\*" end="\*/"
+
+# Templates
+color white,blue "TEMPLATE\((~|_|[[:alpha:]])+\)"
+color white,blue "CMP\(.*,.*\)"
+color white,blue "\<(TYPE|KEY|VALUE|NULL|KEY_NULL|VALUE_NULL)\>"
+
+# Preprocessor
+color brightgreen "^[[:space:]]*#[[:space:]]*include[[:space:]]+<[^[:blank:]=]*>"
+color brightcyan "^[[:space:]]*#[[:space:]]*(define|else|endif|include(_next)?|undef)\>"
+color brightcyan start="^[[:space:]]*#[[:space:]]*(if(n?def)?|elif|warning|error|pragma)\>" end="(\`|[^\\])$"
