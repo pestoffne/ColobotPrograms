@@ -10,17 +10,10 @@ return true;
 }
 }
 
-public class ListElemGoal {
-Goal value;
-ListElemGoal prev;
-ListElemGoal next;
+public class ListElemGoal { public void ListElemGoal(Goal value , ListElemGoal prev = null , ListElemGoal next = null ) { this.value = value; this.prev = prev; this.next = next; } public Goal value; public ListElemGoal prev; public ListElemGoal next; }
 
-void ListElemGoal(Goal value, ListElemGoal prev = null, ListElemGoal next = null) {
-this.value = value;
-this.prev = prev;
-this.next = next;
-}
-}
+
+
 
 public class ListIteratorGoal {
 protected ListElemGoal _elem;

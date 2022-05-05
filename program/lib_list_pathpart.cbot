@@ -10,17 +10,10 @@ return true;
 }
 }
 
-public class ListElemPathPart {
-PathPart value;
-ListElemPathPart prev;
-ListElemPathPart next;
+public class ListElemPathPart { public void ListElemPathPart(PathPart value , ListElemPathPart prev = null , ListElemPathPart next = null ) { this.value = value; this.prev = prev; this.next = next; } public PathPart value; public ListElemPathPart prev; public ListElemPathPart next; }
 
-void ListElemPathPart(PathPart value, ListElemPathPart prev = null, ListElemPathPart next = null) {
-this.value = value;
-this.prev = prev;
-this.next = next;
-}
-}
+
+
 
 public class ListIteratorPathPart {
 protected ListElemPathPart _elem;

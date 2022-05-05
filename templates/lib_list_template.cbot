@@ -1,3 +1,4 @@
+#include <macro.cbot>
 
 public class TEMPLATE(UnaryPredicate) {
 	void TEMPLATE(UnaryPredicate)() {
@@ -9,17 +10,10 @@ public class TEMPLATE(UnaryPredicate) {
 	}
 }
 
-public class TEMPLATE(ListElem) {
-	TYPE value;
-	TEMPLATE(ListElem) prev;
-	TEMPLATE(ListElem) next;
-	
-	void TEMPLATE(ListElem)(TYPE value, TEMPLATE(ListElem) prev = null, TEMPLATE(ListElem) next = null) {
-		this.value = value;
-		this.prev = prev;
-		this.next = next;
-	}
-}
+NAMED_TUPLE(TEMPLATE(ListElem), 3,
+	TYPE			, value	, 	,
+	TEMPLATE(ListElem)	, prev	, = null,
+	TEMPLATE(ListElem)	, next	, = null)
 
 public class TEMPLATE(ListIterator) {
 	protected TEMPLATE(ListElem) _elem;

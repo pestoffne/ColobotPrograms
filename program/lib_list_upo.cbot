@@ -10,17 +10,10 @@ return true;
 }
 }
 
-public class ListElemUnaryPredicateObject {
-UnaryPredicateObject value;
-ListElemUnaryPredicateObject prev;
-ListElemUnaryPredicateObject next;
+public class ListElemUnaryPredicateObject { public void ListElemUnaryPredicateObject(UnaryPredicateObject value , ListElemUnaryPredicateObject prev = null , ListElemUnaryPredicateObject next = null ) { this.value = value; this.prev = prev; this.next = next; } public UnaryPredicateObject value; public ListElemUnaryPredicateObject prev; public ListElemUnaryPredicateObject next; }
 
-void ListElemUnaryPredicateObject(UnaryPredicateObject value, ListElemUnaryPredicateObject prev = null, ListElemUnaryPredicateObject next = null) {
-this.value = value;
-this.prev = prev;
-this.next = next;
-}
-}
+
+
 
 public class ListIteratorUnaryPredicateObject {
 protected ListElemUnaryPredicateObject _elem;

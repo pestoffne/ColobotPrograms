@@ -10,17 +10,10 @@ return true;
 }
 }
 
-public class ListElemInt {
-int value;
-ListElemInt prev;
-ListElemInt next;
+public class ListElemInt { public void ListElemInt(int value , ListElemInt prev = null , ListElemInt next = null ) { this.value = value; this.prev = prev; this.next = next; } public int value; public ListElemInt prev; public ListElemInt next; }
 
-void ListElemInt(int value, ListElemInt prev = null, ListElemInt next = null) {
-this.value = value;
-this.prev = prev;
-this.next = next;
-}
-}
+
+
 
 public class ListIteratorInt {
 protected ListElemInt _elem;
