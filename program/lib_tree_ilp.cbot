@@ -1,6 +1,6 @@
-// This file is generated automaticaly from template. Do not edit.
+// Generated file.
 
-public class TreeNodeIntListPoint { public void TreeNodeIntListPoint(MT_4 int(ARGUMENT, key , = 0 , ListPoint , value , = null , TreeNodeIntListPoint , less , = null , TreeNodeIntListPoint , more , = null)) { MT_4 int(ASSIGN, key , = 0 , ListPoint , value , = null , TreeNodeIntListPoint , less , = null , TreeNodeIntListPoint , more , = null) } MT_4 int(FIELD, key , = 0 , ListPoint , value , = null , TreeNodeIntListPoint , less , = null , TreeNodeIntListPoint , more , = null) }
+public class TreeNodeIntListPoint { public void TreeNodeIntListPoint(_MT_4 int(_ARGUMENT, key , = 0 , ListPoint , value , = null , TreeNodeIntListPoint , less , = null , TreeNodeIntListPoint , more , = null)) { _MT_4 int(_ASSIGN, key , = 0 , ListPoint , value , = null , TreeNodeIntListPoint , less , = null , TreeNodeIntListPoint , more , = null) } _MT_4 int(_FIELD, key , = 0 , ListPoint , value , = null , TreeNodeIntListPoint , less , = null , TreeNodeIntListPoint , more , = null) }
 
 
 

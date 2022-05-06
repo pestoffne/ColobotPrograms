@@ -1,21 +1,35 @@
-#define MAP_TRIPLET(count, macro, ...) MT_ ## count(macro, __VA_ARGS__)
-#define MT_1(m, a, b, c) m(a, b, c)
-#define MT_2(m, a, b, c, ...) m(a, b, c, __VA_ARGS__) MT_1(m, __VA_ARGS__)
-#define MT_3(m, a, b, c, ...) m(a, b, c, __VA_ARGS__) MT_2(m, __VA_ARGS__)
-#define MT_4(m, a, b, c, ...) m(a, b, c, __VA_ARGS__) MT_3(m, __VA_ARGS__)
-#define MT_5(m, a, b, c, ...) m(a, b, c, __VA_ARGS__) MT_4(m, __VA_ARGS__)
-#define MT_6(m, a, b, c, ...) m(a, b, c, __VA_ARGS__) MT_5(m, __VA_ARGS__)
-#define MT_7(m, a, b, c, ...) m(a, b, c, __VA_ARGS__) MT_6(m, __VA_ARGS__)
-#define MT_8(m, a, b, c, ...) m(a, b, c, __VA_ARGS__) MT_7(m, __VA_ARGS__)
+#define _MAP_TRIPLET(count, macro, ...) _MT_ ## count(macro, __VA_ARGS__)
+#define _MT_1(m, a, b, c) m(a, b, c)
+#define _MT_2(m, a, b, c, ...) m(a, b, c, __VA_ARGS__) _MT_1(m, __VA_ARGS__)
+#define _MT_3(m, a, b, c, ...) m(a, b, c, __VA_ARGS__) _MT_2(m, __VA_ARGS__)
+#define _MT_4(m, a, b, c, ...) m(a, b, c, __VA_ARGS__) _MT_3(m, __VA_ARGS__)
+#define _MT_5(m, a, b, c, ...) m(a, b, c, __VA_ARGS__) _MT_4(m, __VA_ARGS__)
+#define _MT_6(m, a, b, c, ...) m(a, b, c, __VA_ARGS__) _MT_5(m, __VA_ARGS__)
+#define _MT_7(m, a, b, c, ...) m(a, b, c, __VA_ARGS__) _MT_6(m, __VA_ARGS__)
+#define _MT_8(m, a, b, c, ...) m(a, b, c, __VA_ARGS__) _MT_7(m, __VA_ARGS__)
 
-#define ARGUMENT(type, name, default, ...) type name default __VA_OPT__(,)
-#define ASSIGN(type, name, ...) this.name = name;
-#define FIELD(type, name, ...) public type name;
+#define _ARGUMENT(type, name, default, ...) type name default __VA_OPT__(,)
+#define _ASSIGN(type, name, ...) this.name = name;
+#define _FIELD(type, name, ...) public type name;
 
 #define NAMED_TUPLE(tuple_name, count, ...) \
 	public class tuple_name { \
-		public void tuple_name(MAP_TRIPLET(count, ARGUMENT, __VA_ARGS__)) { \
-			MAP_TRIPLET(count, ASSIGN, __VA_ARGS__) \
+		public void tuple_name(_MAP_TRIPLET(count, _ARGUMENT, __VA_ARGS__)) { \
+			_MAP_TRIPLET(count, _ASSIGN, __VA_ARGS__) \
 		} \
-		MAP_TRIPLET(count, FIELD, __VA_ARGS__) \
+		_MAP_TRIPLET(count, _FIELD, __VA_ARGS__) \
 	}
+
+#define REPEAT(count, macro) _REPEAT_##count(macro)
+#define _REPEAT_1(macro) macro(1)
+#define _REPEAT_2(macro) _REPEAT_1(macro) macro(2)
+#define _REPEAT_3(macro) _REPEAT_2(macro) macro(3)
+#define _REPEAT_4(macro) _REPEAT_3(macro) macro(4)
+#define _REPEAT_5(macro) _REPEAT_4(macro) macro(5)
+#define _REPEAT_6(macro) _REPEAT_5(macro) macro(6)
+#define _REPEAT_7(macro) _REPEAT_6(macro) macro(7)
+#define _REPEAT_8(macro) _REPEAT_7(macro) macro(8)
+#define _REPEAT_9(macro) _REPEAT_8(macro) macro(9)
+
+#define _CAT(a, b) a ## b
+#define CAT(a, b) _CAT(a, b)

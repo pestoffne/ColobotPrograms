@@ -13,7 +13,7 @@ color brightgreen ""([^"]|\\")*""
 # Keywords
 color green "\<(float|bool|int|object|point|string|void)\>"
 color green "\<(class|public|protected|private|static|synchronized|extends|extern)\>"
-color brightyellow "\<(for|if|while|do|else|case|default|switch|and|or|not|sizeof|try|throw|catch|new)\>"
+color brightyellow "\<(for|if|while|do|else|case|default|switch|and|or|not|sizeof|try|throw|catch|new|repeat)\>"
 color magenta "\<(continue|break|return|this|super)\>"
 
 # Build-in constants
@@ -42,6 +42,7 @@ color blue start="/\*" end="\*/"
 color white,blue "TEMPLATE\((~|_|[[:alpha:]])+\)"
 color white,blue "CMP\(.*,.*\)"
 color white,blue "\<(TYPE|KEY|VALUE|NULL|KEY_NULL|VALUE_NULL)\>"
+color white,blue "\<(NAMED_TUPLE|REPEAT|CAT)\>"
 
 # Preprocessor
 color brightgreen "^[[:space:]]*#[[:space:]]*include[[:space:]]+<[^[:blank:]=]*>"
