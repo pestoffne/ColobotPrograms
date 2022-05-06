@@ -10,17 +10,10 @@ return true;
 }
 }
 
-public class ListElemPoint {
-point value;
-ListElemPoint prev;
-ListElemPoint next;
+public class ListElemPoint { public void ListElemPoint(point value , ListElemPoint prev = null , ListElemPoint next = null ) { this.value = value; this.prev = prev; this.next = next; } public point value; public ListElemPoint prev; public ListElemPoint next; }
 
-void ListElemPoint(point value, ListElemPoint prev = null, ListElemPoint next = null) {
-this.value = value;
-this.prev = prev;
-this.next = next;
-}
-}
+
+
 
 public class ListIteratorPoint {
 protected ListElemPoint _elem;

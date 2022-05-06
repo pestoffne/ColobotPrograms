@@ -1,20 +1,21 @@
-public class TEMPLATE(TreeNode) {
-	public KEY key = KEY_NULL;
-	public VALUE value = VALUE_NULL;
-	public TEMPLATE(TreeNode) less = null;
-	public TEMPLATE(TreeNode) more = null;
-	
-	public void init(KEY key, VALUE value) {
-		this.key = key;
-		this.value = value;
-	}
+#include <macro.cbot>
+
+NAMED_TUPLE(TEMPLATE(TreeNode), 4
+	KEY			, key	, = KEY_NULL	,
+	VALUE			, value	, = VALUE_NULL	,
+	TEMPLATE(TreeNode)	, less	, = null	,
+	TEMPLATE(TreeNode)	, more	, = null	)
+
+public void TEMPLATE(TreeNode)::init(KEY key, VALUE value) {
+	this.key = key;
+	this.value = value;
 }
 
 public class TEMPLATE(SortedTree) {
 	public TEMPLATE(TreeNode) root = null;
 	private int _size = 0;
 	
-	/*private*/ TEMPLATE(TreeNode) _create_subtree(int size) {
+	private TEMPLATE(TreeNode) _create_subtree(int size) {
 		TEMPLATE(TreeNode) pointer;
 		
 		if (0 == size) {

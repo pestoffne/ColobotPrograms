@@ -15,8 +15,14 @@ define generate_sorted_tree
                 grep -v '^#' | awk '{$$1=$$1};1' >> $(1)
 endef
 
-all: $(PROGRAM_DIR)/lib_list_int.cbot $(PROGRAM_DIR)/lib_list_goal.cbot $(PROGRAM_DIR)/lib_list_object.cbot $(PROGRAM_DIR)/lib_list_upo.cbot \
-	$(PROGRAM_DIR)/lib_list_pathpart.cbot $(PROGRAM_DIR)/lib_tree_ilp.cbot $(PROGRAM_DIR)/lib_tree_ii.cbot
+.PHONY: all clean
+
+all: $(PROGRAM_DIR)/lib_list_int.cbot $(PROGRAM_DIR)/lib_list_goal.cbot \
+$(PROGRAM_DIR)/lib_list_object.cbot $(PROGRAM_DIR)/lib_list_upo.cbot \
+$(PROGRAM_DIR)/lib_tree_ilp.cbot $(PROGRAM_DIR)/lib_tree_ii.cbot
+
+clean:
+	rm -vf $(PROGRAM_DIR)/lib_list_*.cbot $(PROGRAM_DIR)/lib_tree_*.cbot
 
 $(PROGRAM_DIR)/lib_list_int.cbot: lib_list_template.cbot $(INCLUDE_DIR)/macro.cbot
 	$(call generate_list,$(PROGRAM_DIR)/lib_list_int.cbot,int,Int,0,lib_list_template.cbot)
@@ -33,11 +39,11 @@ $(PROGRAM_DIR)/lib_list_object.cbot: lib_list_template.cbot $(INCLUDE_DIR)/macro
 $(PROGRAM_DIR)/lib_list_upo.cbot: lib_list_template.cbot $(INCLUDE_DIR)/macro.cbot
 	$(call generate_list,$(PROGRAM_DIR)/lib_list_upo.cbot,UnaryPredicateObject,UnaryPredicateObject,null,lib_list_template.cbot)
 
-$(PROGRAM_DIR)/lib_list_pathpart.cbot: lib_list_template.cbot $(INCLUDE_DIR)/macro.cbot
+$(PROGRAM_DIR)/lib_list_pathpart.cbot: lib_list_template.cbot $(PROGRAM_DIR)/lib_pathpart.cbot $(INCLUDE_DIR)/macro.cbot
 	$(call generate_list,$(PROGRAM_DIR)/lib_list_pathpart.cbot,PathPart,PathPart,null,lib_list_template.cbot)
 
-$(PROGRAN_DIR)/lib_tree_ilp.cbot: lib_sorted_tree_template.cbot $(PROGRAM_DIR)/lib_list_point.cbot
+$(PROGRAM_DIR)/lib_tree_ilp.cbot: lib_sorted_tree_template.cbot $(PROGRAM_DIR)/lib_list_point.cbot $(INCLUDE_DIR)/macro.cbot
 	$(call generate_sorted_tree,$(PROGRAM_DIR)/lib_tree_ilp.cbot,int,ListPoint,Int,ListPoint,0,null,((X)-(Y)),lib_sorted_tree_template.cbot)
 
-$(PROGRAN_DIR)/lib_tree_ii.cbot: lib_sorted_tree_template.cbot
+$(PROGRAM_DIR)/lib_tree_ii.cbot: lib_sorted_tree_template.cbot $(INCLUDE_DIR)/macro.cbot
 	$(call generate_sorted_tree,$(PROGRAM_DIR)/lib_tree_ii.cbot,int,int,Int,Int,0,0,((X)-(Y)),lib_sorted_tree_template.cbot)

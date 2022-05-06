@@ -1,21 +1,21 @@
 // This file is generated automaticaly from template. Do not edit.
-public class TreeNodeIntInt {
-public int key = 0;
-public int value = 0;
-public TreeNodeIntInt less = null;
-public TreeNodeIntInt more = null;
 
-public void init(int key, int value) {
+public class TreeNodeIntInt { public void TreeNodeIntInt(MT_4 int(ARGUMENT, key , = 0 , int , value , = 0 , TreeNodeIntInt , less , = null , TreeNodeIntInt , more , = null)) { MT_4 int(ASSIGN, key , = 0 , int , value , = 0 , TreeNodeIntInt , less , = null , TreeNodeIntInt , more , = null) } MT_4 int(FIELD, key , = 0 , int , value , = 0 , TreeNodeIntInt , less , = null , TreeNodeIntInt , more , = null) }
+
+
+
+
+
+public void TreeNodeIntInt::init(int key, int value) {
 this.key = key;
 this.value = value;
-}
 }
 
 public class SortedTreeIntInt {
 public TreeNodeIntInt root = null;
 private int _size = 0;
 
-TreeNodeIntInt _create_subtree(int size) {
+private TreeNodeIntInt _create_subtree(int size) {
 TreeNodeIntInt pointer;
 
 if (0 == size) {
