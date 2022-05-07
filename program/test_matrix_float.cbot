@@ -1,0 +1,58 @@
+public class TestMatrix_float extends EBoost {
+	Matrix_float mat;
+	MatrixElem_float root;
+	
+	void setup() {
+		root = matrix_values(
+			1.0, 2.0, 3.0,
+			4.0, 5.0, 6.0
+		);
+		mat = new Matrix_float(3, 2, root);
+	}
+	
+	void cleanup() {
+		
+	}
+	
+	void test_internal_structure() {
+		MatrixElem_float p;
+		
+		// prepare
+		setup();
+		p = root;
+		
+		assert_equal(p.value, 1.0); p = p.right;
+		assert_equal(p.value, 2.0); p = p.right;
+		assert_equal(p.value, 3.0); p = p.right;
+		assert_equal(p.value, 4.0); p = p.right;
+		assert_equal(p.value, 5.0); p = p.right;
+		assert_equal(p.value, 6.0); p = p.right;
+		assert_equal(p.value, 1.0); p = p.right;
+		assert_equal(p.value, 2.0); p = p.right;
+		assert_equal(p.value, 3.0); p = p.right;
+		assert_equal(p.value, 4.0); p = p.right;
+		assert_equal(p.value, 5.0); p = p.right;
+		assert_equal(p.value, 6.0); p = p.right;
+
+		assert_equal(p.value, 1.0); p = p.down;
+		assert_equal(p.value, 4.0); p = p.down;
+		assert_equal(p.value, 2.0); p = p.down;
+		assert_equal(p.value, 5.0); p = p.down;
+		assert_equal(p.value, 3.0); p = p.down;
+		assert_equal(p.value, 6.0); p = p.down;
+		assert_equal(p.value, 1.0); p = p.down;
+		assert_equal(p.value, 4.0); p = p.down;
+		assert_equal(p.value, 2.0); p = p.down;
+		assert_equal(p.value, 5.0); p = p.down;
+		assert_equal(p.value, 3.0); p = p.down;
+		assert_equal(p.value, 6.0); p = p.down;
+		
+		cleanup();
+	}
+}
+
+extern void Test_Matrix_float() {
+	TestMatrix_float t();
+	t.test_internal_structure();
+	message("Tests passed", DisplayInfo);
+}

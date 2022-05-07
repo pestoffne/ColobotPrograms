@@ -1,22 +1,21 @@
 #include <macro.cbot>
 
-NAMED_TUPLE(CAT(MatrixElem_, TYPE), 3
+NAMED_TUPLE(CAT(MatrixElem_, TYPE), 3,
 	TYPE			, value	, = NULL	,
 	CAT(MatrixElem_, TYPE)	, right	, = null	,
 	CAT(MatrixElem_, TYPE)	, down	, = null	)
 
 #define MATRIX_VALUES_ARGUMENT(number, ...) , TYPE v##number
-#define MATRIX_VALUES_ASSIGN(number, ...) p1 = new CAT(MatrixElem_, TYPE)(v##number); p1.right = p1;
+#define MATRIX_VALUES_ASSIGN(number, ...) p1 = p1.right = new CAT(MatrixElem_, TYPE)(v##number);
 #define MATRIX_VALUES(count) \
-	public void matrix_values(TYPE v0 REPEAT(count, MATRIX_VALUES_ARGUMENT)) { \
-		CAT(MatrixElem_, TYPE) p0, p1;
-		p1 = new CAT(MatrixElem_, TYPE)(v0); \
-		p0 = p1; \
+	public CAT(MatrixElem_, TYPE) matrix_values(TYPE v0 REPEAT(count, MATRIX_VALUES_ARGUMENT)) { \
+		CAT(MatrixElem_, TYPE) p0, p1; \
+		p0 = p1 = new CAT(MatrixElem_, TYPE)(v0); \
 		REPEAT(count, MATRIX_VALUES_ASSIGN) \
-		p1.right = p0;
+		return p1.right = p0; \
 	}
 
-MATRIX_VALUES(8)
+MATRIX_VALUES(5)
 
 public class CAT(Matrix_, TYPE) {
 	private CAT(MatrixElem_, TYPE) _root;
@@ -32,17 +31,30 @@ public class CAT(Matrix_, TYPE) {
 			p1 = p1.right;
 		}
 		
-		repeat(this._width * this._height) {
+		repeat(this._width * (this._height - 1)) {
 			p2.down = p1;
 			p1 = p1.right;
 			p2 = p2.right;
 		}
+		
+		p1 = p1.right;
+		
+		repeat(this._width - 1) {
+			p2.down = p1;
+			p1 = p1.right;
+			p2 = p2.right;
+		}
+		
+		p2.down = this._root;
 	}
 	
-	public void CAT(Matrix_, TYPE)(int width, int height, CAT(Matrix_, TYPE) values) {
+	public void CAT(Matrix_, TYPE)(int width, int height, CAT(MatrixElem_, TYPE) values) {
 		this._width = width;
 		this._height = height;
 		this._root = values;
 		this._set_shape();
 	}
+}
+
+extern void CAT(Library_Matrix_, TYPE)() {
 }
