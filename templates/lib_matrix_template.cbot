@@ -1,9 +1,9 @@
 #include <macro.cbot>
 
 NAMED_TUPLE(CAT(MatrixElem_, TYPE), 3,
-	TYPE			, value	, = NULL	,
-	CAT(MatrixElem_, TYPE)	, right	, = null	,
-	CAT(MatrixElem_, TYPE)	, down	, = null	)
+	TYPE, value, = NULL,
+	CAT(MatrixElem_, TYPE), right, = null,
+	CAT(MatrixElem_, TYPE), down, = null)
 
 #define MATRIX_VALUES_ARGUMENT(number, ...) , TYPE v##number
 #define MATRIX_VALUES_ASSIGN(number, ...) p1 = p1.right = new CAT(MatrixElem_, TYPE)(v##number);

@@ -11,9 +11,9 @@ public class TEMPLATE(UnaryPredicate) {
 }
 
 NAMED_TUPLE(TEMPLATE(ListElem), 3,
-	TYPE			, value	, 	,
-	TEMPLATE(ListElem)	, prev	, = null,
-	TEMPLATE(ListElem)	, next	, = null)
+	TYPE, value,,
+	TEMPLATE(ListElem), prev, = null,
+	TEMPLATE(ListElem), next, = null)
 
 public class TEMPLATE(ListIterator) {
 	protected TEMPLATE(ListElem) _elem;

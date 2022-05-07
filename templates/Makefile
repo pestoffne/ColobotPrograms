@@ -57,5 +57,5 @@ $(PROGRAM_DIR)/lib_tree_ilp.cbot: lib_sorted_tree_template.cbot $(PROGRAM_DIR)/l
 $(PROGRAM_DIR)/lib_tree_ii.cbot: lib_sorted_tree_template.cbot $(INCLUDE_DIR)/macro.cbot
 	$(call generate_sorted_tree,$(PROGRAM_DIR)/lib_tree_ii.cbot,int,int,Int,Int,0,0,((X)-(Y)),lib_sorted_tree_template.cbot)
 
-$(PROGRAM_DIR)/lib_matrix_float.cbot: lib_matrix.cbot $(INCLUDE_DIR)/macro.cbot
-	$(call generate_matrix,$(PROGRAM_DIR)/lib_matrix_float.cbot,float,0.0,lib_matrix.cbot)
+$(PROGRAM_DIR)/lib_matrix_float.cbot: lib_matrix_template.cbot $(INCLUDE_DIR)/macro.cbot
+	$(call generate_matrix,$(PROGRAM_DIR)/lib_matrix_float.cbot,float,0.0,lib_matrix_template.cbot)
