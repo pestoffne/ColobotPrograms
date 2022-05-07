@@ -1,8 +1,37 @@
 // Generated file.
 
 public class MatrixElem_float { public void MatrixElem_float(float value = 0.0 , MatrixElem_float right = null , MatrixElem_float down = null ) { this.value = value; this.right = right; this.down = down; } public float value; public MatrixElem_float right; public MatrixElem_float down; }
-public MatrixElem_float matrix_values(float v0 , float v1 , float v2 , float v3 , float v4 , float v5) { MatrixElem_float p0, p1; p0 = p1 = new MatrixElem_float(v0); p1 = p1.right = new MatrixElem_float(v1); p1 = p1.right = new MatrixElem_float(v2); p1 = p1.right = new MatrixElem_float(v3); p1 = p1.right = new MatrixElem_float(v4); p1 = p1.right = new MatrixElem_float(v5); return p1.right = p0; }
-public MatrixElem_float matrix_values(float v0 , float v1 , float v2 , float v3 , float v4 , float v5 , float v6 , float v7 , float v8) { MatrixElem_float p0, p1; p0 = p1 = new MatrixElem_float(v0); p1 = p1.right = new MatrixElem_float(v1); p1 = p1.right = new MatrixElem_float(v2); p1 = p1.right = new MatrixElem_float(v3); p1 = p1.right = new MatrixElem_float(v4); p1 = p1.right = new MatrixElem_float(v5); p1 = p1.right = new MatrixElem_float(v6); p1 = p1.right = new MatrixElem_float(v7); p1 = p1.right = new MatrixElem_float(v8); return p1.right = p0; }
+public MatrixElem_float matrix_values(float v0 , float v1 , float v2 , float v3 , float v4 , float v5) { MatrixElem_float p0, p1; p0 = p1 = new MatrixElem_float(v0); p1 = p1.right = new MatrixElem_float(v1); p1 = p1.right = new MatrixElem_float(v2); p1 = p1.right = new MatrixElem_float(v3); p1 = p1.right = new MatrixElem_float(v4); p1 = p1.right = new MatrixElem_float(v5); return p0; }
+public MatrixElem_float matrix_values(float v0 , float v1 , float v2 , float v3 , float v4 , float v5 , float v6 , float v7 , float v8) { MatrixElem_float p0, p1; p0 = p1 = new MatrixElem_float(v0); p1 = p1.right = new MatrixElem_float(v1); p1 = p1.right = new MatrixElem_float(v2); p1 = p1.right = new MatrixElem_float(v3); p1 = p1.right = new MatrixElem_float(v4); p1 = p1.right = new MatrixElem_float(v5); p1 = p1.right = new MatrixElem_float(v6); p1 = p1.right = new MatrixElem_float(v7); p1 = p1.right = new MatrixElem_float(v8); return p0; }
+
+public class MatrixIterator_float {
+protected MatrixElem_float _elem;
+
+public void MatrixIterator_float(MatrixElem_float elem) {
+this._elem = elem;
+}
+
+public MatrixIterator_float copy() {
+return new MatrixIterator_float(this._elem);
+}
+
+public bool equal(MatrixIterator_float that) {
+return this._elem == that._elem;
+}
+
+public bool is_null() {
+return this._elem == null;
+}
+
+public float value() {
+return this._elem.value;
+}
+
+public MatrixIterator_float shift() {
+this._elem = this._elem.right;
+return this;
+}
+}
 
 public class Matrix_float {
 private MatrixElem_float _root;
@@ -18,21 +47,24 @@ repeat(this._width) {
 p1 = p1.right;
 }
 
-repeat(this._width * (this._height - 1)) {
+for (;;) {
 p2.down = p1;
+
+if (p1.right == null) {
+break;
+}
+
 p1 = p1.right;
 p2 = p2.right;
 }
 
-p1 = p1.right;
+p1 = this._root;
 
 repeat(this._width - 1) {
-p2.down = p1;
 p1 = p1.right;
 p2 = p2.right;
+p2.down = p1;
 }
-
-p2.down = this._root;
 }
 
 public void Matrix_float(int width, int height, MatrixElem_float values) {
@@ -40,6 +72,14 @@ this._width = width;
 this._height = height;
 this._root = values;
 this._set_shape();
+}
+
+public MatrixIterator_float begin() {
+return new MatrixIterator_float(this._root);
+}
+
+public MatrixIterator_float end() {
+return new MatrixIterator_float(null);
 }
 
 public bool eq(Matrix_float that) {
@@ -68,9 +108,42 @@ public bool ne(Matrix_float that) {
 return not this.eq(that);
 }
 
-public Matrix_float mul(Matrix_float that) {
+private MatrixElem_float _mul_helper(MatrixElem_float p_this, MatrixElem_float p_that) {
+MatrixElem_float acc;
 
-return that;
+acc = new MatrixElem_float();
+repeat(this._width) {
+acc.value += p_this.value * p_that.value;
+p_this = p_this.right;
+p_that = p_that.down;
+}
+
+return acc;
+}
+
+public Matrix_float mul(Matrix_float that) {
+MatrixElem_float p_this, p_that, p_out, p_dummy; Matrix_float res;
+
+if (this._width != that._height) {
+message("Can't multiply matrixes due it's sizes", DisplayError);
+return null;
+}
+
+p_this = this._root;
+p_that = that._root;
+p_dummy = p_out = new MatrixElem_float();
+
+repeat(this._height) {
+repeat(that._width) {
+p_out = p_out.right = this._mul_helper(p_this, p_that);
+p_that = p_that.right;
+}
+p_this = p_this.down;
+p_that = that._root;
+}
+
+res = new Matrix_float(this._height, that._width, p_dummy.right);
+return res;
 }
 }
 

@@ -12,11 +12,40 @@ NAMED_TUPLE(CAT(MatrixElem_, TYPE), 3,
 		CAT(MatrixElem_, TYPE) p0, p1; \
 		p0 = p1 = new CAT(MatrixElem_, TYPE)(v0); \
 		REPEAT(count, MATRIX_VALUES_ASSIGN) \
-		return p1.right = p0; \
+		return p0; \
 	}
 
 MATRIX_VALUES(5)
 MATRIX_VALUES(8)
+
+public class CAT(MatrixIterator_, TYPE) {
+	protected CAT(MatrixElem_, TYPE) _elem;
+	
+	public void CAT(MatrixIterator_, TYPE)(CAT(MatrixElem_, TYPE) elem) {
+		this._elem = elem;
+	}
+	
+	public CAT(MatrixIterator_, TYPE) copy() {
+		return new CAT(MatrixIterator_, TYPE)(this._elem);
+	}
+	
+	public bool equal(CAT(MatrixIterator_, TYPE) that) {
+		return this._elem == that._elem;
+	}
+	
+	public bool is_null() {
+		return this._elem == null;
+	}
+	
+	public TYPE value() {
+		return this._elem.value;
+	}
+	
+	public CAT(MatrixIterator_, TYPE) shift() {
+		this._elem = this._elem.right;
+		return this;
+	}
+}
 
 public class CAT(Matrix_, TYPE) {
 	private CAT(MatrixElem_, TYPE) _root;
@@ -32,21 +61,24 @@ public class CAT(Matrix_, TYPE) {
 			p1 = p1.right;
 		}
 		
-		repeat(this._width * (this._height - 1)) {
+		for (;;) {
 			p2.down = p1;
+			
+			if (p1.right == null) {
+				break;
+			}
+			
 			p1 = p1.right;
 			p2 = p2.right;
 		}
 		
-		p1 = p1.right;
+		p1 = this._root;
 		
 		repeat(this._width - 1) {
-			p2.down = p1;
 			p1 = p1.right;
 			p2 = p2.right;
+			p2.down = p1;
 		}
-		
-		p2.down = this._root;
 	}
 	
 	public void CAT(Matrix_, TYPE)(int width, int height, CAT(MatrixElem_, TYPE) values) {
@@ -54,6 +86,14 @@ public class CAT(Matrix_, TYPE) {
 		this._height = height;
 		this._root = values;
 		this._set_shape();
+	}
+	
+	public CAT(MatrixIterator_, TYPE) begin() {
+		return new CAT(MatrixIterator_, TYPE)(this._root);
+	}
+	
+	public CAT(MatrixIterator_, TYPE) end() {
+		return new CAT(MatrixIterator_, TYPE)(null);
 	}
 	
 	public bool eq(CAT(Matrix_, TYPE) that) {
@@ -82,9 +122,42 @@ public class CAT(Matrix_, TYPE) {
 		return not this.eq(that);
 	}
 	
+	private CAT(MatrixElem_, TYPE) _mul_helper(CAT(MatrixElem_, TYPE) p_this, CAT(MatrixElem_, TYPE) p_that) {
+		CAT(MatrixElem_, TYPE) acc;
+		
+		acc = new CAT(MatrixElem_, TYPE)();
+		repeat(this._width) {
+			acc.value += p_this.value * p_that.value;
+			p_this = p_this.right;
+			p_that = p_that.down;
+		}
+		
+		return acc;
+	}
+	
 	public CAT(Matrix_, TYPE) mul(CAT(Matrix_, TYPE) that) {
-		// TODO
-		return that;
+		CAT(MatrixElem_, TYPE) p_this, p_that, p_out, p_dummy; CAT(Matrix_, TYPE) res;
+		
+		if (this._width != that._height) {
+			message("Can't multiply matrixes due it's sizes", DisplayError);
+			return null;
+		}
+		
+		p_this = this._root;
+		p_that = that._root;
+		p_dummy = p_out = new CAT(MatrixElem_, TYPE)();
+		
+		repeat(this._height) {
+			repeat(that._width) {
+				p_out = p_out.right = this._mul_helper(p_this, p_that);
+				p_that = p_that.right;
+			}
+			p_this = p_this.down;
+			p_that = that._root;
+		}
+		
+		res = new CAT(Matrix_, TYPE)(this._height, that._width, p_dummy.right);
+		return res;
 	}
 }
 

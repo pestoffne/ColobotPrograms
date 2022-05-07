@@ -1,40 +1,32 @@
 public class TestMatrix_float extends EBoost {
 	void test_internal_structure() {
-		Matrix_float mat; MatrixElem_float p;
+		Matrix_float mat; MatrixElem_float root, p;
 		
 		// prepare
-		p = matrix_values(
+		root = matrix_values(
 			1.0, 2.0, 3.0,
 			4.0, 5.0, 6.0
 		);
-		mat = new Matrix_float(3, 2, p);
+		mat = new Matrix_float(3, 2, root);
 		
 		// test and assert
+		p = root;
 		assert_equal(p.value, 1.0); p = p.right;
 		assert_equal(p.value, 2.0); p = p.right;
 		assert_equal(p.value, 3.0); p = p.right;
 		assert_equal(p.value, 4.0); p = p.right;
 		assert_equal(p.value, 5.0); p = p.right;
 		assert_equal(p.value, 6.0); p = p.right;
-		assert_equal(p.value, 1.0); p = p.right;
-		assert_equal(p.value, 2.0); p = p.right;
-		assert_equal(p.value, 3.0); p = p.right;
-		assert_equal(p.value, 4.0); p = p.right;
-		assert_equal(p.value, 5.0); p = p.right;
-		assert_equal(p.value, 6.0); p = p.right;
+		assert(p == null, "test_internal_structure: error last right link is not null");
 		
+		p = root;
 		assert_equal(p.value, 1.0); p = p.down;
 		assert_equal(p.value, 4.0); p = p.down;
 		assert_equal(p.value, 2.0); p = p.down;
 		assert_equal(p.value, 5.0); p = p.down;
 		assert_equal(p.value, 3.0); p = p.down;
 		assert_equal(p.value, 6.0); p = p.down;
-		assert_equal(p.value, 1.0); p = p.down;
-		assert_equal(p.value, 4.0); p = p.down;
-		assert_equal(p.value, 2.0); p = p.down;
-		assert_equal(p.value, 5.0); p = p.down;
-		assert_equal(p.value, 3.0); p = p.down;
-		assert_equal(p.value, 6.0); p = p.down;
+		assert(p == null, "test_internal_structure: error last down link is not null");
 	}
 	
 	void test_matrix_mul_e() {
