@@ -1,58 +1,100 @@
 public class TestMatrix_float extends EBoost {
-	Matrix_float mat;
-	MatrixElem_float root;
-	
-	void setup() {
-		root = matrix_values(
+	void test_internal_structure() {
+		Matrix_float mat; MatrixElem_float p;
+		
+		// prepare
+		p = matrix_values(
 			1.0, 2.0, 3.0,
 			4.0, 5.0, 6.0
 		);
-		mat = new Matrix_float(3, 2, root);
-	}
-	
-	void cleanup() {
+		mat = new Matrix_float(3, 2, p);
 		
+		// test and assert
+		assert_equal(p.value, 1.0); p = p.right;
+		assert_equal(p.value, 2.0); p = p.right;
+		assert_equal(p.value, 3.0); p = p.right;
+		assert_equal(p.value, 4.0); p = p.right;
+		assert_equal(p.value, 5.0); p = p.right;
+		assert_equal(p.value, 6.0); p = p.right;
+		assert_equal(p.value, 1.0); p = p.right;
+		assert_equal(p.value, 2.0); p = p.right;
+		assert_equal(p.value, 3.0); p = p.right;
+		assert_equal(p.value, 4.0); p = p.right;
+		assert_equal(p.value, 5.0); p = p.right;
+		assert_equal(p.value, 6.0); p = p.right;
+		
+		assert_equal(p.value, 1.0); p = p.down;
+		assert_equal(p.value, 4.0); p = p.down;
+		assert_equal(p.value, 2.0); p = p.down;
+		assert_equal(p.value, 5.0); p = p.down;
+		assert_equal(p.value, 3.0); p = p.down;
+		assert_equal(p.value, 6.0); p = p.down;
+		assert_equal(p.value, 1.0); p = p.down;
+		assert_equal(p.value, 4.0); p = p.down;
+		assert_equal(p.value, 2.0); p = p.down;
+		assert_equal(p.value, 5.0); p = p.down;
+		assert_equal(p.value, 3.0); p = p.down;
+		assert_equal(p.value, 6.0); p = p.down;
 	}
 	
-	void test_internal_structure() {
-		MatrixElem_float p;
+	void test_matrix_mul_e() {
+		Matrix_float m1, m2, m3, e;
 		
 		// prepare
-		setup();
-		p = root;
+		m1 = new Matrix_float(3, 3, matrix_values(
+			1, 2, 3,
+			4, 5, 6,
+			7, 8, 9
+		));
 		
-		assert_equal(p.value, 1.0); p = p.right;
-		assert_equal(p.value, 2.0); p = p.right;
-		assert_equal(p.value, 3.0); p = p.right;
-		assert_equal(p.value, 4.0); p = p.right;
-		assert_equal(p.value, 5.0); p = p.right;
-		assert_equal(p.value, 6.0); p = p.right;
-		assert_equal(p.value, 1.0); p = p.right;
-		assert_equal(p.value, 2.0); p = p.right;
-		assert_equal(p.value, 3.0); p = p.right;
-		assert_equal(p.value, 4.0); p = p.right;
-		assert_equal(p.value, 5.0); p = p.right;
-		assert_equal(p.value, 6.0); p = p.right;
-
-		assert_equal(p.value, 1.0); p = p.down;
-		assert_equal(p.value, 4.0); p = p.down;
-		assert_equal(p.value, 2.0); p = p.down;
-		assert_equal(p.value, 5.0); p = p.down;
-		assert_equal(p.value, 3.0); p = p.down;
-		assert_equal(p.value, 6.0); p = p.down;
-		assert_equal(p.value, 1.0); p = p.down;
-		assert_equal(p.value, 4.0); p = p.down;
-		assert_equal(p.value, 2.0); p = p.down;
-		assert_equal(p.value, 5.0); p = p.down;
-		assert_equal(p.value, 3.0); p = p.down;
-		assert_equal(p.value, 6.0); p = p.down;
+		e = new Matrix_float(3, 3, matrix_values(
+			1, 0, 0,
+			0, 1, 0,
+			0, 0, 1
+		));
 		
-		cleanup();
+		// test
+		m2 = m1.mul(e);
+		m3 = e.mul(m1);
+		
+		// assert
+		assert(m1.eq(m2), "test_matrix_mul_e: error m1 != m2");
+		assert(m1.eq(m3), "test_matrix_mul_e: error m1 != m3");
+	}
+	
+	void test_matrix_mul() {
+		Matrix_float m1, m2, m3, m4;
+		
+		// prepare
+		m1 = new Matrix_float(2, 3, matrix_values(
+			1, 2,
+			3, 4,
+			5, 6
+		));
+		
+		m2 = new Matrix_float(3, 2, matrix_values(
+			7, 8, 9,
+			10, 11, 12
+		));
+		
+		m3 = new Matrix_float(3, 3, matrix_values(
+			27,  30,  33,
+			61,  68,  75,
+			95, 106, 117
+		));
+		
+		// test
+		m4 = m1.mul(m2);
+		
+		// assert
+		assert(m3.eq(m4), "test_matrix_mul: error m3 != m4");
 	}
 }
 
 extern void Test_Matrix_float() {
 	TestMatrix_float t();
 	t.test_internal_structure();
+	t.test_matrix_mul_e();
+	t.test_matrix_mul();
 	message("Tests passed", DisplayInfo);
 }

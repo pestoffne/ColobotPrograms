@@ -2,6 +2,7 @@
 
 public class MatrixElem_float { public void MatrixElem_float(float value = 0.0 , MatrixElem_float right = null , MatrixElem_float down = null ) { this.value = value; this.right = right; this.down = down; } public float value; public MatrixElem_float right; public MatrixElem_float down; }
 public MatrixElem_float matrix_values(float v0 , float v1 , float v2 , float v3 , float v4 , float v5) { MatrixElem_float p0, p1; p0 = p1 = new MatrixElem_float(v0); p1 = p1.right = new MatrixElem_float(v1); p1 = p1.right = new MatrixElem_float(v2); p1 = p1.right = new MatrixElem_float(v3); p1 = p1.right = new MatrixElem_float(v4); p1 = p1.right = new MatrixElem_float(v5); return p1.right = p0; }
+public MatrixElem_float matrix_values(float v0 , float v1 , float v2 , float v3 , float v4 , float v5 , float v6 , float v7 , float v8) { MatrixElem_float p0, p1; p0 = p1 = new MatrixElem_float(v0); p1 = p1.right = new MatrixElem_float(v1); p1 = p1.right = new MatrixElem_float(v2); p1 = p1.right = new MatrixElem_float(v3); p1 = p1.right = new MatrixElem_float(v4); p1 = p1.right = new MatrixElem_float(v5); p1 = p1.right = new MatrixElem_float(v6); p1 = p1.right = new MatrixElem_float(v7); p1 = p1.right = new MatrixElem_float(v8); return p1.right = p0; }
 
 public class Matrix_float {
 private MatrixElem_float _root;
@@ -39,6 +40,37 @@ this._width = width;
 this._height = height;
 this._root = values;
 this._set_shape();
+}
+
+public bool eq(Matrix_float that) {
+MatrixElem_float p1, p2;
+
+if (this._width != that._width or this._height != that._height) {
+return false;
+}
+
+p1 = this._root;
+p2 = that._root;
+
+repeat(this._width * this._height) {
+if (p1.value != p2.value) {
+return false;
+}
+
+p1 = p1.right;
+p2 = p2.right;
+}
+
+return true;
+}
+
+public bool ne(Matrix_float that) {
+return not this.eq(that);
+}
+
+public Matrix_float mul(Matrix_float that) {
+
+return that;
 }
 }
 

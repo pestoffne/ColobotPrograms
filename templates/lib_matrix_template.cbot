@@ -16,6 +16,7 @@ NAMED_TUPLE(CAT(MatrixElem_, TYPE), 3,
 	}
 
 MATRIX_VALUES(5)
+MATRIX_VALUES(8)
 
 public class CAT(Matrix_, TYPE) {
 	private CAT(MatrixElem_, TYPE) _root;
@@ -53,6 +54,37 @@ public class CAT(Matrix_, TYPE) {
 		this._height = height;
 		this._root = values;
 		this._set_shape();
+	}
+	
+	public bool eq(CAT(Matrix_, TYPE) that) {
+		CAT(MatrixElem_, TYPE) p1, p2;
+		
+		if (this._width != that._width or this._height != that._height) {
+			return false;
+		}
+		
+		p1 = this._root;
+		p2 = that._root;
+		
+		repeat(this._width * this._height) {
+			if (p1.value != p2.value) {
+				return false;
+			}
+			
+			p1 = p1.right;
+			p2 = p2.right;
+		}
+		
+		return true;
+	}
+	
+	public bool ne(CAT(Matrix_, TYPE) that) {
+		return not this.eq(that);
+	}
+	
+	public CAT(Matrix_, TYPE) mul(CAT(Matrix_, TYPE) that) {
+		// TODO
+		return that;
 	}
 }
 
