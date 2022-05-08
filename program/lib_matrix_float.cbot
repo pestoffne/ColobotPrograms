@@ -108,6 +108,39 @@ public bool ne(Matrix_float that) {
 return not this.eq(that);
 }
 
+public string to_str() {
+string res; MatrixIterator_float iter;
+
+iter = this.begin();
+res = "[";
+
+for (int i = this._height - 1;; --i) {
+res += "[";
+
+for (int j = this._width - 1;; --j) {
+res += iter.value();
+iter.shift();
+
+if (j <= 0) {
+break;
+}
+
+res += ",";
+}
+
+res += "]";
+
+if (i <= 0) {
+break;
+}
+
+res += ",";
+}
+
+res += "]";
+return res;
+}
+
 private MatrixElem_float _mul_helper(MatrixElem_float p_this, MatrixElem_float p_that) {
 MatrixElem_float acc;
 

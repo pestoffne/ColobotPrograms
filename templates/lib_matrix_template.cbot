@@ -122,6 +122,39 @@ public class CAT(Matrix_, TYPE) {
 		return not this.eq(that);
 	}
 	
+	public string to_str() {
+		string res; CAT(MatrixIterator_, TYPE) iter;
+		
+		iter = this.begin();
+		res = "[";
+		
+		for (int i = this._height - 1;; --i) {
+			res += "[";
+			
+			for (int j = this._width - 1;; --j) {
+				res += iter.value();
+				iter.shift();
+				
+				if (j <= 0) {
+					break;
+				}
+				
+				res += ",";
+			}
+			
+			res += "]";
+			
+			if (i <= 0) {
+				break;
+			}
+			
+			res += ",";
+		}
+		
+		res += "]";
+		return res;
+	}
+	
 	private CAT(MatrixElem_, TYPE) _mul_helper(CAT(MatrixElem_, TYPE) p_this, CAT(MatrixElem_, TYPE) p_that) {
 		CAT(MatrixElem_, TYPE) acc;
 		
