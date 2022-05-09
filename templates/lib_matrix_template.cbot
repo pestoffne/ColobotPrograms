@@ -17,6 +17,7 @@ NAMED_TUPLE(CAT(MatrixElem_, TYPE), 3,
 
 MATRIX_VALUES(5)
 MATRIX_VALUES(8)
+MATRIX_VALUES(80)
 
 public class CAT(MatrixIterator_, TYPE) {
 	protected CAT(MatrixElem_, TYPE) _elem;

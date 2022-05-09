@@ -1,0 +1,52 @@
+// File benchmark_matrix.cbot
+// Depends: lib_eboost, lib_matrix_float.cbot
+
+extern void object::Benchmark_Matrix() {
+	float time; string s1, s2; Matrix_float m, m2;
+	EBoost e(this);
+	s1 = "[[1,2,3,4,5,6,7,8,9],[2,4,6,8,10,12,14,16,18],[3,6,9,12,15,18,21,24,27],[4,8,12,16,20,24,28,32,36],[5,10,15,20,25,30,35,40,45],[6,12,18,24,30,36,42,48,54],[7,14,21,28,35,42,49,56,63],[8,16,24,32,40,48,57,64,72],[9,18,27,36,45,54,63,72,81]]";
+
+	e.log("---benchmark-begin---");
+	
+	// O(N**2)
+	// N=9 --> 0.68s (benchmark)
+	// N=3 --> 0.076s (calculated)
+	// N=2 --> 0.034s (calculated)
+	time = abstime();
+	m = new Matrix_float(9, 9, matrix_values(
+	1, 2, 3, 4, 5, 6, 7, 8, 9,
+	2, 4, 6, 8,10,12,14,16,18,
+	3, 6, 9,12,15,18,21,24,27,
+	4, 8,12,16,20,24,28,32,36,
+	5,10,15,20,25,30,35,40,45,
+	6,12,18,24,30,36,42,48,54,
+	7,14,21,28,35,42,49,56,63,
+	8,16,24,32,40,48,57,64,72,
+	9,18,27,36,45,54,63,72,81
+	));
+	time = abstime() - time;
+	e.log("create matrix " + time);
+	
+	// O(N**2)
+	// N=9 --> 1.1s (benchmark)
+	// N=3 --> 0.12s (calculated)
+	// N=2 --> 0.054s (calculated)
+	time = abstime();
+	s2 = m.to_str();
+	time = abstime() - time;
+	e.assert(s1 == s2, "error 1");
+	e.log("to_str   " + time);
+	
+	// O(N**3)
+	// N=9 --> 7.1s (benchmark)
+	// N=3 --> 0.26s (calculated)
+	// N=2 --> 0.078s (calculated)
+	time = abstime();
+	m2 = m.mul(m);
+	time = abstime() - time;
+	e.log("mul " + time);
+	
+	e.log("---benchmark--end----");
+}
+
+// End of file benchmark_matrix.cbot
