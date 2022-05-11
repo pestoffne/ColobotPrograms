@@ -95,6 +95,22 @@ public class TestMatrix_float extends EBoost {
 		// assert
 		assert(s1 == s2, "test_to_str: error s1 != s2");
 	}
+	
+	void test_matrix_zeros() {
+		Matrix_float m1, m2;
+		
+		// prepare
+		m1 = new Matrix_float(3, 2, matrix_values(
+			0, 0, 0,
+			0, 0, 0
+		));
+		
+		// test
+		m2 = matrix_zeros_float(3, 2);
+		
+		// assert
+		assert(m1.eq(m2), "test_matrix_zeros: error m1 != m2");
+	}
 }
 
 extern void Test_Matrix_float() {
@@ -103,5 +119,6 @@ extern void Test_Matrix_float() {
 	t.test_matrix_mul_e();
 	t.test_matrix_mul();
 	t.test_to_str();
+	t.test_matrix_zeros();
 	message("Tests passed", DisplayInfo);
 }
