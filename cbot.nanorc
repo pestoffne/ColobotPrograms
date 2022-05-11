@@ -40,11 +40,13 @@ color blue start="/\*" end="\*/"
 
 # Templates
 color white,blue "\<(NAMED_TUPLE)\>"
+color white,blue "\<(CAT)\>\((~|_|[[:alpha:]])+,[[:space:]]*(~|_|[[:alpha:]])+,[[:space:]]*(~|_|[[:alpha:]])+\)"
 color white,blue "\<(CAT|CMP|REPEAT)\>\((~|_|[[:alpha:]])+,[[:space:]]*(~|_|[[:alpha:]])+\)"
 color white,blue "\<(TEMPLATE)\>\((~|_|[[:alpha:]])+\)"
-color white,cyan "\<(TYPE|KEY|VALUE|NULL|KEY_NULL|VALUE_NULL|ZERO)\>"
+color white,cyan "\<(TYPE|KEY|VALUE|NULL|KEY_NULL|VALUE_NULL|ZERO|SIZE|ONE)\>"
 
 # Preprocessor
 color brightgreen "^[[:space:]]*#[[:space:]]*include[[:space:]]+<[^[:blank:]=]*>"
 color brightcyan "^[[:space:]]*#[[:space:]]*(define|else|endif|include(_next)?|undef)\>"
 color brightcyan start="^[[:space:]]*#[[:space:]]*(if(n?def)?|elif|warning|error|pragma)\>" end="(\`|[^\\])$"
+color blue "^[[:space:]]*##.*"
