@@ -1,7 +1,7 @@
 #include <macro.cbot>
 
 NAMED_TUPLE(CAT(MatrixElem_, TYPE), 3,
-	TYPE, value, = NULL,
+	TYPE, value, = ZERO,
 	CAT(MatrixElem_, TYPE), right, = null,
 	CAT(MatrixElem_, TYPE), down, = null)
 
