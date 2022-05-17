@@ -33,6 +33,21 @@ return this;
 }
 }
 
+public class MatrixIteratorVertical_float extends MatrixIterator_float {
+public void MatrixIteratorVertical_float(MatrixElem_float elem) {
+this._elem = elem;
+}
+
+public MatrixIteratorVertical_float copy() {
+return new MatrixIteratorVertical_float(this._elem);
+}
+
+public MatrixIteratorVertical_float shift() {
+this._elem = this._elem.down;
+return this;
+}
+}
+
 public class Matrix_float {
 private MatrixElem_float _root;
 private int _width;
@@ -80,6 +95,14 @@ return new MatrixIterator_float(this._root);
 
 public MatrixIterator_float end() {
 return new MatrixIterator_float(null);
+}
+
+public MatrixIteratorVertical_float vbegin() {
+return new MatrixIteratorVertical_float(this._root);
+}
+
+public MatrixIteratorVertical_float vend() {
+return new MatrixIteratorVertical_float(null);
 }
 
 public bool eq(Matrix_float that) {

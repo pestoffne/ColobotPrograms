@@ -47,6 +47,21 @@ public class CAT(MatrixIterator_, TYPE) {
 	}
 }
 
+public class CAT(MatrixIteratorVertical_, TYPE) extends CAT(MatrixIterator_, TYPE) {
+	public void CAT(MatrixIteratorVertical_, TYPE)(CAT(MatrixElem_, TYPE) elem) {
+		this._elem = elem;
+	}
+	
+	public CAT(MatrixIteratorVertical_, TYPE) copy() {
+		return new CAT(MatrixIteratorVertical_, TYPE)(this._elem);
+	}
+	
+	public CAT(MatrixIteratorVertical_, TYPE) shift() {
+		this._elem = this._elem.down;
+		return this;
+	}
+}
+
 public class CAT(Matrix_, TYPE) {
 	private CAT(MatrixElem_, TYPE) _root;
 	private int _width;
@@ -94,6 +109,14 @@ public class CAT(Matrix_, TYPE) {
 	
 	public CAT(MatrixIterator_, TYPE) end() {
 		return new CAT(MatrixIterator_, TYPE)(null);
+	}
+	
+	public CAT(MatrixIteratorVertical_, TYPE) vbegin() {
+		return new CAT(MatrixIteratorVertical_, TYPE)(this._root);
+	}
+	
+	public CAT(MatrixIteratorVertical_, TYPE) vend() {
+		return new CAT(MatrixIteratorVertical_, TYPE)(null);
 	}
 	
 	public bool eq(CAT(Matrix_, TYPE) that) {
