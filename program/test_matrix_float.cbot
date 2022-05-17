@@ -208,7 +208,7 @@ public class TestMatrix_float extends EBoost {
 		));
 		
 		// test
-		m1.add(m2);
+		m1.add_mut(m2);
 		
 		// assert
 		assert(m1.eq(m3), "test_add_matrix: error");

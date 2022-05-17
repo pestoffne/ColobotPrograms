@@ -194,7 +194,7 @@ public class CAT(Matrix_, TYPE) {
 		return null;
 	}
 	
-	public void add(CAT(Matrix_, TYPE) that) {
+	public void add_mut(CAT(Matrix_, TYPE) that) {
 		CAT(MatrixElem_, TYPE) p1, p2;
 		
 		p1 = this._root;

@@ -180,7 +180,7 @@ nan * 0;
 return null;
 }
 
-public void add(Matrix_float that) {
+public void add_mut(Matrix_float that) {
 MatrixElem_float p1, p2;
 
 p1 = this._root;
