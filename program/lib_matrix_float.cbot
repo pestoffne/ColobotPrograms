@@ -180,6 +180,10 @@ nan * 0;
 return null;
 }
 
+public void transpose_mut() {
+nan * 0;
+}
+
 public void add_mut(Matrix_float that) {
 MatrixElem_float p1, p2;
 

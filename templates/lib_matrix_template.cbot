@@ -194,6 +194,10 @@ public class CAT(Matrix_, TYPE) {
 		return null;
 	}
 	
+	public void transpose_mut() {
+		nan * 0;  // Not implemented
+	}
+	
 	public void add_mut(CAT(Matrix_, TYPE) that) {
 		CAT(MatrixElem_, TYPE) p1, p2;
 		
