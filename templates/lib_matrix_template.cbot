@@ -194,6 +194,10 @@ public class CAT(Matrix_, TYPE) {
 		return null;
 	}
 	
+	public void add(CAT(Matrix_, TYPE) that) {
+		nan * 0;  // Not implemented
+	}
+	
 	private CAT(MatrixElem_, TYPE) _mul_helper(CAT(MatrixElem_, TYPE) p_this, CAT(MatrixElem_, TYPE) p_that) {
 		CAT(MatrixElem_, TYPE) acc;
 		

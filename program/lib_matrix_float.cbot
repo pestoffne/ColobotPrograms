@@ -180,6 +180,10 @@ nan * 0;
 return null;
 }
 
+public void add(Matrix_float that) {
+nan * 0;
+}
+
 private MatrixElem_float _mul_helper(MatrixElem_float p_this, MatrixElem_float p_that) {
 MatrixElem_float acc;
 
