@@ -181,7 +181,16 @@ return null;
 }
 
 public void add(Matrix_float that) {
-nan * 0;
+MatrixElem_float p1, p2;
+
+p1 = this._root;
+p2 = that._root;
+
+repeat (this._width * this._height) {
+p1.value += p2.value;
+p1 = p1.right;
+p2 = p2.right;
+}
 }
 
 private MatrixElem_float _mul_helper(MatrixElem_float p_this, MatrixElem_float p_that) {
