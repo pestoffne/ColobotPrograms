@@ -15,6 +15,7 @@ NAMED_TUPLE(CAT(MatrixElem_, TYPE), 3,
 		return p0; \
 	}
 
+MATRIX_VALUES(3)
 MATRIX_VALUES(5)
 MATRIX_VALUES(8)
 
@@ -181,6 +182,11 @@ public class CAT(Matrix_, TYPE) {
 	public TYPE determenant() {
 		nan * 0;  // Not implemented
 		return ZERO;
+	}
+	
+	public CAT(Matrix_, TYPE) inverse() {
+		nan * 0;  // Not implemented
+		return null;
 	}
 	
 	private CAT(MatrixElem_, TYPE) _mul_helper(CAT(MatrixElem_, TYPE) p_this, CAT(MatrixElem_, TYPE) p_that) {
