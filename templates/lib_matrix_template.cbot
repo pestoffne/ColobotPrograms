@@ -189,6 +189,11 @@ public class CAT(Matrix_, TYPE) {
 		return null;
 	}
 	
+	public CAT(Matrix_, TYPE) transpose() {
+		nan * 0;  // Not implemented
+		return null;
+	}
+	
 	private CAT(MatrixElem_, TYPE) _mul_helper(CAT(MatrixElem_, TYPE) p_this, CAT(MatrixElem_, TYPE) p_that) {
 		CAT(MatrixElem_, TYPE) acc;
 		

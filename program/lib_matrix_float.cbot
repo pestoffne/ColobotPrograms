@@ -175,6 +175,11 @@ nan * 0;
 return null;
 }
 
+public Matrix_float transpose() {
+nan * 0;
+return null;
+}
+
 private MatrixElem_float _mul_helper(MatrixElem_float p_this, MatrixElem_float p_that) {
 MatrixElem_float acc;
 
