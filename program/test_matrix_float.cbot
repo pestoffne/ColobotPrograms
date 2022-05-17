@@ -131,6 +131,23 @@ public class TestMatrix_float extends EBoost {
 		assert(iter.value() == 6, "test_iterator_vertical: error 6"); iter.shift();
 		assert(iter.is_null());
 	}
+	
+	void test_determenant() {
+		Matrix_float m; float d;
+		
+		// prepare
+		m = new Matrix_float(3, 3, matrix_values(
+			2,  3, 4,
+			9, 10, 5,
+			8,  7, 6
+		));
+		
+		// test
+		d = m.determenant();
+		
+		// assert
+		assert(d == -60, "test_determenant: error");
+	}
 }
 
 extern void Test_Matrix_float() {
@@ -141,5 +158,6 @@ extern void Test_Matrix_float() {
 	t.test_to_str();
 	t.test_matrix_zeros();
 	t.test_iterator_vertical();
+	t.test_determenant();
 	message("Tests passed", DisplayInfo);
 }
