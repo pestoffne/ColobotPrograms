@@ -132,6 +132,34 @@ public class TestMatrix_float extends EBoost {
 		assert(iter.is_null());
 	}
 	
+	void test_copy() {
+		Matrix_float m1, m2, m3, m4; MatrixElem_float r1;
+		
+		// prepare
+		r1 = matrix_values(
+			1, 2,
+			3, 4
+		);
+		m1 = new Matrix_float(2, 2, r1);
+		m2 = new Matrix_float(2, 2, matrix_values(
+			1, 2,
+			3, 4
+		));
+		m3 = new Matrix_float(2, 2, matrix_values(
+			0, 3,
+			2, 4
+		));
+		
+		// test
+		m4 = m1.copy();
+		m1.transpose_mut();
+		r1.value = 0;
+		
+		// assert
+		assert(m2.eq(m4), "test_copy: error incorrect copy");
+		assert(m1.eq(m3), "test_copt: error unexpected change");
+	}
+	
 	void test_determenant() {
 		Matrix_float m; float d;
 		
@@ -244,6 +272,7 @@ extern void Test_Matrix_float() {
 	t.test_to_str();
 	t.test_matrix_zeros();
 	t.test_iterator_vertical();
+	t.test_copy();
 	t.test_determenant();
 	t.test_inverse();
 	t.test_transpose();

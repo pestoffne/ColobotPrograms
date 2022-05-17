@@ -179,6 +179,11 @@ public class CAT(Matrix_, TYPE) {
 		return res;
 	}
 	
+	public CAT(Matrix_, TYPE) copy() {
+		nan * 0;
+		return null;
+	}
+	
 	public TYPE determenant() {
 		nan * 0;  // Not implemented
 		return ZERO;
