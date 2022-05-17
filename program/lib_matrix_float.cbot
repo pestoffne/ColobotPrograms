@@ -181,7 +181,13 @@ return null;
 }
 
 public void transpose_mut() {
-nan * 0;
+MatrixElem_float p, tmp;
+
+for (p = this._root; p != null; p = p.right) {
+tmp = p.right;
+p.right = p.down;
+p.down = tmp;
+}
 }
 
 public void add_mut(Matrix_float that) {

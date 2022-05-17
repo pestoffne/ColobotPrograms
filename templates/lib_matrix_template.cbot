@@ -195,7 +195,13 @@ public class CAT(Matrix_, TYPE) {
 	}
 	
 	public void transpose_mut() {
-		nan * 0;  // Not implemented
+		CAT(MatrixElem_, TYPE) p, tmp;
+		
+		for (p = this._root; p != null; p = p.right) {
+			tmp = p.right;
+			p.right = p.down;
+			p.down = tmp;
+		}
 	}
 	
 	public void add_mut(CAT(Matrix_, TYPE) that) {
