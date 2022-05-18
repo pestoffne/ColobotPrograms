@@ -1,32 +1,57 @@
 public class TestMatrix_float extends EBoost {
-	void test_internal_structure() {
-		Matrix_float mat; MatrixElem_float root, p;
+	private MatrixElem_float _elem_at(MatrixElem_float p, int x, int y) {
+		repeat (x) {
+			p = p.right;
+		}
 		
-		// prepare
-		root = matrix_values(
-			1.0, 2.0, 3.0,
-			4.0, 5.0, 6.0
-		);
-		mat = new Matrix_float(3, 2, root);
+		repeat (y) {
+			p = p.down;
+		}
+
+		return p;
+	}
+	
+	private bool _check_structure(Matrix_float m) {
+		MatrixElem_float p1, p2, root, last; int width, width_m1, height_m1;
 		
-		// test and assert
-		p = root;
-		assert_equal(p.value, 1.0); p = p.right;
-		assert_equal(p.value, 2.0); p = p.right;
-		assert_equal(p.value, 3.0); p = p.right;
-		assert_equal(p.value, 4.0); p = p.right;
-		assert_equal(p.value, 5.0); p = p.right;
-		assert_equal(p.value, 6.0); p = p.right;
-		assert(p == null, "test_internal_structure: error last right link is not null");
+		width = m.width();
+		width_m1 = width - 1;
+		height_m1 = m.height() - 1;
+		root = m._root();
+		last = _elem_at(root, width_m1, height_m1);
 		
-		p = root;
-		assert_equal(p.value, 1.0); p = p.down;
-		assert_equal(p.value, 4.0); p = p.down;
-		assert_equal(p.value, 2.0); p = p.down;
-		assert_equal(p.value, 5.0); p = p.down;
-		assert_equal(p.value, 3.0); p = p.down;
-		assert_equal(p.value, 6.0); p = p.down;
-		assert(p == null, "test_internal_structure: error last down link is not null");
+		// check last
+		if (last.right != null or last.down != null) {
+			return false;
+		}
+		
+		// check line 1
+		p1 = _elem_at(root, 0, height_m1);
+		p2 = root;
+		
+		repeat (width_m1) {
+			if (p1.down != p2.right) {
+				return false;
+			}
+			
+			p1 = p1.right;
+			p2 = p2.right;
+		}
+		
+		// check lines 2, 3, ...
+		p1 = root;
+		p2 = _elem_at(root, width_m1, 0);
+		
+		repeat (width * height_m1) {
+			if (p1.down != p2.right) {
+				return false;
+			}
+			
+			p1 = p1.right;
+			p2 = p2.right;
+		}
+		
+		return true;
 	}
 	
 	void test_matrix_mul_e() {
@@ -48,6 +73,8 @@ public class TestMatrix_float extends EBoost {
 		// assert
 		assert(m1.eq(m2), "test_matrix_mul_e: error m1 != m2");
 		assert(m1.eq(m3), "test_matrix_mul_e: error m1 != m3");
+		assert(_check_structure(m2), "test_matrix_mul_e: error m2 structure");
+		assert(_check_structure(m3), "test_matrix_mul_e: error m3 structure");
 	}
 	
 	void test_matrix_mul() {
@@ -76,6 +103,7 @@ public class TestMatrix_float extends EBoost {
 		
 		// assert
 		assert(m3.eq(m4), "test_matrix_mul: error m3 != m4");
+		assert(_check_structure(m4), "test_matrix_mul: error m4 structure");
 	}
 	
 	void test_to_str() {
@@ -110,6 +138,28 @@ public class TestMatrix_float extends EBoost {
 		
 		// assert
 		assert(m1.eq(m2), "test_matrix_zeros: error m1 != m2");
+		assert(_check_structure(m2), "test_matrix_zeros: error m2 structure");
+	}
+	
+	void test_iterator() {
+		Matrix_float m; MatrixIterator_float iter;
+		
+		// prepare
+		m = new Matrix_float(2, 3, matrix_values(
+			1, 2,
+			3, 4,
+			5, 6
+		));
+		
+		// test, assert
+		iter = m.begin();
+		assert(iter.value() == 1, "test_iterator: error 1"); iter.shift();
+		assert(iter.value() == 2, "test_iterator: error 2"); iter.shift();
+		assert(iter.value() == 3, "test_iterator: error 3"); iter.shift();
+		assert(iter.value() == 4, "test_iterator: error 4"); iter.shift();
+		assert(iter.value() == 5, "test_iterator: error 5"); iter.shift();
+		assert(iter.value() == 6, "test_iterator: error 6"); iter.shift();
+		assert(iter.is_null());
 	}
 	
 	void test_iterator_vertical() {
@@ -158,6 +208,8 @@ public class TestMatrix_float extends EBoost {
 		// assert
 		assert(m2.eq(m4), "test_copy: error incorrect copy");
 		assert(m1.eq(m3), "test_copt: error unexpected change");
+		assert(_check_structure(m1), "test_copy: error m1 structure");
+		assert(_check_structure(m4), "test_copy: error m4 structure");
 	}
 	
 	void test_determenant() {
@@ -195,6 +247,7 @@ public class TestMatrix_float extends EBoost {
 		
 		// assert
 		assert(m2.eq(m3), "test_inverse: error");
+		assert(_check_structure(m3), "test_inverse: error m3 structure");
 	}
 	
 	void test_transpose() {
@@ -216,6 +269,7 @@ public class TestMatrix_float extends EBoost {
 		
 		// assert
 		assert(m2.eq(m3), "test_transpose: error");
+		assert(_check_structure(m3), "test_transpose: error m3 structure");
 	}
 	
 	void test_transpose_mut() {
@@ -237,6 +291,7 @@ public class TestMatrix_float extends EBoost {
 		
 		// assert
 		assert(m1.eq(m2), "test_transpose_mut: error");
+		assert(_check_structure(m1), "test_transpose_mut: error m1 structure");
 	}
 	
 	void test_add_matrix() {
@@ -261,16 +316,17 @@ public class TestMatrix_float extends EBoost {
 		
 		// assert
 		assert(m1.eq(m3), "test_add_matrix: error");
+		assert(_check_structure(m1), "test_add_matrix: error m1 structure");
 	}
 }
 
 extern void Test_Matrix_float() {
 	TestMatrix_float t();
-	t.test_internal_structure();
 	t.test_matrix_mul_e();
 	t.test_matrix_mul();
 	t.test_to_str();
 	t.test_matrix_zeros();
+	t.test_iterator();
 	t.test_iterator_vertical();
 	t.test_copy();
 	t.test_determenant();

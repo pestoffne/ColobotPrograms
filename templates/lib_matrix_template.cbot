@@ -68,6 +68,10 @@ public class CAT(Matrix_, TYPE) {
 	private int _width;
 	private int _height;
 	
+	public /* only for tests */ CAT(MatrixElem_, TYPE) _root() {
+		return this._root;
+	}
+	
 	private void _set_shape() {
 		CAT(MatrixElem_, TYPE) p1, p2;
 		
