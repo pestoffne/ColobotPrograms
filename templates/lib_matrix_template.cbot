@@ -225,9 +225,73 @@ public class CAT(Matrix_, TYPE) {
 		return new CAT(Matrix_, TYPE)(this._width, this._height, this._copy_values());
 	}
 	
+	private CAT(MatrixElem_, TYPE) _at_y(int y) {
+		CAT(MatrixElem_, TYPE) p;
+		
+		p = this._root;
+		
+                repeat (y) {
+                        p = p.down;
+                }
+		
+                return p;
+	}
+	
+	private void _add_row_mut(CAT(MatrixElem_, TYPE) p_from, CAT(MatrixElem_, TYPE) p_to, TYPE coef) {
+		for (;;) {
+			p_to.value += p_from.value * coef;
+			
+			p_to = p_to.right;
+			
+			if (p_to == null) {
+				break;
+			}
+			
+			p_from = p_from.right;
+		}
+	}
+	
+	private void _triangulate_mut() {
+		CAT(MatrixElem_, TYPE) p; int x, y;
+		
+		for (y = this._width - 2; y >= 0; --y) {
+			p = this._at_y(y);
+			x = this._width - y - 1;
+			
+			for (;;) {
+				this._add_row_mut(p, p.down, -p.down.value / p.value);
+				
+				if (--x <= 0) {
+					break;
+				}
+				
+				p = p.right.down;
+			}
+		}
+	}
+	
 	public TYPE determenant() {
-		nan * 0;  // Not implemented
-		return ZERO;
+		CAT(Matrix_, TYPE) m; CAT(MatrixElem_, TYPE) p; TYPE acc;
+		
+		m = this.copy();
+		m._triangulate_mut();
+		
+		// assume width == height
+		// assume there is at least one element
+		acc = 1;
+		p = m._root;
+		
+		for (;;) {
+			acc *= p.value;
+			
+			if (p.right == null) {
+				break;
+			}
+			
+			p = p.right.down;
+		}
+		
+		return acc;
 	}
 	
 	public CAT(Matrix_, TYPE) inverse() {

@@ -211,9 +211,73 @@ public Matrix_float copy() {
 return new Matrix_float(this._width, this._height, this._copy_values());
 }
 
+private MatrixElem_float _at_y(int y) {
+MatrixElem_float p;
+
+p = this._root;
+
+repeat (y) {
+p = p.down;
+}
+
+return p;
+}
+
+private void _add_row_mut(MatrixElem_float p_from, MatrixElem_float p_to, float coef) {
+for (;;) {
+p_to.value += p_from.value * coef;
+
+p_to = p_to.right;
+
+if (p_to == null) {
+break;
+}
+
+p_from = p_from.right;
+}
+}
+
+private void _triangulate_mut() {
+MatrixElem_float p; int x, y;
+
+for (y = this._width - 2; y >= 0; --y) {
+p = this._at_y(y);
+x = this._width - y - 1;
+
+for (;;) {
+this._add_row_mut(p, p.down, -p.down.value / p.value);
+
+if (--x <= 0) {
+break;
+}
+
+p = p.right.down;
+}
+}
+}
+
 public float determenant() {
-nan * 0;
-return 0.0;
+Matrix_float m; MatrixElem_float p; float acc;
+
+m = this.copy();
+m._triangulate_mut();
+
+
+
+acc = 1;
+p = m._root;
+
+for (;;) {
+acc *= p.value;
+
+if (p.right == null) {
+break;
+}
+
+p = p.right.down;
+}
+
+return acc;
 }
 
 public Matrix_float inverse() {
