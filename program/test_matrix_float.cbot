@@ -211,6 +211,23 @@ public class TestMatrix_float extends EBoost {
 		assert(_check_structure(m4), "test_copy: error m4 structure");
 	}
 	
+	void test_determenant_0() {
+		Matrix_float m; float d;
+		
+		// prepare
+		m = new Matrix_float(3, 3, matrix_values(
+			1, 2, 3,
+			4, 5, 6,
+			7, 8, 9
+		));
+		
+		// test
+		d = m.determenant();
+		
+		// assert
+		assert(d == 0, "test_determenant_0: error");
+	}
+	
 	void test_determenant() {
 		Matrix_float m; float d;
 		
@@ -328,6 +345,7 @@ extern void Test_Matrix_float() {
 	t.test_iterator();
 	t.test_iterator_vertical();
 	t.test_copy();
+	t.test_determenant_0();
 	t.test_determenant();
 	t.test_inverse();
 	t.test_transpose();
