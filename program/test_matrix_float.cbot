@@ -186,11 +186,10 @@ public class TestMatrix_float extends EBoost {
 		Matrix_float m1, m2, m3, m4; MatrixElem_float r1;
 		
 		// prepare
-		r1 = matrix_values(
+		m1 = new Matrix_float(2, 2, r1 = matrix_values(
 			1, 2,
 			3, 4
-		);
-		m1 = new Matrix_float(2, 2, r1);
+		));
 		m2 = new Matrix_float(2, 2, matrix_values(
 			1, 2,
 			3, 4
@@ -207,7 +206,7 @@ public class TestMatrix_float extends EBoost {
 		
 		// assert
 		assert(m2.eq(m4), "test_copy: error incorrect copy");
-		assert(m1.eq(m3), "test_copt: error unexpected change");
+		assert(m1.eq(m3), "test_copy: error unexpected change");
 		assert(_check_structure(m1), "test_copy: error m1 structure");
 		assert(_check_structure(m4), "test_copy: error m4 structure");
 	}
