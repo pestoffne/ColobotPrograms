@@ -17,7 +17,7 @@ endef
 
 define generate_matrix
 	echo '// Generated file.' > $(1)
-	cpp -I$(INCLUDE_DIR) -D='TYPE $(2)' -D='ZERO $(3)' $(4) |\
+	cpp -I$(INCLUDE_DIR) -D='TYPE $(2)' -D='ZERO $(3)' -D='ONE $(4)' $(5) |\
 		grep -v '^#' | awk '{$$1=$$1};1' >> $(1)
 endef
 
