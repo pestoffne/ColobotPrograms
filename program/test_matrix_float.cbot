@@ -205,7 +205,7 @@ public class TestMatrix_float extends EBoost {
 			1, 2, 3,
 			4, 5, 6
 		));
-		m2 = new Matrix_float(3, 2, matrix_values(
+		m2 = new Matrix_float(2, 3, matrix_values(
 			1, 4,
 			2, 5,
 			3, 6
@@ -226,7 +226,7 @@ public class TestMatrix_float extends EBoost {
 			1, 2, 3,
 			4, 5, 6
 		));
-		m2 = new Matrix_float(3, 2, matrix_values(
+		m2 = new Matrix_float(2, 3, matrix_values(
 			1, 4,
 			2, 5,
 			3, 6
