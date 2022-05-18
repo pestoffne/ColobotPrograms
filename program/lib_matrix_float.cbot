@@ -165,9 +165,21 @@ res += "]";
 return res;
 }
 
+private MatrixElem_float _copy_values() {
+MatrixElem_float p1, p2, root;
+
+
+root = p2 = new MatrixElem_float(this._root.value);
+
+for (p1 = this._root.right; p1 != null; p1 = p1.right) {
+p2 = p2.right = new MatrixElem_float(p1.value);
+}
+
+return root;
+}
+
 public Matrix_float copy() {
-nan * 0;
-return null;
+return new Matrix_float(this._width, this._height, this._copy_values());
 }
 
 public float determenant() {

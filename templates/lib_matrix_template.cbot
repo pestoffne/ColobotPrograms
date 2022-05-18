@@ -179,9 +179,21 @@ public class CAT(Matrix_, TYPE) {
 		return res;
 	}
 	
+	private CAT(MatrixElem_, TYPE) _copy_values() {
+		CAT(MatrixElem_, TYPE) p1, p2, root;
+		
+		// assume there is at least one element in matrix
+		root = p2 = new CAT(MatrixElem_, TYPE)(this._root.value);
+		
+		for (p1 = this._root.right; p1 != null; p1 = p1.right) {
+			p2 = p2.right = new CAT(MatrixElem_, TYPE)(p1.value);
+		}
+		
+		return root;
+	}
+	
 	public CAT(Matrix_, TYPE) copy() {
-		nan * 0;
-		return null;
+		return new CAT(Matrix_, TYPE)(this._width, this._height, this._copy_values());
 	}
 	
 	public TYPE determenant() {
