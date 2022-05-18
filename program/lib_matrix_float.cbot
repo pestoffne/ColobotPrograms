@@ -190,6 +190,19 @@ p2 = p2.right = new MatrixElem_float(p1.value);
 return root;
 }
 
+private MatrixElem_float _copy_transposed() {
+MatrixElem_float p1, p2, root;
+
+
+root = p2 = new MatrixElem_float(this._root.value);
+
+for (p1 = this._root.down; p1 != null; p1 = p1.down) {
+p2 = p2.right = new MatrixElem_float(p1.value);
+}
+
+return root;
+}
+
 public Matrix_float copy() {
 return new Matrix_float(this._width, this._height, this._copy_values());
 }
@@ -205,8 +218,7 @@ return null;
 }
 
 public Matrix_float transpose() {
-nan * 0;
-return null;
+return new Matrix_float(this._height, this._width, this._copy_transposed());
 }
 
 public void transpose_mut() {

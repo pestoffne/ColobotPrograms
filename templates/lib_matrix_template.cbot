@@ -204,6 +204,19 @@ public class CAT(Matrix_, TYPE) {
 		return root;
 	}
 	
+	private CAT(MatrixElem_, TYPE) _copy_transposed() {
+		CAT(MatrixElem_, TYPE) p1, p2, root;
+		
+		// assume there is at least one element in matrix
+		root = p2 = new CAT(MatrixElem_, TYPE)(this._root.value);
+		
+		for (p1 = this._root.down; p1 != null; p1 = p1.down) {
+			p2 = p2.right = new CAT(MatrixElem_, TYPE)(p1.value);
+		}
+		
+		return root;
+	}
+	
 	public CAT(Matrix_, TYPE) copy() {
 		return new CAT(Matrix_, TYPE)(this._width, this._height, this._copy_values());
 	}
@@ -219,8 +232,7 @@ public class CAT(Matrix_, TYPE) {
 	}
 	
 	public CAT(Matrix_, TYPE) transpose() {
-		nan * 0;  // Not implemented
-		return null;
+		return new CAT(Matrix_, TYPE)(this._height, this._width, this._copy_transposed());
 	}
 	
 	public void transpose_mut() {
