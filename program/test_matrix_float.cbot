@@ -242,7 +242,7 @@ public class TestMatrix_float extends EBoost {
 		d = m.determenant();
 		
 		// assert
-		assert(d == -60, "test_determenant: error");
+		assert(abs(d + 60) < 0.001, "test_determenant: error");
 	}
 	
 	void test_inverse() {
