@@ -120,6 +120,18 @@ public class CAT(Matrix_, TYPE) {
 		return new CAT(MatrixIteratorVertical_, TYPE)(null);
 	}
 	
+	public int width() {
+		return this._width;
+	}
+	
+	public int height() {
+		return this._height;
+	}
+	
+	public int count() {
+		return this._width * this._height;
+	}
+	
 	public bool eq(CAT(Matrix_, TYPE) that) {
 		CAT(MatrixElem_, TYPE) p1, p2;
 		

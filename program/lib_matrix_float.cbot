@@ -106,6 +106,18 @@ public MatrixIteratorVertical_float vend() {
 return new MatrixIteratorVertical_float(null);
 }
 
+public int width() {
+return this._width;
+}
+
+public int height() {
+return this._height;
+}
+
+public int count() {
+return this._width * this._height;
+}
+
 public bool eq(Matrix_float that) {
 MatrixElem_float p1, p2;
 
