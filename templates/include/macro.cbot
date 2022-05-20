@@ -30,6 +30,12 @@
 #define _REPEAT_7(macro) _REPEAT_6(macro) macro(7)
 #define _REPEAT_8(macro) _REPEAT_7(macro) macro(8)
 #define _REPEAT_9(macro) _REPEAT_8(macro) macro(9)
+#define _REPEAT_10(macro) _REPEAT_9(macro) macro(10)
+#define _REPEAT_11(macro) _REPEAT_10(macro) macro(11)
+#define _REPEAT_12(macro) _REPEAT_11(macro) macro(12)
+#define _REPEAT_13(macro) _REPEAT_12(macro) macro(13)
+#define _REPEAT_14(macro) _REPEAT_13(macro) macro(14)
+#define _REPEAT_15(macro) _REPEAT_14(macro) macro(15)
 
 #define _CAT(a, b) a ## b
 #define CAT(a, b) _CAT(a, b)
