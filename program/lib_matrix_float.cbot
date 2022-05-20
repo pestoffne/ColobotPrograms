@@ -224,35 +224,41 @@ p = p.down;
 return p;
 }
 
-private void _add_row_mut(MatrixElem_float p_from, MatrixElem_float p_to, float coef) {
-for (;;) {
+private void _add_row_mut(MatrixElem_float p_from, MatrixElem_float p_to,
+float coef, int width_m1) {
 p_to.value += p_from.value * coef;
 
+repeat (width_m1) {
 p_to = p_to.right;
-
-if (p_to == null) {
-break;
-}
-
 p_from = p_from.right;
+p_to.value += p_from.value * coef;
 }
 }
 
 private void _triangulate_mut() {
-MatrixElem_float p; int x, y;
+MatrixElem_float p_diag, p_i; int x, size;
 
-for (y = this._width - 2; y >= 0; --y) {
-p = this._at_y(y);
-x = this._width - y - 1;
 
-for (;;) {
-this._add_row_mut(p, p.down, -p.down.value / p.value);
+size = this._width;
+p_diag = this._root;
+x = size - 1;
 
-if (--x <= 0) {
-break;
+p_i = p_diag;
+
+repeat (x) {
+p_i = p_i.down;
+this._add_row_mut(p_diag, p_i, -p_i.value / p_diag.value, x);
 }
 
-p = p.right.down;
+repeat (x) {
+--x;
+p_diag = p_diag.right.down;
+
+p_i = p_diag;
+
+repeat (x) {
+p_i = p_i.down;
+this._add_row_mut(p_diag, p_i, -p_i.value / p_diag.value, x);
 }
 }
 }

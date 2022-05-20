@@ -238,35 +238,41 @@ public class CAT(Matrix_, TYPE) {
                 return p;
 	}
 	
-	private void _add_row_mut(CAT(MatrixElem_, TYPE) p_from, CAT(MatrixElem_, TYPE) p_to, TYPE coef) {
-		for (;;) {
-			p_to.value += p_from.value * coef;
-			
+	private void _add_row_mut(CAT(MatrixElem_, TYPE) p_from, CAT(MatrixElem_, TYPE) p_to,
+	TYPE coef, int width_m1) {
+		p_to.value += p_from.value * coef;
+		
+		repeat (width_m1) {
 			p_to = p_to.right;
-			
-			if (p_to == null) {
-				break;
-			}
-			
 			p_from = p_from.right;
+			p_to.value += p_from.value * coef;
 		}
 	}
 	
 	private void _triangulate_mut() {
-		CAT(MatrixElem_, TYPE) p; int x, y;
+		CAT(MatrixElem_, TYPE) p_diag, p_i; int x, size;
 		
-		for (y = this._width - 2; y >= 0; --y) {
-			p = this._at_y(y);
-			x = this._width - y - 1;
+		// assume width == height
+		size = this._width;
+		p_diag = this._root;
+		x = size - 1;
+		
+		p_i = p_diag;
+		
+		repeat (x) {
+			p_i = p_i.down;
+			this._add_row_mut(p_diag, p_i, -p_i.value / p_diag.value, x);
+		}
+		
+		repeat (x) {
+			--x;
+			p_diag = p_diag.right.down;
 			
-			for (;;) {
-				this._add_row_mut(p, p.down, -p.down.value / p.value);
-				
-				if (--x <= 0) {
-					break;
-				}
-				
-				p = p.right.down;
+			p_i = p_diag;
+			
+			repeat (x) {
+				p_i = p_i.down;
+				this._add_row_mut(p_diag, p_i, -p_i.value / p_diag.value, x);
 			}
 		}
 	}
