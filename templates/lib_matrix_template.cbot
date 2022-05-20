@@ -72,7 +72,7 @@ public class CAT(Matrix_, TYPE) {
 		return this._root;
 	}
 	
-	private void _set_shape() {
+	private void _set_shape_mut() {
 		CAT(MatrixElem_, TYPE) p1, p2;
 		
 		p1 = p2 = this._root;
@@ -105,7 +105,7 @@ public class CAT(Matrix_, TYPE) {
 		this._width = width;
 		this._height = height;
 		this._root = values;
-		this._set_shape();
+		this._set_shape_mut();
 	}
 	
 	public CAT(MatrixIterator_, TYPE) begin() {

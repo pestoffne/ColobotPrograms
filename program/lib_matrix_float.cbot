@@ -58,7 +58,7 @@ public MatrixElem_float _root() {
 return this._root;
 }
 
-private void _set_shape() {
+private void _set_shape_mut() {
 MatrixElem_float p1, p2;
 
 p1 = p2 = this._root;
@@ -91,7 +91,7 @@ public void Matrix_float(int width, int height, MatrixElem_float values) {
 this._width = width;
 this._height = height;
 this._root = values;
-this._set_shape();
+this._set_shape_mut();
 }
 
 public MatrixIterator_float begin() {
