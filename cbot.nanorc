@@ -43,6 +43,7 @@ color white,blue "\<(NAMED_TUPLE)\>"
 color white,blue "\<(CAT)\>\((~|_|[[:alpha:]])+,[[:space:]]*(~|_|[[:alpha:]])+,[[:space:]]*(~|_|[[:alpha:]])+\)"
 color white,blue "\<(CAT|CMP|REPEAT)\>\((~|_|[[:alpha:]])+,[[:space:]]*(~|_|[[:alpha:]])+\)"
 color white,blue "\<(TEMPLATE)\>\((~|_|[[:alpha:]])+\)"
+color white,blue "\<(LOOP|MAX_INT|MIN_INT)\>"
 color white,cyan "\<(TYPE|KEY|VALUE|NULL|KEY_NULL|VALUE_NULL|ZERO|SIZE|ONE)\>"
 
 # Preprocessor
