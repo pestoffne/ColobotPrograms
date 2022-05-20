@@ -29,7 +29,7 @@ color brightyellow "\<(detect|radar|radarall|search|direction|distance|distance2
 color brightyellow "\<(pen(down|up|color|width)|canresearch|researched|space|flatspace|topo|flatground)\>"
 color brightyellow "\<(grub|drop|sniff|thump|recycle|shield|fire|aim|build|canbuild|buildingenabled|factory|research|takeoff|busy)\>"
 color brightyellow "\<(receive|send|(test|delete)info)|str(len|left|right|mid|find|val|upper|lower)|open|close|writeln|readln|eof|deletefile\>"
-color brightyellow "\<(rand|pow|sqrt|floor|ceil|round|ceil|round|trunc|sin|cos|tan|asin|acos|atan|atan2)\>"
+color brightyellow "\<(rand|pow|sqrt|floor|ceil|round|ceil|round|trunc|sin|cos|tan|asin|acos|atan|atan2|abs)\>"
 
 # String constants
 color brightgreen ""([^"]|\\")*""
