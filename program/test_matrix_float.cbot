@@ -262,6 +262,23 @@ public class TestMatrix_float extends EBoost {
 		assert(abs(d - 1740) < 0.001, "test_determenant_4x4: error");
 	}
 	
+	void test_determenant_4x4_ones() {
+		Matrix_float m; float d;
+		
+		// prepare
+		m = new Matrix_float(4, 4, matrix_values(
+			0, 0, 0, 1,
+			0, 1, 0, 0,
+			1, 0, 0, 0,
+			0, 0, 1, 0
+		));
+		
+		// test
+		d = m.determenant();
+		
+		assert(abs(d - 1) < 0.001, "test_determenant_4x4_ones: error");
+	}
+	
 	void test_inverse_3x3() {
 		Matrix_float m1, m2, m3;
 		
@@ -392,6 +409,7 @@ extern void Test_Matrix_float() {
 	t.test_determenant_3x3_zero();
 	t.test_determenant_3x3();
 	t.test_determenant_4x4();
+	t.test_determenant_4x4_ones();
 	t.test_inverse_3x3();
 	t.test_inverse_4x4_ones();
 	t.test_transpose();
