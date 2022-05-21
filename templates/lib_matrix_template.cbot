@@ -249,6 +249,15 @@ public class CAT(Matrix_, TYPE) {
 		}
 	}
 	
+	private void _mul_row_mut(CAT(MatrixElem_, TYPE) p, TYPE coef, int width_m1) {
+		p.value *= coef;
+		
+		repeat (width_m1) {
+			p = p.right;
+			p.value *= coef;
+		}
+	}
+	
 	private void _triangulate_mut() {
 		CAT(MatrixElem_, TYPE) p_diag, p_i; int x, size;
 		
@@ -302,8 +311,56 @@ public class CAT(Matrix_, TYPE) {
 	}
 	
 	public CAT(Matrix_, TYPE) inverse() {
-		nan * 0;  // Not implemented
-		return null;
+		CAT(Matrix_, TYPE) m1, m2; TYPE coef; int x, y, size;
+		CAT(MatrixElem_, TYPE) p1_diag, p1_diag_left, p1_diag_top, p1_i, p1_i_left, p2_diag_left, p2_i_left;
+		
+		// assume width == height
+		size = this._width;
+		
+		m1 = this.copy();
+		m2 = CAT(matrix_eye_, TYPE)(size);
+		
+		x = 0;
+		p1_i = p1_i_left = p1_diag = p1_diag_left = p1_diag_top = m1._root;
+		p2_diag_left = p2_i_left = m2._root;
+		
+		LOOP {
+			y = 0;
+			p1_i_left = m1._root;
+			p2_i_left = m2._root;
+			
+			coef = 1 / p1_diag.value;
+			m1._mul_row_mut(p1_diag_left, coef, size - 1);
+			m2._mul_row_mut(p2_diag_left, coef, size - 1);
+			
+			LOOP {
+				if (x != y) {
+					coef = -p1_i.value;
+					m1._add_row_mut(p1_diag_left, p1_i_left, coef, size - 1);
+					m2._add_row_mut(p2_diag_left, p2_i_left, coef, size - 1);
+				}
+				
+				p1_i = p1_i.down;
+				
+				if (++y >= size) {
+					break;
+				}
+				
+				p1_i_left = p1_i_left.down;
+				p2_i_left = p2_i_left.down;
+			}
+			
+			if (++x >= size) {
+				break;
+			}
+			
+			p1_diag = p1_diag.right.down;
+			p1_diag_top = p1_diag_top.right;
+			p1_diag_left = p1_diag_left.down;
+			p2_diag_left = p2_diag_left.down;
+		}
+		
+		return m2;
 	}
 	
 	public CAT(Matrix_, TYPE) transpose() {

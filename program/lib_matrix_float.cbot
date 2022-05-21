@@ -235,6 +235,15 @@ p_to.value += p_from.value * coef;
 }
 }
 
+private void _mul_row_mut(MatrixElem_float p, float coef, int width_m1) {
+p.value *= coef;
+
+repeat (width_m1) {
+p = p.right;
+p.value *= coef;
+}
+}
+
 private void _triangulate_mut() {
 MatrixElem_float p_diag, p_i; int x, size;
 
@@ -288,8 +297,56 @@ return acc;
 }
 
 public Matrix_float inverse() {
-nan * 0;
-return null;
+Matrix_float m1, m2; float coef; int x, y, size;
+MatrixElem_float p1_diag, p1_diag_left, p1_diag_top, p1_i, p1_i_left, p2_diag_left, p2_i_left;
+
+
+size = this._width;
+
+m1 = this.copy();
+m2 = matrix_eye_float(size);
+
+x = 0;
+p1_i = p1_i_left = p1_diag = p1_diag_left = p1_diag_top = m1._root;
+p2_diag_left = p2_i_left = m2._root;
+
+repeat (2147483647) {
+y = 0;
+p1_i_left = m1._root;
+p2_i_left = m2._root;
+
+coef = 1 / p1_diag.value;
+m1._mul_row_mut(p1_diag_left, coef, size - 1);
+m2._mul_row_mut(p2_diag_left, coef, size - 1);
+
+repeat (2147483647) {
+if (x != y) {
+coef = -p1_i.value;
+m1._add_row_mut(p1_diag_left, p1_i_left, coef, size - 1);
+m2._add_row_mut(p2_diag_left, p2_i_left, coef, size - 1);
+}
+
+p1_i = p1_i.down;
+
+if (++y >= size) {
+break;
+}
+
+p1_i_left = p1_i_left.down;
+p2_i_left = p2_i_left.down;
+}
+
+if (++x >= size) {
+break;
+}
+
+p1_diag = p1_diag.right.down;
+p1_diag_top = p1_diag_top.right;
+p1_diag_left = p1_diag_left.down;
+p2_diag_left = p2_diag_left.down;
+}
+
+return m2;
 }
 
 public Matrix_float transpose() {
