@@ -245,6 +245,57 @@ public class TestMatrix_float extends EBoost {
 		assert(abs(d + 60) < 0.001, "test_determenant_3x3: error");
 	}
 	
+	void test_determenant_3x3_swap_1() {
+		Matrix_float m; float d;
+		
+		// prepare
+		m = new Matrix_float(3, 3, matrix_values(
+			0, 0, 1,
+			1, 0, 0,
+			0, 1, 0
+		));
+		
+		// test
+		d = m.determenant();
+		
+		// assert
+		assert(abs(d - 1) < 0.001, "test_determenant_3x3_swap_1: error");
+	}
+	
+	void test_determenant_3x3_swap_2() {
+		Matrix_float m; float d;
+		
+		// prepare
+		m = new Matrix_float(3, 3, matrix_values(
+			0, 0, 1,
+			0, 1, 0,
+			1, 0, 0
+		));
+		
+		// test
+		d = m.determenant();
+		
+		// assert
+		assert(abs(d + 1) < 0.001, "test_determenant_3x3_swap_2: error");
+	}
+	
+	void test_determenant_3x3_swap_3() {
+		Matrix_float m; float d;
+		
+		// prepare
+		m = new Matrix_float(3, 3, matrix_values(
+			1, 0, 0,
+			0, 0, 1,
+			0, 1, 0
+		));
+		
+		// test
+		d = m.determenant();
+		
+		// assert
+		assert(abs(d + 1) < 0.001, "test_determenant_3x3_swap_3: error");
+	}
+	
 	void test_determenant_4x4() {
 		Matrix_float m; float d;
 		
@@ -408,6 +459,9 @@ extern void Test_Matrix_float() {
 	t.test_copy();
 	t.test_determenant_3x3_zero();
 	t.test_determenant_3x3();
+	t.test_determenant_3x3_swap_1();
+	t.test_determenant_3x3_swap_2();
+	t.test_determenant_3x3_swap_3();
 	t.test_determenant_4x4();
 	t.test_determenant_4x4_ones();
 	t.test_inverse_3x3();
