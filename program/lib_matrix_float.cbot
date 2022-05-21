@@ -280,17 +280,12 @@ m._triangulate_mut();
 
 
 
-acc = 1;
 p = m._root;
+acc = p.value;
 
-for (;;) {
-acc *= p.value;
-
-if (p.right == null) {
-break;
-}
-
+repeat (this._width - 1) {
 p = p.right.down;
+acc *= p.value;
 }
 
 return acc;
