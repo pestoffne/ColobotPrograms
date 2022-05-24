@@ -451,5 +451,17 @@ public CAT(Matrix_, TYPE) CAT(matrix_zeros_, TYPE)(int width, int height) {
 	return new CAT(Matrix_, TYPE)(width, height, p0);
 }
 
+public CAT(Matrix_, TYPE) CAT(matrix_full_, TYPE)(int width, int height, TYPE value) {
+	CAT(MatrixElem_, TYPE) p0, p1;
+	
+	p0 = p1 = new CAT(MatrixElem_, TYPE)(value);
+	
+	repeat (width * height - 1) {
+		p1 = p1.right = new CAT(MatrixElem_, TYPE)(value);
+	}
+	
+	return new CAT(Matrix_, TYPE)(width, height, p0);
+}
+
 extern void CAT(Library_Matrix_, TYPE)() {
 }

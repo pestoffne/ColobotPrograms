@@ -437,5 +437,17 @@ p1 = p1.right = new MatrixElem_float(0.0);
 return new Matrix_float(width, height, p0);
 }
 
+public Matrix_float matrix_full_float(int width, int height, float value) {
+MatrixElem_float p0, p1;
+
+p0 = p1 = new MatrixElem_float(value);
+
+repeat (width * height - 1) {
+p1 = p1.right = new MatrixElem_float(value);
+}
+
+return new Matrix_float(width, height, p0);
+}
+
 extern void Library_Matrix_float() {
 }
