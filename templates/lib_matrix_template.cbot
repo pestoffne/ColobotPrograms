@@ -401,7 +401,6 @@ public class CAT(Matrix_, TYPE) {
 		CAT(MatrixElem_, TYPE) p_this, p_that, p_out, p_dummy; CAT(Matrix_, TYPE) res;
 		
 		if (this._width != that._height) {
-			message("Can't multiply matrixes due it's sizes", DisplayError);
 			return null;
 		}
 		

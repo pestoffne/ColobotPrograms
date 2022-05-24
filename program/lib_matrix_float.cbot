@@ -387,7 +387,6 @@ public Matrix_float mul(Matrix_float that) {
 MatrixElem_float p_this, p_that, p_out, p_dummy; Matrix_float res;
 
 if (this._width != that._height) {
-message("Can't multiply matrixes due it's sizes", DisplayError);
 return null;
 }
 

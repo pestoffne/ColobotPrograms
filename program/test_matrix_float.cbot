@@ -78,7 +78,7 @@ public class TestMatrix_float extends EBoost {
 	}
 	
 	void test_matrix_mul() {
-		Matrix_float m1, m2, m3, m4;
+		Matrix_float m1, m2, m3, m4, m5, m6;
 		
 		// prepare
 		m1 = new Matrix_float(2, 3, matrix_values(
@@ -86,24 +86,46 @@ public class TestMatrix_float extends EBoost {
 			3, 4,
 			5, 6
 		));
-		
 		m2 = new Matrix_float(3, 2, matrix_values(
 			7, 8, 9,
 			10, 11, 12
 		));
-		
 		m3 = new Matrix_float(3, 3, matrix_values(
 			27,  30,  33,
 			61,  68,  75,
 			95, 106, 117
 		));
+		m4 = new Matrix_float(2, 2, matrix_values(
+			76, 100,
+			103, 136
+		));
+		
+		// test
+		m5 = m1.mul(m2);
+		m6 = m2.mul(m1);
+		
+		// assert
+		assert(m3.eq(m5), "test_matrix_mul: error m3 != m5");
+		assert(m4.eq(m6), "test_matrix_mul: error m4 != m6");
+		assert(_check_structure(m5), "test_matrix_mul: error m5 structure");
+		assert(_check_structure(m6), "test_matrix_mul: error m6 structure");
+	}
+	
+	void test_matrix_mul_sizes() {
+		Matrix_float m1, m2, m3, m4, m5;
+		
+		// prepare
+		m1 = matrix_full_float(2, 2, 1.0);
+		m2 = matrix_full_float(3, 2, 1.0);
+		m3 = matrix_full_float(3, 2, 2.0);
 		
 		// test
 		m4 = m1.mul(m2);
+		m5 = m2.mul(m1);
 		
 		// assert
-		assert(m3.eq(m4), "test_matrix_mul: error m3 != m4");
-		assert(_check_structure(m4), "test_matrix_mul: error m4 structure");
+		assert(m3.eq(m4), "test_matrix_mul_sizes: error m3 != m4");
+		assert(m5 == null, "test_matrix_mul_sizes: error m5 != null");
 	}
 	
 	void test_to_str() {
@@ -452,6 +474,7 @@ extern void Test_Matrix_float() {
 	TestMatrix_float t();
 	t.test_matrix_mul_e();
 	t.test_matrix_mul();
+	t.test_matrix_mul_sizes();
 	t.test_to_str();
 	t.test_matrix_zeros();
 	t.test_iterator();
