@@ -403,7 +403,7 @@ p_this = p_this.down;
 p_that = that._root;
 }
 
-res = new Matrix_float(this._height, that._width, p_dummy.right);
+res = new Matrix_float(that._width, this._height, p_dummy.right);
 return res;
 }
 }

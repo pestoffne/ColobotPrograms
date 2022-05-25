@@ -417,7 +417,7 @@ public class CAT(Matrix_, TYPE) {
 			p_that = that._root;
 		}
 		
-		res = new CAT(Matrix_, TYPE)(this._height, that._width, p_dummy.right);
+		res = new CAT(Matrix_, TYPE)(that._width, this._height, p_dummy.right);
 		return res;
 	}
 }
