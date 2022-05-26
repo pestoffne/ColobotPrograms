@@ -429,7 +429,7 @@ public class CAT(Matrix_, TYPE) {
 	}
 	
 	public CAT(Matrix_, TYPE) mul(CAT(Matrix_, TYPE) that) {
-		CAT(MatrixElem_, TYPE) p_this, p_that, p_out, p_dummy; CAT(Matrix_, TYPE) res;
+		CAT(MatrixElem_, TYPE) p_this, p_that, p_out, p_dummy;
 		
 		if (this._width != that._height) {
 			return null;
@@ -448,8 +448,7 @@ public class CAT(Matrix_, TYPE) {
 			p_that = that._root;
 		}
 		
-		res = new CAT(Matrix_, TYPE)(that._width, this._height, p_dummy.right);
-		return res;
+		return new CAT(Matrix_, TYPE)(that._width, this._height, p_dummy.right);
 	}
 }
 

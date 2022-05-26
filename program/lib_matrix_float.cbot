@@ -415,7 +415,7 @@ return acc;
 }
 
 public Matrix_float mul(Matrix_float that) {
-MatrixElem_float p_this, p_that, p_out, p_dummy; Matrix_float res;
+MatrixElem_float p_this, p_that, p_out, p_dummy;
 
 if (this._width != that._height) {
 return null;
@@ -434,8 +434,7 @@ p_this = p_this.down;
 p_that = that._root;
 }
 
-res = new Matrix_float(that._width, this._height, p_dummy.right);
-return res;
+return new Matrix_float(that._width, this._height, p_dummy.right);
 }
 }
 
