@@ -193,6 +193,19 @@ public class CAT(Matrix_, TYPE) {
 		return res;
 	}
 	
+	public point to_point() {
+		CAT(MatrixElem_, TYPE) p;
+		
+		p = this._root;
+		
+		// assume matrix count is 2 or 3
+		if (this.count() == 2) {
+			return new point(p.value, p.right.value);
+		}
+		
+		return new point(p.value, p.right.value, p.right.right.value);
+	}
+	
 	private CAT(MatrixElem_, TYPE) _copy_values() {
 		CAT(MatrixElem_, TYPE) p1, p2, root;
 		

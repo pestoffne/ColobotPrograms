@@ -179,6 +179,19 @@ res += "]";
 return res;
 }
 
+public point to_point() {
+MatrixElem_float p;
+
+p = this._root;
+
+
+if (this.count() == 2) {
+return new point(p.value, p.right.value);
+}
+
+return new point(p.value, p.right.value, p.right.right.value);
+}
+
 private MatrixElem_float _copy_values() {
 MatrixElem_float p1, p2, root;
 
