@@ -480,7 +480,32 @@ public class TestMatrix_float extends EBoost {
 		assert(_check_structure(m1), "test_transpose_mut: error m1 structure");
 	}
 	
-	void test_add_matrix() {
+	void test_add() {
+		Matrix_float m1, m2, m3, m4;
+		
+		// prepare
+		m1 = new Matrix_float(3, 2, matrix_values(
+			1, 2, 3,
+			4, 5, 6
+		));
+		m2 = new Matrix_float(3, 2, matrix_values(
+			2, 3, 4,
+			5, 6, 7
+		));
+		m3 = new Matrix_float(3, 2, matrix_values(
+			3,  5,  7,
+			9, 11, 13
+		));
+		
+		// test
+		m4 = m1.add(m2);
+		
+		// assert
+		assert(m3.eq(m4), "test_add: error m3 != m4");
+		assert(_check_structure(m4), "test_add: error m4 structure");
+	}
+	
+	void test_add_mut() {
 		Matrix_float m1, m2, m3;
 		
 		// prepare
@@ -501,8 +526,8 @@ public class TestMatrix_float extends EBoost {
 		m1.add_mut(m2);
 		
 		// assert
-		assert(m1.eq(m3), "test_add_matrix: error");
-		assert(_check_structure(m1), "test_add_matrix: error m1 structure");
+		assert(m1.eq(m3), "test_add_mut: error m1 != m3");
+		assert(_check_structure(m1), "test_add_mut: error m1 structure");
 	}
 }
 
@@ -529,6 +554,7 @@ extern void Test_Matrix_float() {
 	t.test_inverse_4x4_ones();
 	t.test_transpose();
 	t.test_transpose_mut();
-	t.test_add_matrix();
+	t.test_add();
+	t.test_add_mut();
 	message("Tests passed", DisplayInfo);
 }

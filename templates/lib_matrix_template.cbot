@@ -386,6 +386,11 @@ public class CAT(Matrix_, TYPE) {
 		this._height = tmp_i;
 	}
 	
+	public CAT(Matrix_, TYPE) add(CAT(Matrix_, TYPE) that) {
+		nan * 0;  // Not implemented
+		return null;
+	}
+	
 	public void add_mut(CAT(Matrix_, TYPE) that) {
 		CAT(MatrixElem_, TYPE) p1, p2;
 		

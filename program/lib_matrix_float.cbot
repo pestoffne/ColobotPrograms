@@ -372,6 +372,11 @@ this._width = this._height;
 this._height = tmp_i;
 }
 
+public Matrix_float add(Matrix_float that) {
+nan * 0;
+return null;
+}
+
 public void add_mut(Matrix_float that) {
 MatrixElem_float p1, p2;
 
