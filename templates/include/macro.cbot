@@ -37,8 +37,9 @@
 #define _REPEAT_14(macro) _REPEAT_13(macro) macro(14)
 #define _REPEAT_15(macro) _REPEAT_14(macro) macro(15)
 
-#define _CAT(a, b) a ## b
-#define CAT(a, b) _CAT(a, b)
+// CAT -- concatenates 2 or 3 arguments into 1 lexeme
+#define _CAT(a, b, ...) a ## b ## __VA_ARGS__
+#define CAT(...) _CAT(__VA_ARGS__)
 
 #define MAX_INT 2147483647
 #define MIN_INT -2147483648
