@@ -373,8 +373,19 @@ this._height = tmp_i;
 }
 
 public Matrix_float add(Matrix_float that) {
-nan * 0;
-return null;
+MatrixElem_float p_this, p_that, p_out, p_root;
+
+p_this = this._root;
+p_that = that._root;
+p_root = p_out = new MatrixElem_float(p_this.value + p_that.value);
+
+repeat (this._width * this._height - 1) {
+p_this = p_this.right;
+p_that = p_that.right;
+p_out = p_out.right = new MatrixElem_float(p_this.value + p_that.value);
+}
+
+return new Matrix_float(this._width, this._height, p_root);
 }
 
 public void add_mut(Matrix_float that) {

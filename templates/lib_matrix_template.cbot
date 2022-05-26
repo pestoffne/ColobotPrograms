@@ -387,8 +387,19 @@ public class CAT(Matrix_, TYPE) {
 	}
 	
 	public CAT(Matrix_, TYPE) add(CAT(Matrix_, TYPE) that) {
-		nan * 0;  // Not implemented
-		return null;
+		CAT(MatrixElem_, TYPE) p_this, p_that, p_out, p_root;
+		
+		p_this = this._root;
+		p_that = that._root;
+		p_root = p_out = new CAT(MatrixElem_, TYPE)(p_this.value + p_that.value);
+		
+		repeat (this._width * this._height - 1) {
+			p_this = p_this.right;
+			p_that = p_that.right;
+			p_out = p_out.right = new CAT(MatrixElem_, TYPE)(p_this.value + p_that.value);
+		}
+		
+		return new CAT(Matrix_, TYPE)(this._width, this._height, p_root);
 	}
 	
 	public void add_mut(CAT(Matrix_, TYPE) that) {
