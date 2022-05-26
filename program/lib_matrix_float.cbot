@@ -478,5 +478,15 @@ p1 = p1.right = new MatrixElem_float(value);
 return new Matrix_float(width, height, p0);
 }
 
+public Matrix_float to_2d_row_matrix_float(point pos) {
+nan * 0;
+return null;
+}
+
+public Matrix_float to_3d_row_matrix_float(point pos) {
+nan * 0;
+return null;
+}
+
 extern void Library_Matrix_float() {
 }

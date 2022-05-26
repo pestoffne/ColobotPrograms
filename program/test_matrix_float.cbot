@@ -529,6 +529,38 @@ public class TestMatrix_float extends EBoost {
 		assert(m1.eq(m3), "test_add_mut: error m1 != m3");
 		assert(_check_structure(m1), "test_add_mut: error m1 structure");
 	}
+	
+	void test_to_2d_row_matrix() {
+		Matrix_float m1, m2; point p; int x, y;
+		
+		// prepare
+		x = 3; y = 5;
+		p = new point(x, y);
+		m1 = new Matrix_float(2, 1, matrix_values(x, y));
+		
+		// test
+		m2 = to_2d_row_matrix_float(p);
+		
+		// assert
+		assert(m1.eq(m2), "test_to_2d_row_matrix: error m1 != m2");
+		assert(_check_structure(m2), "test_to_2d_row_matrix: error m2 structure");
+	}
+	
+	void test_to_3d_row_matrix() {
+		Matrix_float m1, m2; point p; int x, y, z;
+		
+		// prepare
+		x = 4; y = 5; z = 6;
+		p = new point(x, y, z);
+		m1 = new Matrix_float(3, 1, matrix_values(x, y, z));
+		
+		// test
+		m2 = to_3d_row_matrix_float(p);
+		
+		// assert
+		assert(m1.eq(m2), "test_to_3d_row_matrix: error m1 != m2");
+		assert(_check_structure(m2), "test_to_3d_row_matrix: error m2 structure");
+	}
 }
 
 extern void Test_Matrix_float() {
@@ -556,5 +588,7 @@ extern void Test_Matrix_float() {
 	t.test_transpose_mut();
 	t.test_add();
 	t.test_add_mut();
+	t.test_to_2d_row_matrix();
+	t.test_to_3d_row_matrix();
 	message("Tests passed", DisplayInfo);
 }

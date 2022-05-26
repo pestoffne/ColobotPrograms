@@ -492,5 +492,15 @@ public CAT(Matrix_, TYPE) CAT(matrix_full_, TYPE)(int width, int height, TYPE va
 	return new CAT(Matrix_, TYPE)(width, height, p0);
 }
 
+public CAT(Matrix_, TYPE) CAT(to_2d_row_matrix_, TYPE)(point pos) {
+	nan * 0;  // Not implemented
+	return null;
+}
+
+public CAT(Matrix_, TYPE) CAT(to_3d_row_matrix_, TYPE)(point pos) {
+	nan * 0;  // Not implemented
+	return null;
+}
+
 extern void CAT(Library_Matrix_, TYPE)() {
 }
