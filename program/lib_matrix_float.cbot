@@ -479,13 +479,11 @@ return new Matrix_float(width, height, p0);
 }
 
 public Matrix_float to_2d_row_matrix_float(point pos) {
-nan * 0;
-return null;
+return new Matrix_float(2, 1, matrix_values(pos.x, pos.y));
 }
 
 public Matrix_float to_3d_row_matrix_float(point pos) {
-nan * 0;
-return null;
+return new Matrix_float(3, 1, matrix_values(pos.x, pos.y, pos.z));
 }
 
 extern void Library_Matrix_float() {
