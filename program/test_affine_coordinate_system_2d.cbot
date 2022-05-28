@@ -1,0 +1,21 @@
+public class TestAffineCoordinateSystem2D extends EBoost {
+	void test_identity() {
+		AffineCoordinateSystem2D cs; point p1, p2;
+		
+		// prepare
+		p1 = new point(10, 11);
+		
+		// test
+		cs = coordinate_system_identity_2d();
+		p2 = cs._(p1);
+		
+		// assert
+		assert(p1 == p2, "test_identity: error");
+	}
+}
+
+extern void Test_AffineCoordinateSystem2D() {
+	TestAffineCoordinateSystem2D t();
+	t.test_identity();
+	message("Tests passed", DisplayInfo);
+}

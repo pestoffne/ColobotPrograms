@@ -1,0 +1,33 @@
+#include <macro.cbot>
+
+#if SIZE - 2
+#	define IF_3D(...) __VA_ARGS__
+#else
+#	define IF_3D(...)
+#endif
+
+public class CAT(AffineCoordinateSystem, SIZE, D) {
+	private Matrix_float _a;
+	private Matrix_float _b;
+	
+	public void CAT(AffineCoordinateSystem, SIZE, D)(Matrix_float a, Matrix_float b) {
+		this._a = a;
+		this._b = b;
+	}
+	
+	public point _(point pos) {
+		return CAT(to_, SIZE, d_row_matrix_float)(pos).mul(this._a).add(this._b).to_point();
+	}
+}
+
+public CAT(AffineCoordinateSystem, SIZE, D) CAT(coordinate_system_from_matrix_, SIZE, d)(Matrix_float ab) {
+	nan * 0;  // Not implemented
+	return null;
+}
+
+public CAT(AffineCoordinateSystem, SIZE, D) CAT(coordinate_system_identity_, SIZE, d)() {
+	return new CAT(AffineCoordinateSystem, SIZE, D)(matrix_eye_float(SIZE), matrix_zeros_float(SIZE, 1));
+}
+
+extern void CAT(Library_AffineCoordinateSystem, SIZE, D)() {
+}

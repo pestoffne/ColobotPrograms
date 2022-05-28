@@ -1,0 +1,33 @@
+// Generated file.
+
+
+
+
+
+
+
+public class AffineCoordinateSystem2D {
+private Matrix_float _a;
+private Matrix_float _b;
+
+public void AffineCoordinateSystem2D(Matrix_float a, Matrix_float b) {
+this._a = a;
+this._b = b;
+}
+
+public point _(point pos) {
+return to_2d_row_matrix_float(pos).mul(this._a).add(this._b).to_point();
+}
+}
+
+public AffineCoordinateSystem2D coordinate_system_from_matrix_2d(Matrix_float ab) {
+nan * 0;
+return null;
+}
+
+public AffineCoordinateSystem2D coordinate_system_identity_2d() {
+return new AffineCoordinateSystem2D(matrix_eye_float(2), matrix_zeros_float(2, 1));
+}
+
+extern void Library_AffineCoordinateSystem2D() {
+}

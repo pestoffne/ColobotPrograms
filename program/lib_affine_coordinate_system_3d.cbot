@@ -1,0 +1,33 @@
+// Generated file.
+
+
+
+
+
+
+
+public class AffineCoordinateSystem3D {
+private Matrix_float _a;
+private Matrix_float _b;
+
+public void AffineCoordinateSystem3D(Matrix_float a, Matrix_float b) {
+this._a = a;
+this._b = b;
+}
+
+public point _(point pos) {
+return to_3d_row_matrix_float(pos).mul(this._a).add(this._b).to_point();
+}
+}
+
+public AffineCoordinateSystem3D coordinate_system_from_matrix_3d(Matrix_float ab) {
+nan * 0;
+return null;
+}
+
+public AffineCoordinateSystem3D coordinate_system_identity_3d() {
+return new AffineCoordinateSystem3D(matrix_eye_float(3), matrix_zeros_float(3, 1));
+}
+
+extern void Library_AffineCoordinateSystem3D() {
+}
