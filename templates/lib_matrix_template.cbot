@@ -160,6 +160,47 @@ public class CAT(Matrix_, TYPE) {
 		return not this.eq(that);
 	}
 	
+	public void debug_dump(string filename="matrix_debug_dump.txt") {
+		CAT(MatrixElem_, TYPE) p; string line; file f;
+		
+		f = new file();
+		f.open(filename, "w");
+		
+		line = "width=" + this._width + ",height=" + this._height;
+		p = this._root;
+		if (p == null) {
+			line += ",root=null";
+		} else {
+			line += ",root=" + p.value;
+		}
+		f.writeln(line);
+		
+		repeat (100) {
+			if (p == null) {
+				break;
+			}
+			
+			line = "value=" + p.value;
+			
+			if (p.right == null) {
+				line += ",right=null";
+			} else {
+				line += ",right=" + p.right.value;
+			}
+			
+			if (p.down == null) {
+				line += ",down=null";
+			} else {
+				line += ",down=" + p.down.value;
+			}
+			
+			f.writeln(line);
+			p = p.right;
+		}
+		
+		f.close();
+	}
+	
 	public string to_str() {
 		string res; CAT(MatrixIterator_, TYPE) iter;
 		
