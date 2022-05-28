@@ -8,7 +8,7 @@ syntax cbot "\.cbot$"
 color brightgreen "\<[0-9.]+\>"
 
 # Keywords
-color green "\<(float|bool|int|object|point|string|void)\>"
+color green "\<(float|bool|int|object|point|string|void|file)\>"
 color green "\<(class|public|protected|private|static|synchronized|extends|extern)\>"
 color brightyellow "\<(for|if|while|do|else|case|default|switch|and|or|not|sizeof|try|throw|catch|new|repeat)\>"
 color magenta "\<(continue|break|return|this|super)\>"
