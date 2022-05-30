@@ -21,17 +21,27 @@ define generate_matrix
 		grep -v '^#' | awk '{$$1=$$1};1' >> $(1)
 endef
 
+define generate_affine
+	echo '// Generated file.' > $(1)
+	cpp -I$(INCLUDE_DIR) -D='SIZE $(2)' $(3) |\
+		grep -v '^#' | awk '{$$1=$$1};1' >> $(1)
+endef
+
 .PHONY: all clean
 
 all: $(PROGRAM_DIR)/lib_list_int.cbot $(PROGRAM_DIR)/lib_list_goal.cbot \
 $(PROGRAM_DIR)/lib_list_object.cbot $(PROGRAM_DIR)/lib_list_upo.cbot \
 $(PROGRAM_DIR)/lib_list_pathpart.cbot \
 $(PROGRAM_DIR)/lib_tree_ilp.cbot $(PROGRAM_DIR)/lib_tree_ii.cbot \
-$(PROGRAM_DIR)/lib_matrix_float.cbot
+$(PROGRAM_DIR)/lib_matrix_float.cbot \
+$(PROGRAM_DIR)/lib_matrix_float.cbot \
+$(PROGRAM_DIR)/lib_affine_coordinate_system_2d.cbot \
+$(PROGRAM_DIR)/lib_affine_coordinate_system_3d.cbot
 
 clean:
 	rm -vf $(PROGRAM_DIR)/lib_list_*.cbot $(PROGRAM_DIR)/lib_tree_*.cbot \
-	$(PROGRAM_DIR)/lib_matrix_*.cbot
+	$(PROGRAM_DIR)/lib_matrix_*.cbot \
+	$(PROGRAM_DIR)/lib_affine_coordinate_system_*d.cbot
 
 $(PROGRAM_DIR)/lib_list_int.cbot: lib_list_template.cbot $(INCLUDE_DIR)/macro.cbot
 	$(call generate_list,$(PROGRAM_DIR)/lib_list_int.cbot,int,Int,0,lib_list_template.cbot)
@@ -59,3 +69,9 @@ $(PROGRAM_DIR)/lib_tree_ii.cbot: lib_sorted_tree_template.cbot $(INCLUDE_DIR)/ma
 
 $(PROGRAM_DIR)/lib_matrix_float.cbot: lib_matrix_template.cbot $(INCLUDE_DIR)/macro.cbot
 	$(call generate_matrix,$(PROGRAM_DIR)/lib_matrix_float.cbot,float,0.0,1.0,lib_matrix_template.cbot)
+
+$(PROGRAM_DIR)/lib_affine_coordinate_system_2d.cbot: lib_affine_coordinate_system_template.cbot $(INCLUDE_DIR)/macro.cbot
+	$(call generate_affine,$(PROGRAM_DIR)/lib_affine_coordinate_system_2d.cbot,2,lib_affine_coordinate_system_template.cbot)
+
+$(PROGRAM_DIR)/lib_affine_coordinate_system_3d.cbot: lib_affine_coordinate_system_template.cbot $(INCLUDE_DIR)/macro.cbot
+	$(call generate_affine,$(PROGRAM_DIR)/lib_affine_coordinate_system_3d.cbot,3,lib_affine_coordinate_system_template.cbot)
