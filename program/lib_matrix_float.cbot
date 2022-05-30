@@ -531,5 +531,13 @@ public Matrix_float to_3d_row_matrix_float(point pos) {
 return new Matrix_float(3, 1, matrix_values(pos.x, pos.y, pos.z));
 }
 
+public Matrix_float to_2d_column_matrix_float(point pos) {
+return new Matrix_float(1, 2, matrix_values(pos.x, pos.y));
+}
+
+public Matrix_float to_3d_column_matrix_float(point pos) {
+return new Matrix_float(1, 3, matrix_values(pos.x, pos.y, pos.z));
+}
+
 extern void Library_Matrix_float() {
 }

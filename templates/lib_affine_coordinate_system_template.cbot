@@ -16,7 +16,7 @@ public class CAT(AffineCoordinateSystem, SIZE, D) {
 	}
 	
 	public point _(point pos) {
-		return CAT(to_, SIZE, d_row_matrix_float)(pos).mul(this._a).add(this._b).to_point();
+		return this._a.mul(CAT(to_, SIZE, d_column_matrix_float)(pos)).add(this._b).to_point();
 	}
 }
 
@@ -26,8 +26,9 @@ public CAT(AffineCoordinateSystem, SIZE, D) CAT(coordinate_system_from_matrix_, 
 }
 
 public CAT(AffineCoordinateSystem, SIZE, D) CAT(coordinate_system_identity_, SIZE, d)() {
-	return new CAT(AffineCoordinateSystem, SIZE, D)(matrix_eye_float(SIZE), matrix_zeros_float(SIZE, 1));
+	return new CAT(AffineCoordinateSystem, SIZE, D)(matrix_eye_float(SIZE), matrix_zeros_float(1, SIZE));
 }
 
 extern void CAT(Library_AffineCoordinateSystem, SIZE, D)() {
 }
+

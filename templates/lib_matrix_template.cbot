@@ -545,5 +545,13 @@ public CAT(Matrix_, TYPE) CAT(to_3d_row_matrix_, TYPE)(point pos) {
 	return new CAT(Matrix_, TYPE)(3, 1, matrix_values(pos.x, pos.y, pos.z));
 }
 
+public CAT(Matrix_, TYPE) CAT(to_2d_column_matrix_, TYPE)(point pos) {
+	return new CAT(Matrix_, TYPE)(1, 2, matrix_values(pos.x, pos.y));
+}
+
+public CAT(Matrix_, TYPE) CAT(to_3d_column_matrix_, TYPE)(point pos) {
+	return new CAT(Matrix_, TYPE)(1, 3, matrix_values(pos.x, pos.y, pos.z));
+}
+
 extern void CAT(Library_Matrix_, TYPE)() {
 }

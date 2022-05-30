@@ -16,7 +16,7 @@ this._b = b;
 }
 
 public point _(point pos) {
-return to_2d_row_matrix_float(pos).mul(this._a).add(this._b).to_point();
+return this._a.mul(to_2d_column_matrix_float(pos)).add(this._b).to_point();
 }
 }
 
@@ -26,7 +26,7 @@ return null;
 }
 
 public AffineCoordinateSystem2D coordinate_system_identity_2d() {
-return new AffineCoordinateSystem2D(matrix_eye_float(2), matrix_zeros_float(2, 1));
+return new AffineCoordinateSystem2D(matrix_eye_float(2), matrix_zeros_float(1, 2));
 }
 
 extern void Library_AffineCoordinateSystem2D() {

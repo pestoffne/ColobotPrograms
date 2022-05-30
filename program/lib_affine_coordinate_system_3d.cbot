@@ -16,7 +16,7 @@ this._b = b;
 }
 
 public point _(point pos) {
-return to_3d_row_matrix_float(pos).mul(this._a).add(this._b).to_point();
+return this._a.mul(to_3d_column_matrix_float(pos)).add(this._b).to_point();
 }
 }
 
@@ -26,7 +26,7 @@ return null;
 }
 
 public AffineCoordinateSystem3D coordinate_system_identity_3d() {
-return new AffineCoordinateSystem3D(matrix_eye_float(3), matrix_zeros_float(3, 1));
+return new AffineCoordinateSystem3D(matrix_eye_float(3), matrix_zeros_float(1, 3));
 }
 
 extern void Library_AffineCoordinateSystem3D() {
