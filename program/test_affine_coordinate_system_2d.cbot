@@ -12,10 +12,139 @@ public class TestAffineCoordinateSystem2D extends EBoost {
 		// assert
 		assert(p1 == p2, "test_identity: error");
 	}
+	
+	void test_translate() {
+		AffineCoordinateSystem2D cs; point p1, p2, p3;
+		
+		// prepare
+		p1 = new point(10, 11);
+		p2 = new point(12, 14);
+		
+		// test
+		cs = coordinate_system_identity_2d().translate(2, 3);
+		p3 = cs._(p1);
+		
+		// assert
+		assert(p2 == p3, "test_translate: error");
+	}
+	
+	void test_scale() {
+		AffineCoordinateSystem2D cs; point p1, p2, p3;
+		
+		// prepare
+		p1 = new point(10, 11);
+		p2 = new point(20, 33);
+		
+		// test
+		cs = coordinate_system_identity_2d().scale(2, 3);
+		p3 = cs._(p1);
+		
+		// assert
+		assert(p2 == p3, "test_scale: error");
+	}
+	
+	void test_rotate_m30() {
+		AffineCoordinateSystem2D cs; point p1, p2, p3;
+		
+		// prepare
+		p1 = new point(1/2, sqrt(3)/2);
+		p2 = new point(sqrt(3)/2, 1/2);
+		
+		// test
+		cs = coordinate_system_identity_2d().rotate(-30);
+		p3 = cs._(p1);
+		
+		// assert
+		assert(abs(p2.x - p3.x) < 0.01 and abs(p2.y - p3.y) < 0.01, "test_rotate_m30: error");
+	}
+	
+	void test_rotate_p90() {
+		AffineCoordinateSystem2D cs; point p1, p2, p3;
+		
+		// prepare
+		p1 = new point(10, 11);
+		p2 = new point(11, -10);
+		
+		// test
+		cs = coordinate_system_identity_2d().rotate(90);
+		p3 = cs._(p1);
+		
+		// assert
+		assert(abs(p2.x - p3.x) < 0.01 and abs(p2.y - p3.y) < 0.01, "test_rotate_p90: error");
+	}
+	
+	void test_scale_translate() {
+		AffineCoordinateSystem2D cs_ts, cs_st; point p1, p2, p_ts, p_st;
+		
+		// prepare
+		p1 = new point(10, 11);
+		p2 = new point(22, -14);
+		
+		// test
+		// x = (10 + 1) * 2 = 22
+		// y = (11 + 3) * -1 = -14
+		cs_ts = coordinate_system_identity_2d().translate(1, 3).scale(2, -1);
+		p_ts = cs_ts._(p1);
+		// x = 10 * 2 + 2 = 22
+		// y = 11 * -1 - 3 = -14
+		cs_st = coordinate_system_identity_2d().scale(2, -1).translate(2, -3);
+		p_st = cs_st._(p1);
+		
+		// assert
+		assert(abs(p2.x - p_ts.x) < 0.01 and abs(p2.y - p_ts.y) < 0.01, "test_scale_translate: error translate+scale");
+		assert(abs(p2.x - p_st.x) < 0.01 and abs(p2.y - p_st.y) < 0.01, "test_scale_translate: error scale+translate");
+	}
+	
+	void test_scale_rotate() {
+		AffineCoordinateSystem2D cs_rs, cs_sr; point p1, p2, p_rs, p_sr;
+		
+		// prepare
+		p1 = new point(1/2, sqrt(3)/2);
+		p2 = new point(sqrt(3), 1);
+		
+		// test
+		cs_rs = coordinate_system_identity_2d().rotate(30).scale(2, 2);
+		p_rs = cs_rs._(p1);
+		cs_sr = coordinate_system_identity_2d().scale(2, 2).rotate(30);
+		p_sr = cs_sr._(p1);
+		
+		// assert
+		assert(abs(p2.x - p_rs.x) < 0.01 and abs(p2.y - p_rs.y) < 0.01, "test_scale_rotate: error rotate+scale");
+		assert(abs(p2.x - p_sr.x) < 0.01 and abs(p2.y - p_sr.y) < 0.01, "test_scale_rotate: error scale+rotate");
+	}
+	
+	void test_from_matrix() {
+		AffineCoordinateSystem2D cs; Matrix_float ab; point pa_1, pa_2, pa_3, pb_1, pb_2, pb_3;
+		
+		// prepare
+		ab = new Matrix_float(3, 2, matrix_values(
+			0.75, -0.25, 2,
+			   0,     1, 3
+		));
+		pa_1 = new point(2, 1);
+		pa_2 = new point(3.25, 4);
+		pb_1 = new point(-1, 4);
+		pb_2 = new point(0.25, 4);
+		
+		// test
+		cs = coordinate_system_from_matrix_2d(ab);
+		pa_3 = cs._(pa_1);
+		pb_3 = cs._(pb_1);
+		
+		// assert
+		assert(abs(pa_2.x - pa_3.x) < 0.01 and abs(pa_2.y - pa_3.y) < 0.01, "test_from_matrix: error pa");
+		assert(abs(pb_2.x - pb_3.x) < 0.01 and abs(pb_2.y - pb_3.y) < 0.01, "test_from_matrix: error pb");
+	}
 }
 
 extern void Test_AffineCoordinateSystem2D() {
 	TestAffineCoordinateSystem2D t();
 	t.test_identity();
+	t.test_translate();
+	t.test_rotate_m30();
+	t.test_rotate_p90();
+	t.test_scale_translate();
+	t.test_scale_rotate();
+	t.test_from_matrix();
 	message("Tests passed", DisplayInfo);
 }

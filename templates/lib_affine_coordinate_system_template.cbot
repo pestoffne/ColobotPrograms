@@ -15,6 +15,18 @@ public class CAT(AffineCoordinateSystem, SIZE, D) {
 		this._b = b;
 	}
 	
+	public CAT(AffineCoordinateSystem, SIZE, D) translate(float dx, float dy) {
+		return this;  // Not implemented
+	}
+	
+	public CAT(AffineCoordinateSystem, SIZE, D) scale(float dx, float dy) {
+		return this;  // Not implemented
+	}
+	
+	public CAT(AffineCoordinateSystem, SIZE, D) rotate(float angle) {
+		return this;  // Not implemented
+	}
+	
 	public point _(point pos) {
 		return this._a.mul(CAT(to_, SIZE, d_column_matrix_float)(pos)).add(this._b).to_point();
 	}
