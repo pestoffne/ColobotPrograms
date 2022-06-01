@@ -47,8 +47,8 @@ public class TestAffineCoordinateSystem2D extends EBoost {
 		AffineCoordinateSystem2D cs; point p1, p2, p3;
 		
 		// prepare
-		p1 = new point(1/2, sqrt(3)/2);
-		p2 = new point(sqrt(3)/2, 1/2);
+		p1 = new point(0.5, sqrt(3)/2);
+		p2 = new point(sqrt(3)/2, 0.5);
 		
 		// test
 		cs = coordinate_system_identity_2d().rotate(-30);
@@ -62,8 +62,8 @@ public class TestAffineCoordinateSystem2D extends EBoost {
 		AffineCoordinateSystem2D cs; point p1, p2, p3;
 		
 		// prepare
-		p1 = new point(10, 11);
-		p2 = new point(11, -10);
+		p1 = new point(2, 3);
+		p2 = new point(-3, 2);
 		
 		// test
 		cs = coordinate_system_identity_2d().rotate(90);
@@ -78,16 +78,12 @@ public class TestAffineCoordinateSystem2D extends EBoost {
 		
 		// prepare
 		p1 = new point(10, 11);
-		p2 = new point(22, -14);
+		p2 = new point(21, -8);
 		
 		// test
-		// x = (10 + 1) * 2 = 22
-		// y = (11 + 3) * -1 = -14
 		cs_ts = coordinate_system_identity_2d().translate(1, 3).scale(2, -1);
 		p_ts = cs_ts._(p1);
-		// x = 10 * 2 + 2 = 22
-		// y = 11 * -1 - 3 = -14
-		cs_st = coordinate_system_identity_2d().scale(2, -1).translate(2, -3);
+		cs_st = coordinate_system_identity_2d().scale(2, -1).translate(0.5, -3);
 		p_st = cs_st._(p1);
 		
 		// assert
@@ -99,7 +95,7 @@ public class TestAffineCoordinateSystem2D extends EBoost {
 		AffineCoordinateSystem2D cs_rs, cs_sr; point p1, p2, p_rs, p_sr;
 		
 		// prepare
-		p1 = new point(1/2, sqrt(3)/2);
+		p1 = new point(0.5, sqrt(3)/2);
 		p2 = new point(sqrt(3), 1);
 		
 		// test
@@ -141,6 +137,7 @@ extern void Test_AffineCoordinateSystem2D() {
 	TestAffineCoordinateSystem2D t();
 	t.test_identity();
 	t.test_translate();
+	t.test_scale();
 	t.test_rotate_m30();
 	t.test_rotate_p90();
 	t.test_scale_translate();
