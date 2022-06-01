@@ -2,17 +2,17 @@
 
 #if SIZE - 2
 #	define IF_3D(...) __VA_ARGS__
+#	define SIZE_P1 4
 #else
 #	define IF_3D(...)
+#	define SIZE_P1 3
 #endif
 
 public class CAT(AffineCoordinateSystem, SIZE, D) {
-	private Matrix_float _a;
-	private Matrix_float _b;
+	private Matrix_float _m;
 	
-	public void CAT(AffineCoordinateSystem, SIZE, D)(Matrix_float a, Matrix_float b) {
-		this._a = a;
-		this._b = b;
+	public void CAT(AffineCoordinateSystem, SIZE, D)(Matrix_float m) {
+		this._m = m;
 	}
 	
 	public CAT(AffineCoordinateSystem, SIZE, D) translate(float dx, float dy) {
@@ -28,8 +28,16 @@ public class CAT(AffineCoordinateSystem, SIZE, D) {
 	}
 	
 	public point _(point pos) {
-		return this._a.mul(CAT(to_, SIZE, d_column_matrix_float)(pos)).add(this._b).to_point();
+		return CAT(_m2p_, SIZE, d)(this._m.mul(CAT(_p2m_, SIZE, d)(pos)).begin());
 	}
+}
+
+/*private*/ Matrix_float CAT(_p2m_, SIZE, d)(point pos) {
+	return new Matrix_float(1, SIZE_P1, matrix_values(pos.x, pos.y, IF_3D(pos.z,) 1));
+}
+
+/*private*/ point CAT(_m2p_, SIZE, d)(MatrixIterator_float iter) {
+	return new point(iter.value(), iter.shift().value() IF_3D(, iter.shift().value()));
 }
 
 public CAT(AffineCoordinateSystem, SIZE, D) CAT(coordinate_system_from_matrix_, SIZE, d)(Matrix_float ab) {
@@ -38,7 +46,7 @@ public CAT(AffineCoordinateSystem, SIZE, D) CAT(coordinate_system_from_matrix_, 
 }
 
 public CAT(AffineCoordinateSystem, SIZE, D) CAT(coordinate_system_identity_, SIZE, d)() {
-	return new CAT(AffineCoordinateSystem, SIZE, D)(matrix_eye_float(SIZE), matrix_zeros_float(1, SIZE));
+	return new CAT(AffineCoordinateSystem, SIZE, D)(matrix_eye_float(SIZE_P1));
 }
 
 extern void CAT(Library_AffineCoordinateSystem, SIZE, D)() {

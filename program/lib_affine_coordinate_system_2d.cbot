@@ -1,18 +1,9 @@
 // Generated file.
-
-
-
-
-
-
-
 public class AffineCoordinateSystem2D {
-private Matrix_float _a;
-private Matrix_float _b;
+private Matrix_float _m;
 
-public void AffineCoordinateSystem2D(Matrix_float a, Matrix_float b) {
-this._a = a;
-this._b = b;
+public void AffineCoordinateSystem2D(Matrix_float m) {
+this._m = m;
 }
 
 public AffineCoordinateSystem2D translate(float dx, float dy) {
@@ -28,8 +19,16 @@ return this;
 }
 
 public point _(point pos) {
-return this._a.mul(to_2d_column_matrix_float(pos)).add(this._b).to_point();
+return _m2p_2d(this._m.mul(_p2m_2d(pos)).begin());
 }
+}
+
+Matrix_float _p2m_2d(point pos) {
+return new Matrix_float(1, 3, matrix_values(pos.x, pos.y, 1));
+}
+
+point _m2p_2d(MatrixIterator_float iter) {
+return new point(iter.value(), iter.shift().value() );
 }
 
 public AffineCoordinateSystem2D coordinate_system_from_matrix_2d(Matrix_float ab) {
@@ -38,7 +37,7 @@ return null;
 }
 
 public AffineCoordinateSystem2D coordinate_system_identity_2d() {
-return new AffineCoordinateSystem2D(matrix_eye_float(2), matrix_zeros_float(1, 2));
+return new AffineCoordinateSystem2D(matrix_eye_float(3));
 }
 
 extern void Library_AffineCoordinateSystem2D() {

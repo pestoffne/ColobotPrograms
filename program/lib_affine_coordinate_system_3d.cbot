@@ -1,18 +1,9 @@
 // Generated file.
-
-
-
-
-
-
-
 public class AffineCoordinateSystem3D {
-private Matrix_float _a;
-private Matrix_float _b;
+private Matrix_float _m;
 
-public void AffineCoordinateSystem3D(Matrix_float a, Matrix_float b) {
-this._a = a;
-this._b = b;
+public void AffineCoordinateSystem3D(Matrix_float m) {
+this._m = m;
 }
 
 public AffineCoordinateSystem3D translate(float dx, float dy) {
@@ -28,8 +19,16 @@ return this;
 }
 
 public point _(point pos) {
-return this._a.mul(to_3d_column_matrix_float(pos)).add(this._b).to_point();
+return _m2p_3d(this._m.mul(_p2m_3d(pos)).begin());
 }
+}
+
+Matrix_float _p2m_3d(point pos) {
+return new Matrix_float(1, 4, matrix_values(pos.x, pos.y, pos.z, 1));
+}
+
+point _m2p_3d(MatrixIterator_float iter) {
+return new point(iter.value(), iter.shift().value() , iter.shift().value());
 }
 
 public AffineCoordinateSystem3D coordinate_system_from_matrix_3d(Matrix_float ab) {
@@ -38,7 +37,7 @@ return null;
 }
 
 public AffineCoordinateSystem3D coordinate_system_identity_3d() {
-return new AffineCoordinateSystem3D(matrix_eye_float(3), matrix_zeros_float(1, 3));
+return new AffineCoordinateSystem3D(matrix_eye_float(4));
 }
 
 extern void Library_AffineCoordinateSystem3D() {
