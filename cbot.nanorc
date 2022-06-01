@@ -39,7 +39,7 @@ color blue "//.*"
 color blue start="/\*" end="\*/"
 
 # Templates
-color white,blue "\<(NAMED_TUPLE)\>"
+color white,blue "\<(NAMED_TUPLE|IF_3D)\>"
 color white,blue "\<(CAT)\>\((~|_|[[:alnum:]])+,[[:space:]]*(~|_|[[:alnum:]])+,[[:space:]]*(~|_|[[:alnum:]])+\)"
 color white,blue "\<(CAT|CMP|REPEAT)\>\((~|_|[[:alnum:]])+,[[:space:]]*(~|_|[[:alnum:]])+\)"
 color white,blue "\<(TEMPLATE)\>\((~|_|[[:alnum:]])+\)"
