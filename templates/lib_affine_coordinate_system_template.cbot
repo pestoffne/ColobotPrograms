@@ -1,9 +1,11 @@
 #include <macro.cbot>
 
 #if SIZE - 2
+#	define IF_2D(...)
 #	define IF_3D(...) __VA_ARGS__
 #	define SIZE_P1 4
 #else
+#	define IF_2D(...) __VA_ARGS__
 #	define IF_3D(...)
 #	define SIZE_P1 3
 #endif
@@ -15,16 +17,46 @@ public class CAT(AffineCoordinateSystem, SIZE, D) {
 		this._m = m;
 	}
 	
-	public CAT(AffineCoordinateSystem, SIZE, D) translate(float dx, float dy) {
-		return this;  // Not implemented
+	public CAT(AffineCoordinateSystem, SIZE, D) translate(float dx, float dy IF_3D(, float dz)) {
+		return new CAT(AffineCoordinateSystem, SIZE, D)(this._m.mul(
+		new Matrix_float(SIZE_P1, SIZE_P1, matrix_values(
+			IF_2D( 1,  0, dx,)
+			IF_2D( 0,  1, dy,)
+			IF_2D( 0,  0,  1 )
+			
+			IF_3D( 1,  0,  0, dx,)
+			IF_3D( 0,  1,  0, dy,)
+			IF_3D( 0,  0,  1, dz,)
+			IF_3D( 0,  0,  0,  1 )
+		))));
 	}
 	
-	public CAT(AffineCoordinateSystem, SIZE, D) scale(float dx, float dy) {
-		return this;  // Not implemented
+	public CAT(AffineCoordinateSystem, SIZE, D) scale(float dx, float dy IF_3D(, float dz)) {
+		return new CAT(AffineCoordinateSystem, SIZE, D)(this._m.mul(
+		new Matrix_float(SIZE_P1, SIZE_P1, matrix_values(
+			IF_2D(dx,  0,  0,)
+			IF_2D( 0, dy,  0,)
+			IF_2D( 0,  0,  1 )
+			
+			IF_3D(dx,  0,  0,  0,)
+			IF_3D( 0, dy,  0,  0,)
+			IF_3D( 0,  0, dz,  0,)
+			IF_3D( 0,  0,  0,  1 )
+		))));
 	}
 	
 	public CAT(AffineCoordinateSystem, SIZE, D) rotate(float angle) {
-		return this;  // Not implemented
+		return new CAT(AffineCoordinateSystem, SIZE, D)(this._m.mul(
+		new Matrix_float(SIZE_P1, SIZE_P1, matrix_values(
+			IF_2D(cos(angle), -sin(angle), 0,)
+			IF_2D(sin(angle),  cos(angle), 0,)
+			IF_2D(         0,           0, 1 )
+			
+			IF_3D(cos(angle), -sin(angle), 0, 0,)
+			IF_3D(sin(angle),  cos(angle), 0, 0,)
+			IF_3D(         0,           0, 1, 0,)
+			IF_3D(         0,           0, 0, 1 )
+		))));
 	}
 	
 	public point _(point pos) {

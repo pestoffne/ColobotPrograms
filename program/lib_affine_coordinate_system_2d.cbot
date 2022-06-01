@@ -6,16 +6,46 @@ public void AffineCoordinateSystem2D(Matrix_float m) {
 this._m = m;
 }
 
-public AffineCoordinateSystem2D translate(float dx, float dy) {
-return this;
+public AffineCoordinateSystem2D translate(float dx, float dy ) {
+return new AffineCoordinateSystem2D(this._m.mul(
+new Matrix_float(3, 3, matrix_values(
+1, 0, dx,
+0, 1, dy,
+0, 0, 1
+
+
+
+
+
+))));
 }
 
-public AffineCoordinateSystem2D scale(float dx, float dy) {
-return this;
+public AffineCoordinateSystem2D scale(float dx, float dy ) {
+return new AffineCoordinateSystem2D(this._m.mul(
+new Matrix_float(3, 3, matrix_values(
+dx, 0, 0,
+0, dy, 0,
+0, 0, 1
+
+
+
+
+
+))));
 }
 
 public AffineCoordinateSystem2D rotate(float angle) {
-return this;
+return new AffineCoordinateSystem2D(this._m.mul(
+new Matrix_float(3, 3, matrix_values(
+cos(angle), -sin(angle), 0,
+sin(angle), cos(angle), 0,
+0, 0, 1
+
+
+
+
+
+))));
 }
 
 public point _(point pos) {

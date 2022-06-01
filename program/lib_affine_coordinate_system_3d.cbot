@@ -6,16 +6,46 @@ public void AffineCoordinateSystem3D(Matrix_float m) {
 this._m = m;
 }
 
-public AffineCoordinateSystem3D translate(float dx, float dy) {
-return this;
+public AffineCoordinateSystem3D translate(float dx, float dy , float dz) {
+return new AffineCoordinateSystem3D(this._m.mul(
+new Matrix_float(4, 4, matrix_values(
+
+
+
+
+1, 0, 0, dx,
+0, 1, 0, dy,
+0, 0, 1, dz,
+0, 0, 0, 1
+))));
 }
 
-public AffineCoordinateSystem3D scale(float dx, float dy) {
-return this;
+public AffineCoordinateSystem3D scale(float dx, float dy , float dz) {
+return new AffineCoordinateSystem3D(this._m.mul(
+new Matrix_float(4, 4, matrix_values(
+
+
+
+
+dx, 0, 0, 0,
+0, dy, 0, 0,
+0, 0, dz, 0,
+0, 0, 0, 1
+))));
 }
 
 public AffineCoordinateSystem3D rotate(float angle) {
-return this;
+return new AffineCoordinateSystem3D(this._m.mul(
+new Matrix_float(4, 4, matrix_values(
+
+
+
+
+cos(angle), -sin(angle), 0, 0,
+sin(angle), cos(angle), 0, 0,
+0, 0, 1, 0,
+0, 0, 0, 1
+))));
 }
 
 public point _(point pos) {
