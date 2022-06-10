@@ -150,6 +150,16 @@ public bool ne(Matrix_float that) {
 return not this.eq(that);
 }
 
+public void vstack_mut(Matrix_float that) {
+MatrixElem_float p;
+
+p = this._root; repeat (this._width - 1) { p = p.right; } repeat (this._height - 1) p = p.down;
+p.right = that._root;
+
+this._height = this._height + that._height;
+this._set_shape_mut();
+}
+
 public void debug_dump(string filename="matrix_debug_dump.txt") {
 MatrixElem_float p; string line; file f;
 
@@ -265,18 +275,6 @@ return root;
 
 public Matrix_float copy() {
 return new Matrix_float(this._width, this._height, this._copy_values());
-}
-
-private MatrixElem_float _at_y(int y) {
-MatrixElem_float p;
-
-p = this._root;
-
-repeat (y) {
-p = p.down;
-}
-
-return p;
 }
 
 private void _add_row_mut(MatrixElem_float p_from, MatrixElem_float p_to,

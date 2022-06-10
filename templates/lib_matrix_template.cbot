@@ -22,6 +22,21 @@ MATRIX_VALUES(5)
 MATRIX_VALUES(8)
 MATRIX_VALUES(15)
 
+// usage:
+// Matrix_float p = this._AT(2, 3);
+#define _AT(x, y) \
+	_root; \
+	repeat (x) { p = p.right; } \
+	repeat (y) p = p.down
+
+#define _AT_X(x) \
+	_root; \
+	repeat (x) p = p.right
+
+#define _AT_Y(y) \
+	_root; \
+	repeat (y) p = p.down
+
 public class CAT(MatrixIterator_, TYPE) {
 	protected CAT(MatrixElem_, TYPE) _elem;
 	
@@ -164,6 +179,16 @@ public class CAT(Matrix_, TYPE) {
 		return not this.eq(that);
 	}
 	
+	public void vstack_mut(CAT(Matrix_, TYPE) that) {
+		CAT(MatrixElem_, TYPE) p;
+		
+		p = this._AT(this._width - 1, this._height - 1);
+		p.right = that._root;
+		// assume this._width = that._width
+		this._height = this._height + that._height;
+		this._set_shape_mut();
+	}
+	
 	public void debug_dump(string filename="matrix_debug_dump.txt") {
 		CAT(MatrixElem_, TYPE) p; string line; file f;
 		
@@ -279,18 +304,6 @@ public class CAT(Matrix_, TYPE) {
 	
 	public CAT(Matrix_, TYPE) copy() {
 		return new CAT(Matrix_, TYPE)(this._width, this._height, this._copy_values());
-	}
-	
-	private CAT(MatrixElem_, TYPE) _at_y(int y) {
-		CAT(MatrixElem_, TYPE) p;
-		
-		p = this._root;
-		
-                repeat (y) {
-                        p = p.down;
-                }
-		
-                return p;
 	}
 	
 	private void _add_row_mut(CAT(MatrixElem_, TYPE) p_from, CAT(MatrixElem_, TYPE) p_to,

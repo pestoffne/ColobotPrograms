@@ -62,8 +62,12 @@ return new point(iter.value(), iter.shift().value() , iter.shift().value());
 }
 
 public AffineCoordinateSystem3D coordinate_system_from_matrix_3d(Matrix_float ab) {
-nan * 0;
-return null;
+ab.vstack_mut(Matrix_float(4, 1, matrix_values(
+
+0, 0, 0, 1
+)));
+
+return new AffineCoordinateSystem3D(ab);
 }
 
 public AffineCoordinateSystem3D coordinate_system_identity_3d() {

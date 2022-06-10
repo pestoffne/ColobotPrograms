@@ -120,7 +120,7 @@ public class TestAffineCoordinateSystem2D extends EBoost {
 		pa_1 = new point(2, 1);
 		pa_2 = new point(3.25, 4);
 		pb_1 = new point(-1, 4);
-		pb_2 = new point(0.25, 4);
+		pb_2 = new point(0.25, 7);
 		
 		// test
 		cs = coordinate_system_from_matrix_2d(ab);
