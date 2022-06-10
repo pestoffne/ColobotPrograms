@@ -99,9 +99,9 @@ public class TestAffineCoordinateSystem2D extends EBoost {
 		p2 = new point(sqrt(3), 1);
 		
 		// test
-		cs_rs = coordinate_system_identity_2d().rotate(30).scale(2, 2);
+		cs_rs = coordinate_system_identity_2d().rotate(-30).scale(2, 2);
 		p_rs = cs_rs._(p1);
-		cs_sr = coordinate_system_identity_2d().scale(2, 2).rotate(30);
+		cs_sr = coordinate_system_identity_2d().scale(2, 2).rotate(-30);
 		p_sr = cs_sr._(p1);
 		
 		// assert
