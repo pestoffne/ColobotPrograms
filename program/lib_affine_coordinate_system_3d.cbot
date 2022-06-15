@@ -62,7 +62,7 @@ return new point(iter.value(), iter.shift().value() , iter.shift().value());
 }
 
 public AffineCoordinateSystem3D coordinate_system_from_matrix_3d(Matrix_float ab) {
-ab.vstack_mut(Matrix_float(4, 1, matrix_values(
+ab.vstack_mut(new Matrix_float(4, 1, matrix_values(
 
 0, 0, 0, 1
 )));

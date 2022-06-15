@@ -73,7 +73,7 @@ public class CAT(AffineCoordinateSystem, SIZE, D) {
 }
 
 public CAT(AffineCoordinateSystem, SIZE, D) CAT(coordinate_system_from_matrix_, SIZE, d)(Matrix_float ab) {
-	ab.vstack_mut(Matrix_float(SIZE_P1, 1, matrix_values(
+	ab.vstack_mut(new Matrix_float(SIZE_P1, 1, matrix_values(
 		IF_2D( 0,  0,  1 )
 		IF_3D( 0,  0,  0,  1 )
 	)));
