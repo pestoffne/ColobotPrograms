@@ -1,4 +1,8 @@
 public class TestAffineCoordinateSystem2D extends EBoost {
+	private bool _almost_eq_2d(point p1, point p2) {
+		return abs(p1.x - p2.x) < 0.01 and abs(p1.y - p2.y) < 0.01;
+	}
+	
 	void test_identity() {
 		AffineCoordinateSystem2D cs; point p1, p2;
 		
@@ -131,6 +135,25 @@ public class TestAffineCoordinateSystem2D extends EBoost {
 		assert(abs(pa_2.x - pa_3.x) < 0.01 and abs(pa_2.y - pa_3.y) < 0.01, "test_from_matrix: error pa");
 		assert(abs(pb_2.x - pb_3.x) < 0.01 and abs(pb_2.y - pb_3.y) < 0.01, "test_from_matrix: error pb");
 	}
+	
+	void test_invert_y() {
+		AffineCoordinateSystem2D cs1, cs2; point p0, p1_a, p1_e, p2_a, p2_e;
+		
+		// prepare
+		p0 = new point(sqrt(3)/2, 0.5);
+		p1_e = new point(1.5, sqrt(3)/2);
+		p2_e = new point(2, 0);
+		cs1 = coordinate_system_identity_2d().translate(1, 0).rotate(30);
+		p1_a = cs1._(p0);
+		assert(_almost_eq_2d(p1_e, p1_a), "test_invert_y: error p1_e != p1_a");
+		
+		// test
+		cs2 = cs1.invert_y();
+		p2_a = cs2._(p0);
+		
+		// assert
+		assert(_almost_eq_2d(p2_e, p2_a), "test_invert_y: error p2_e != p2_a");
+	}
 }
 
 extern void Test_AffineCoordinateSystem2D() {
@@ -143,6 +166,7 @@ extern void Test_AffineCoordinateSystem2D() {
 	t.test_scale_translate();
 	t.test_scale_rotate();
 	t.test_from_matrix();
+	t.test_invert_y();
 	message("Tests passed", DisplayInfo);
 }
 

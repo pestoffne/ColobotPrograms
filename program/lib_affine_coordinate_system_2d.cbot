@@ -48,6 +48,10 @@ sin(angle), cos(angle), 0,
 ))));
 }
 
+public AffineCoordinateSystem2D invert_y() {
+return this;
+}
+
 public point _(point pos) {
 return _m2p_2d(this._m.mul(_p2m_2d(pos)).begin());
 }
