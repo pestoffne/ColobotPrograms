@@ -60,7 +60,17 @@ public class CAT(AffineCoordinateSystem, SIZE, D) {
 	}
 	
 	public CAT(AffineCoordinateSystem, SIZE, D) invert_y() {
-		return this;  // Not implemented
+		return new CAT(AffineCoordinateSystem, SIZE, D)(this._m.mul(
+		new Matrix_float(SIZE_P1, SIZE_P1, matrix_values(
+			IF_2D( 1,  0, 0,)
+			IF_2D( 0, -1, 0,)
+			IF_2D( 0,  0, 1 )
+			
+			IF_3D( 1,  0, 0, 0,)
+			IF_3D( 0, -1, 0, 0,)
+			IF_3D( 0,  0, 1, 0,)
+			IF_3D( 0,  0, 0, 1 )
+		))));
 	}
 	
 	public point _(point pos) {
