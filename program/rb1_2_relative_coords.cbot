@@ -1,0 +1,34 @@
+// Depends:
+// lib_affine_coordinate_system_2d
+
+extern void object::ShowRelativeCoords() {
+	EBoost e(this);
+	AffineCoordinateSystem2D /*css,*/ csi;
+	
+	/*css = coordinate_system_from_matrix_2d(new Matrix_float(3, 2, matrix_values(
+	     0, 5,  79.25,
+	    -5, 0, -55.25
+	)));*/
+	
+	csi = coordinate_system_from_matrix_2d(new Matrix_float(3, 2, matrix_values(
+	      0, -0.2, -11.05,
+	    0.2,    0, -15.85
+	)));
+	
+	message("relative = " + e.point_2d_to_str(csi._(this.position), 4)
+	    + ", absolute = " + e.point_2d_to_str(this.position), 4);
+}
+
+/*extern*/ void object::CalculateMatrixes() {
+	AffineCoordinateSystem2D css, csi;
+	
+	css = coordinate_system_identity_2d()
+	.translate(79.25, -55.25).scale(5, 5).rotate(-89.999);
+	// TODO: with rotate(-90) csi is not correct.
+	// 0/0 in Matrix inverse may cause error.
+	
+	csi = css.inverse();
+	
+	message("css = " + css.to_str(), DisplayInfo);
+	message("csi = " + csi.to_str(), DisplayInfo);
+}
