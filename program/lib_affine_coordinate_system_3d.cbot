@@ -62,6 +62,14 @@ new Matrix_float(4, 4, matrix_values(
 ))));
 }
 
+public AffineCoordinateSystem3D inverse() {
+return new AffineCoordinateSystem3D(this._m.inverse());
+}
+
+public string to_str() {
+return this._m.to_str();
+}
+
 public point _(point pos) {
 return _m2p_3d(this._m.mul(_p2m_3d(pos)).begin());
 }

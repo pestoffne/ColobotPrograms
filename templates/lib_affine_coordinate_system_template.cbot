@@ -73,6 +73,14 @@ public class CAT(AffineCoordinateSystem, SIZE, D) {
 		))));
 	}
 	
+	public CAT(AffineCoordinateSystem, SIZE, D) inverse() {
+		return new CAT(AffineCoordinateSystem, SIZE, D)(this._m.inverse());
+	}
+	
+	public string to_str() {
+		return this._m.to_str();
+	}
+	
 	public point _(point pos) {
 		return CAT(_m2p_, SIZE, d)(this._m.mul(CAT(_p2m_, SIZE, d)(pos)).begin());
 	}
