@@ -1,6 +1,6 @@
 // Generated file.
 
-public class TreeNodeIntListPoint { public void TreeNodeIntListPoint(_MT_4 int(_ARGUMENT, key , = 0 , ListPoint , value , = null , TreeNodeIntListPoint , less , = null , TreeNodeIntListPoint , more , = null)) { _MT_4 int(_ASSIGN, key , = 0 , ListPoint , value , = null , TreeNodeIntListPoint , less , = null , TreeNodeIntListPoint , more , = null) } _MT_4 int(_FIELD, key , = 0 , ListPoint , value , = null , TreeNodeIntListPoint , less , = null , TreeNodeIntListPoint , more , = null) }
+public class TreeNodeIntListPoint { public void TreeNodeIntListPoint(int key = 0 , ListPoint value = null , TreeNodeIntListPoint less = null , TreeNodeIntListPoint more = null ) { this.key = key; this.value = value; this.less = less; this.more = more; } public int key; public ListPoint value; public TreeNodeIntListPoint less; public TreeNodeIntListPoint more; }
 
 
 

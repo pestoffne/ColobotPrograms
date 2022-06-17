@@ -20,6 +20,14 @@
 		_MAP_TRIPLET(count, _FIELD, __VA_ARGS__) \
 	}
 
+#define NAMED_TUPLE_EXTENDED(tuple_name, base, count, ...) \
+        public class tuple_name extends base { \
+                public void tuple_name(_MAP_TRIPLET(count, _ARGUMENT, __VA_ARGS__)) { \
+                        _MAP_TRIPLET(count, _ASSIGN, __VA_ARGS__) \
+                } \
+                _MAP_TRIPLET(count, _FIELD, __VA_ARGS__) \
+        }
+
 #define REPEAT(count, macro) _REPEAT_##count(macro)
 #define _REPEAT_1(macro) macro(1)
 #define _REPEAT_2(macro) _REPEAT_1(macro) macro(2)

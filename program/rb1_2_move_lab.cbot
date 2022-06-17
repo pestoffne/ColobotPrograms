@@ -49,6 +49,10 @@ public class Path {
 		return this;
 	}
 	
+	public Path line(point pos) {
+		return this;
+	}
+	
 	public Path arc(float r) {
 		return this;
 	}
@@ -67,15 +71,28 @@ public class Path {
 }
 
 public class MoveArcFunctionVV extends FunctionVV {
-	private EBoost e;
+	private EBoost _e;
 	
 	public void MoveArcFunctionVV(EBoost e) {
-		this.e = e;
+		this._e = e;
 	}
 	
 	public void _() {
-		// start point (84.25, -85.5)
+		AffineCoordinateSystem2D css; Path path;
 		
+		css = coordinate_system_from_matrix_2d(new Matrix_float(3, 2, matrix_values(
+	             0, 5,  79.25,
+        	    -5, 0, -55.25
+	        )));
+		
+		// start point relative = (6, 1), absolute = (84.25, -85.5)
+		path = new Path(this._e);
+		path.line(css._(5, 5));
+		path.arc()
+		path.line(css._(2, 5));
+		path.line(css._(1, 4));
+		path.line(css._(1, 1));
+		path.line(css._(3, 0));
 	}
 }
 

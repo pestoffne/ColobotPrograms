@@ -70,6 +70,11 @@ public string to_str() {
 return this._m.to_str();
 }
 
+public point _(float x, float y , float z) {
+return _m2p_3d(this._m.mul(
+new Matrix_float(1, 4, matrix_values(x, y, z, 1))));
+}
+
 public point _(point pos) {
 return _m2p_3d(this._m.mul(_p2m_3d(pos)).begin());
 }

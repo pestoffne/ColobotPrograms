@@ -81,6 +81,11 @@ public class CAT(AffineCoordinateSystem, SIZE, D) {
 		return this._m.to_str();
 	}
 	
+	public point _(float x, float y IF_3D(, float z)) {
+		return CAT(_m2p_, SIZE, d)(this._m.mul(
+		new Matrix_float(1, SIZE_P1, matrix_values(x, y, IF_3D(z,) 1))));
+	}
+	
 	public point _(point pos) {
 		return CAT(_m2p_, SIZE, d)(this._m.mul(CAT(_p2m_, SIZE, d)(pos)).begin());
 	}

@@ -1,0 +1,54 @@
+// Generated file.
+public class PathLine extends PathPart { public void PathLine(float from_x , float from_y , float to_x , float to_y ) { this.from_x = from_x; this.from_y = from_y; this.to_x = to_x; this.to_y = to_y; } public float from_x; public float from_y; public float to_x; public float to_y; }
+
+
+
+
+
+public point PathLine::from() {
+return new point(from_x, from_y);
+}
+
+public point PathLine::to() {
+return new point(to_x, to_y);
+}
+
+public float PathLine::length() {
+return sqrt(pow((from_x) - (to_x), 2) + pow((from_y) - (to_y), 2));
+}
+
+public float PathLine::time() {
+return sqrt(pow((from_x) - (to_x), 2) + pow((from_y) - (to_y), 2)) / 5;
+}
+
+public void PathLine::go(EBoost e) {
+nan * 0;
+}
+
+public class PathArc extends PathPart { public void PathArc(float center_x , float center_y , float radius , float from_angle , float to_angle ) { this.center_x = center_x; this.center_y = center_y; this.radius = radius; this.from_angle = from_angle; this.to_angle = to_angle; } public float center_x; public float center_y; public float radius; public float from_angle; public float to_angle; }
+
+
+
+
+
+
+public point PathArc::from() {
+return new point(center_x + radius * cos(from_angle), center_y + radius * sin(from_angle));
+}
+
+public point PathArc::to() {
+return new point(center_x + radius * cos(to_angle), center_y + radius * sin(to_angle));
+}
+
+public float PathArc::length() {
+return (3.14159265359 * abs(to_angle - from_angle) * (radius) / 180);
+}
+
+public float PathArc::time() {
+return (3.14159265359 * abs(to_angle - from_angle) * (radius) / 180)
+* ((((1 - 2 / ((radius) + 1))) + (1)) * 2.5);
+}
+
+public void PathArc::go(EBoost e) {
+nan * 0;
+}

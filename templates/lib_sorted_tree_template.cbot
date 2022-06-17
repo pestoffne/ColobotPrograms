@@ -1,6 +1,6 @@
 #include <macro.cbot>
 
-NAMED_TUPLE(TEMPLATE(TreeNode), 4
+NAMED_TUPLE(TEMPLATE(TreeNode), 4,
 	KEY			, key	, = KEY_NULL	,
 	VALUE			, value	, = VALUE_NULL	,
 	TEMPLATE(TreeNode)	, less	, = null	,

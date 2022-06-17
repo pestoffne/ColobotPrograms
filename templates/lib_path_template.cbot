@@ -1,0 +1,105 @@
+// Depends:
+// lib_pathpart.cbot
+// lib_list_pathpart.cbot
+#include <macro.cbot>
+
+#define PI 3.14159265359
+#define MAX_SPEED 5
+#define DISTANCE_2D(fx, fy, tx, ty) sqrt(pow((fx) - (tx), 2) + pow((fy) - (ty), 2))
+#define ARC_LENGTH(angle, radius) (PI * abs(angle) * (radius) / 180)
+#define RADIUS_TO_MOTOR_VALUE(radius) (1 - 2 / ((radius) + 1))
+#define PREDICT_VELOCITY(motor_left, motor_right) (((motor_left) + (motor_right)) * 2.5)
+
+NAMED_TUPLE_EXTENDED(PathLine, PathPart, 4,
+	float, from_x,,
+	float, from_y,,
+	float, to_x,,
+	float, to_y,)
+
+public point PathLine::from() {
+	return new point(from_x, from_y);
+}
+
+public point PathLine::to() {
+	return new point(to_x, to_y);
+}
+
+public float PathLine::length() {
+	return DISTANCE_2D(from_x, from_y, to_x, to_y);
+}
+
+public float PathLine::time() {
+	return DISTANCE_2D(from_x, from_y, to_x, to_y) / MAX_SPEED;
+}
+
+public void PathLine::go(EBoost e) {
+	nan * 0;  // Not implemented
+}
+
+NAMED_TUPLE_EXTENDED(PathArc, PathPart, 5,
+        float, center_x,,
+        float, center_y,,
+        float, radius,,     // assume radius >= 0
+        float, from_angle,, // assume -180 < angle <= 180
+        float, to_angle,)
+
+public point PathArc::from() {
+	return new point(center_x + radius * cos(from_angle), center_y + radius * sin(from_angle));
+}
+
+public point PathArc::to() {
+	return new point(center_x + radius * cos(to_angle), center_y + radius * sin(to_angle));
+}
+
+public float PathArc::length() {
+	return ARC_LENGTH(to_angle - from_angle, radius);
+}
+
+public float PathArc::time() {
+	return ARC_LENGTH(to_angle - from_angle, radius)
+	* PREDICT_VELOCITY(RADIUS_TO_MOTOR_VALUE(radius), 1);
+}
+
+public void PathArc::go(EBoost e) {
+	nan * 0;  // Not implemented
+}
+
+public class PathCompiled {
+	private ListPathPart _list;
+	
+	public void PathCompiled() {
+		
+	}
+	
+	public float length() {
+                ListIteratorPathPart it; float sum;
+
+                for (it = this._list.begin(); not it.is_null(); it.shift()) {
+                        sum += it.value().length();
+                }
+
+                return sum;
+	}
+	
+	public float time() {
+		ListIteratorPathPart it; float sum;
+		
+		for (it = this._list.begin(); not it.is_null(); it.shift()) {
+			sum += it.value().time();
+		}
+		
+		return sum;
+	}
+	
+	public void go(EBoost e) {
+		ListIteratorPathPart it;
+		
+		for (it = this._list.begin(); not it.is_null(); it.shift()) {
+			it.value().go(e);
+		}
+	}
+}
+
+public class Path {
+
+}

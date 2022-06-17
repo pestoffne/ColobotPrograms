@@ -8,7 +8,7 @@ syntax cbot "\.cbot$"
 color brightgreen "\<[0-9.]+\>"
 
 # Keywords
-color green "\<(float|bool|int|object|point|string|void|file)\>"
+color green "\<(float|bool|int|object|point|string|void|file|double)\>"
 color green "\<(class|public|protected|private|static|synchronized|extends|extern)\>"
 color brightyellow "\<(for|if|while|do|else|case|default|switch|and|or|not|sizeof|try|throw|catch|new|repeat)\>"
 color magenta "\<(continue|break|return|this|super)\>"
@@ -39,7 +39,7 @@ color blue "//.*"
 color blue start="/\*" end="\*/"
 
 # Templates
-color white,blue "\<(NAMED_TUPLE|IF_2D|IF_3D)\>"
+color white,blue "\<(NAMED_TUPLE|NAMED_TUPLE_EXTENDED|IF_2D|IF_3D)\>"
 color white,blue "\<(CAT)\>\((~|_|[[:alnum:]])+,[[:space:]]*(~|_|[[:alnum:]])+,[[:space:]]*(~|_|[[:alnum:]])+\)"
 color white,blue "\<(CAT|CMP|REPEAT)\>\((~|_|[[:alnum:]])+,[[:space:]]*(~|_|[[:alnum:]])+\)"
 color white,blue "\<(TEMPLATE)\>\((~|_|[[:alnum:]])+\)"
