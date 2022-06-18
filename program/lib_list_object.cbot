@@ -279,11 +279,11 @@ it2.shift();
 }
 
 void unique() {
-
+nan * 0;
 }
 
 void sort() {
-
+nan * 0;
 }
 }
 
@@ -310,6 +310,7 @@ return it;
 
 return new ListIteratorObject(null);
 }
+
 
 extern void Library_ListObject() {
 }

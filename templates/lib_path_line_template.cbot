@@ -1,0 +1,31 @@
+// Depends:
+// lib_pathpart.cbot
+#include <macro.cbot>
+
+#define DISTANCE_2D(fx, fy, tx, ty) sqrt(pow((fx) - (tx), 2) + pow((fy) - (ty), 2))
+
+NAMED_TUPLE_EXTENDED(PathLine, PathPart, 4,
+	float, from_x,,
+	float, from_y,,
+	float, to_x,,
+	float, to_y,)
+
+public point PathLine::from() {
+	return new point(from_x, from_y);
+}
+
+public point PathLine::to() {
+	return new point(to_x, to_y);
+}
+
+public float PathLine::length() {
+	return DISTANCE_2D(from_x, from_y, to_x, to_y);
+}
+
+public float PathLine::time() {
+	return DISTANCE_2D(from_x, from_y, to_x, to_y) / MAX_SPEED;
+}
+
+public void PathLine::go(EBoost e) {
+	nan * 0;  // Not implemented
+}

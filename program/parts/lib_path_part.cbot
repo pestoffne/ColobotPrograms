@@ -1,0 +1,29 @@
+public class PathPart {
+	public void PathPart() {
+		nan * 0;  // abstract class
+	}
+	
+	public point from() {
+		nan * 0;  // abstract method
+		return new point;
+	}
+	
+	public point to() {
+		nan * 0;  // abstract method
+		return new point;
+	}
+	
+	public float length() {
+		nan * 0;  // abstract method
+		return 0;
+	}
+	
+	public float time() {
+		nan * 0;  // abstract method
+		return 0;
+	}
+	
+	public void go(EBoost e) {
+		nan * 0;  // abstract method
+	}
+}

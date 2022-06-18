@@ -1,0 +1,35 @@
+// Depends:
+// lib_pathpart.cbot
+#include <macro.cbot>
+
+#define ARC_LENGTH(angle, radius) (PI * abs(angle) * (radius) / 180)
+#define RADIUS_TO_MOTOR_VALUE(radius) (1 - 2 / ((radius) + 1))
+#define PREDICT_VELOCITY(motor_left, motor_right) (((motor_left) + (motor_right)) * 2.5)
+
+NAMED_TUPLE_EXTENDED(PathArc, PathPart, 5,
+        float, center_x,,
+        float, center_y,,
+        float, radius,,     // assume radius >= 0
+        float, from_angle,, // assume -180 < angle <= 180
+        float, to_angle,)
+
+public point PathArc::from() {
+	return new point(center_x + radius * cos(from_angle), center_y + radius * sin(from_angle));
+}
+
+public point PathArc::to() {
+	return new point(center_x + radius * cos(to_angle), center_y + radius * sin(to_angle));
+}
+
+public float PathArc::length() {
+	return ARC_LENGTH(to_angle - from_angle, radius);
+}
+
+public float PathArc::time() {
+	return ARC_LENGTH(to_angle - from_angle, radius)
+	* PREDICT_VELOCITY(RADIUS_TO_MOTOR_VALUE(radius), 1);
+}
+
+public void PathArc::go(EBoost e) {
+	nan * 0;  // Not implemented
+}

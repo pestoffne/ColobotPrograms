@@ -1,0 +1,27 @@
+// Generated file.
+
+
+
+public class Path {
+
+private PathCompiled _path_compiled;
+
+public void Path() {
+
+}
+
+public void compile() {
+}
+
+public float length() {
+return this._path_compiled.length();
+}
+
+public float time() {
+return this._path_compiled.time();
+}
+
+public void go(EBoost e) {
+this._path_compiled.go(e);
+}
+}

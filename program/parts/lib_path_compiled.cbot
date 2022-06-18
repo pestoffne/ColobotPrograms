@@ -1,0 +1,43 @@
+// Generated file.
+
+
+
+public class PathCompiled {
+private ListPathPart _list;
+
+public void PathCompiled(ListPathPart list) {
+this._list = list;
+}
+
+public float length() {
+ListIteratorPathPart it; float sum;
+
+sum = 0;
+
+for (it = this._list.begin(); not it.is_null(); it.shift()) {
+sum += it.value().length();
+}
+
+return sum;
+}
+
+public float time() {
+ListIteratorPathPart it; float sum;
+
+sum = 0;
+
+for (it = this._list.begin(); not it.is_null(); it.shift()) {
+sum += it.value().time();
+}
+
+return sum;
+}
+
+public void go(EBoost e) {
+ListIteratorPathPart it;
+
+for (it = this._list.begin(); not it.is_null(); it.shift()) {
+it.value().go(e);
+}
+}
+}

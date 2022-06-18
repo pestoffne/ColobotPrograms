@@ -1,0 +1,9 @@
+#include <lib_path_part.cbot>
+#include <lib_list_path_part.cbot>
+#include <lib_path_arc.cbot>
+#include <lib_path_line.cbot>
+#include <lib_path_compiled.cbot>
+#include <lib_path.cbot>
+
+extern void Library_PathAll() {
+}

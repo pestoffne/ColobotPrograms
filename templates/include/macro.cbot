@@ -52,3 +52,5 @@
 #define MAX_INT 2147483647
 #define MIN_INT -2147483648
 #define LOOP repeat (MAX_INT)
+#define MAX_SPEED 5
+#define PI 3.14159265359

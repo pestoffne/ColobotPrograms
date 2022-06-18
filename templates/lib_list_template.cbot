@@ -289,11 +289,11 @@ public class TEMPLATE(List) {
 	}
 	
 	void unique() {
-		// TODO
+		nan * 0;  // Not implemented
 	}
 	
 	void sort() {
-		// TODO
+		nan * 0;  // Not implemented
 	}
 }
 
@@ -321,5 +321,7 @@ public TEMPLATE(ListIterator) list_find_if(TEMPLATE(ListIterator) first, TEMPLAT
 	return new TEMPLATE(ListIterator)(null);
 }
 
+#if EXTERN
 extern void TEMPLATE(Library_List)() {
 }
+#endif
