@@ -72,8 +72,11 @@ $(PROGRAM_DIR)/lib_list_object.cbot: lib_list_template.cbot $(INCLUDE_DIR)/macro
 $(PROGRAM_DIR)/lib_list_upo.cbot: lib_list_template.cbot $(INCLUDE_DIR)/macro.cbot
 	$(call generate_list,$(PROGRAM_DIR)/lib_list_upo.cbot,UnaryPredicateObject,UnaryPredicateObject,null,1,lib_list_template.cbot)
 
-$(PARTS_DIR)/lib_list_path_part.cbot: lib_list_template.cbot $(PARTS_DIR)/lib_path_part.cbot $(INCLUDE_DIR)/macro.cbot
+$(PARTS_DIR)/lib_list_path_part.cbot: lib_list_template.cbot $(INCLUDE_DIR)/macro.cbot
 	$(call generate_list,$(PARTS_DIR)/lib_list_path_part.cbot,PathPart,PathPart,null,0,lib_list_template.cbot)
+
+$(PARTS_DIR)/lib_list_path_node.cbot: lib_list_template.cbot $(INCLUDE_DIR)/macro.cbot
+	$(call generate_list,$(PARTS_DIR)/lib_list_path_node.cbot,PathNode,PathNode,null,0,lib_list_template.cbot)
 
 $(PROGRAM_DIR)/lib_tree_ilp.cbot: lib_sorted_tree_template.cbot $(PROGRAM_DIR)/lib_list_point.cbot $(INCLUDE_DIR)/macro.cbot
 	$(call generate_sorted_tree,$(PROGRAM_DIR)/lib_tree_ilp.cbot,int,ListPoint,Int,ListPoint,0,null,((X)-(Y)),lib_sorted_tree_template.cbot)
@@ -102,5 +105,12 @@ $(PARTS_DIR)/lib_path_line.cbot: lib_path_line_template.cbot $(INCLUDE_DIR)/macr
 $(PARTS_DIR)/lib_path.cbot: lib_path_template.cbot $(INCLUDE_DIR)/macro.cbot
 	$(call generate_0,$(PARTS_DIR)/lib_path.cbot,lib_path_template.cbot)
 
-$(PROGRAM_DIR)/lib_path_all.cbot: $(PARTS_DIR)/lib_path_part.cbot $(PARTS_DIR)/lib_list_path_part.cbot $(PARTS_DIR)/lib_path_arc.cbot $(PARTS_DIR)/lib_path_line.cbot $(PARTS_DIR)/lib_path_compiled.cbot $(PARTS_DIR)/lib_path.cbot
-	$(call assemble_parts,$(PROGRAM_DIR)/lib_path_all.cbot,lib_path_all.cbot)
+$(PARTS_DIR)/lib_path_node.cbot: lib_path_node_template.cbot $(INCLUDE_DIR)/macro.cbot
+	$(call generate_0,$(PARTS_DIR)/lib_path_node.cbot,lib_path_node_template.cbot)
+
+$(PROGRAM_DIR)/lib_path_all.cbot: lib_path_all_template.cbot \
+$(PARTS_DIR)/lib_path_part.cbot $(PARTS_DIR)/lib_list_path_part.cbot \
+$(PARTS_DIR)/lib_path_node.cbot $(PARTS_DIR)/lib_list_path_node.cbot \
+$(PARTS_DIR)/lib_path_arc.cbot $(PARTS_DIR)/lib_path_line.cbot \
+$(PARTS_DIR)/lib_path_compiled.cbot $(PARTS_DIR)/lib_path.cbot
+	$(call assemble_parts,$(PROGRAM_DIR)/lib_path_all.cbot,lib_path_all_template.cbot)

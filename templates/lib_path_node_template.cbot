@@ -1,0 +1,8 @@
+// Depends:
+// None
+#include <macro.cbot>
+
+NAMED_TUPLE(PathNode, 3,
+	float, center_x,,
+	float, center_y,,
+	float, radius,)   // radius may be negative

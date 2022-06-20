@@ -1,0 +1,61 @@
+// Depends:
+// lib_eboost.cbot
+#include <lib_path_part.cbot>
+#include <lib_list_path_part.cbot>
+#include <lib_path_node.cbot>
+#include <lib_list_path_node.cbot>
+#include <lib_path_arc.cbot>
+#include <lib_path_line.cbot>
+#include <lib_path_compiled.cbot>
+#include <lib_path.cbot>
+
+public class MoveArcFunctionVV extends FunctionVV {
+	private EBoost _e;
+	
+	public void MoveArcFunctionVV(EBoost e) {
+		this._e = e;
+	}
+	
+	public void _() {
+		AffineCoordinateSystem2D css; Path path;
+		
+		css = coordinate_system_from_matrix_2d(new Matrix_float(3, 2, matrix_values(
+	             0, 5,  79.25,
+        	    -5, 0, -55.25
+	        )));
+		
+		// start position relative almost = (6, 1), absolute = (84.25, -85.5)
+#if 1
+		point pos = this._e.actor.position;
+		pos.y += 1.75;
+		path = new Path()
+		    .add_node(pos, 1.75)
+#else
+		path = new Path(this._e.actor.position, this._e.actor.orientation)
+#endif
+		    .add_node(css._(5, 5), 1.75)
+		    .add_node(css._(2, 5), 1.75)
+		    .add_node(css._(1, 4), 1.75)
+		    .add_node(css._(1, 1), 1.75)
+		    .add_node(css._(3, 0), 1.75)
+		    .add_node(css._(3.35, 0), 0)  // 3.35 = 3 + 1.75 * 0.2
+		    .compile();
+		
+		message("length = " + path.length(), ", expected range from 68.86 to 92.5");
+		message("time = " + path.time(), ", expected range from ~16 to 27");
+		
+		//path.go(this._e);
+	}
+}
+
+extern void object::MoveLabirint()
+{
+	float time;
+	EBoost e(this);
+	
+	//pendown(4, 0.1);
+	time = e.benchmark(new MoveArcFunctionVV(e));  // ?? seconds
+	//penup();
+	
+	//message(e.round_digits(time, 2));
+}

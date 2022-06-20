@@ -1,28 +1,56 @@
 // Depends:
+// lib_path_node.cbot
+// lib_list_path_node.cbot
+// lib_path_part.cbot
+// lib_list_path_part.cbot
 // lib_path_compiled.cbot
 #include <macro.cbot>
 
 public class Path {
-	//private ListFoo _list;
+	private ListPathNode _list_nodes;
 	private PathCompiled _path_compiled;
 	
 	public void Path() {
-		//this._list = new ListFoo();
+		this._list_nodes = new ListPathNode();
+	}
+	
+	public Path add_node(point center, float radius) {
+		// assume 2D point for path
+		this._list_nodes.push_back(new PathNode(center.x, center.y, radius));
+		return this;
+	}
+	
+	public Path add_node(float center_x, float center_y, float radius) {
+		this._list_nodes.push_back(new PathNode(center_x, center_y, radius));
+		return this;
 	}
 	
 	public void compile() {
-		/*ListPathPart list; ListIteratorFoo it;
+		ListPathPart list_parts; ListIteratorPathNode it1, it2; PathLine tl;
 		
-		list = new ListPathPart();
+		list_parts = new ListPathPart();
 		
-		for (it = this._list.begin(); not it.is_null(); it.shift()) {
-			...
-			list.push_back(...);
+		it1 = it2 = this._list_nodes.begin();
+		it2.shift();
+		// assume it1.value().radius == 0
+		// rotation may be different, path may start from arc
+		
+		while (not it2.is_null()) {
+			tl = tangent_line(it1, it2);
+			//list_parts.push_back(arc);
+			list_parts.push_back(tl);
+			
+			it1 = it2;
+			it2.shift();
 		}
 		
-		this._path_compiled = new PathCompiled(list);*/
+		// last line
+		// assume it2.value().radius == 0
+		
+		this._list_nodes = null;
+		this._path_compiled = new PathCompiled(list_parts);
 	}
-
+	
 	public float length() {
 		return this._path_compiled.length();
 	}
