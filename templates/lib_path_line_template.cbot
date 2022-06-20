@@ -1,5 +1,6 @@
 // Depends:
 // lib_pathpart.cbot
+// lib_affine_coordinate_system.cbot
 #include <macro.cbot>
 
 #define DISTANCE_2D(fx, fy, tx, ty) sqrt(pow((fx) - (tx), 2) + pow((fy) - (ty), 2))
@@ -28,4 +29,9 @@ public float PathLine::time() {
 
 public void PathLine::go(EBoost e) {
 	nan * 0;  // Not implemented
+}
+
+public PathLine tangent_line(PathNode c1, PathNode c2) {
+	// Not implemented
+	return new PathLine(0, 0, 1, 1);
 }

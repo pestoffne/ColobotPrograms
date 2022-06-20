@@ -1,4 +1,6 @@
 // Depends:
+// lib_matrix_float.cbot
+// lib_affine_coordinate_system.cbot
 // lib_eboost.cbot
 #include <lib_path_part.cbot>
 #include <lib_list_path_part.cbot>

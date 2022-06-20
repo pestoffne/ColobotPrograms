@@ -5,6 +5,7 @@
 #define ARC_LENGTH(angle, radius) (PI * abs(angle) * (radius) / 180)
 #define RADIUS_TO_MOTOR_VALUE(radius) (1 - 2 / ((radius) + 1))
 #define PREDICT_VELOCITY(motor_left, motor_right) (((motor_left) + (motor_right)) * 2.5)
+#define GET_ANGLE(dx, dy) ((dx) > 0 ? atan((dy) / (dx)) : atan((dy) / (dx)) + 180)
 
 NAMED_TUPLE_EXTENDED(PathArc, PathPart, 5,
         float, center_x,,
@@ -32,4 +33,19 @@ public float PathArc::time() {
 
 public void PathArc::go(EBoost e) {
 	nan * 0;  // Not implemented
+}
+
+#if 0
+public PathArc create_arc(point from, point to, point center, float radius) {
+	return new PathArc(center.x, center.y, radius,
+	    GET_ANGLE(from.x - center.x, from.y - center.y),
+	    GET_ANGLE(to.x - center.x, to.y - center.y));
+}
+#endif
+
+public PathArc create_arc(
+float from_x, float from_y, float to_x, float to_y, float center_x, float center_y, float radius) {
+	return new PathArc(center_x, center_y, radius,
+	    GET_ANGLE(from_x - center_x, from_y - center_y),
+	    GET_ANGLE(to_x - center_x, to_y - center_y));
 }

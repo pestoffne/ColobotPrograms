@@ -26,7 +26,7 @@ public class Path {
 	}
 	
 	public void compile() {
-		ListPathPart list_parts; ListIteratorPathNode it1, it2; PathLine tl;
+		ListPathPart list_parts; ListIteratorPathNode it1, it2; PathLine line;
 		
 		list_parts = new ListPathPart();
 		
@@ -36,9 +36,12 @@ public class Path {
 		// rotation may be different, path may start from arc
 		
 		while (not it2.is_null()) {
-			tl = tangent_line(it1, it2);
-			//list_parts.push_back(arc);
-			list_parts.push_back(tl);
+			line = tangent_line(it1.value(), it2.value());
+			list_parts.push_back(create_arc(
+			    line.from_x, line.from_y, line.to_x, line.to_y,
+			    it1.value().center_x, it1.value().center_y, it1.value().radius
+			));
+			list_parts.push_back(line);
 			
 			it1 = it2;
 			it2.shift();
