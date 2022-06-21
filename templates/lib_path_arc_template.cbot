@@ -5,7 +5,6 @@
 #define ARC_LENGTH(angle, radius) (PI * abs(angle) * (radius) / 180)
 #define RADIUS_TO_MOTOR_VALUE(radius) (1 - 2 / ((radius) + 1))
 #define PREDICT_VELOCITY(motor_left, motor_right) (((motor_left) + (motor_right)) * 2.5)
-#define GET_ANGLE(dx, dy) ((dx) > 0 ? atan((dy) / (dx)) : atan((dy) / (dx)) + 180)
 
 NAMED_TUPLE_EXTENDED(PathArc, PathPart, 5,
         float, center_x,,

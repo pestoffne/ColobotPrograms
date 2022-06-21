@@ -97,6 +97,14 @@ ab.vstack_mut(new Matrix_float(4, 1, matrix_values(
 return new AffineCoordinateSystem3D(ab);
 }
 
+
+public AffineCoordinateSystem3D coordinate_system_from_2_points_3d(
+float from_x, float from_y , float from_z, float to_x, float to_y , float to_z) {
+return coordinate_system_identity_3d()
+.translate(from_x, from_y , from_z)
+.rotate(( (to_x - from_x) > 0 ? atan((to_y - from_y) / (to_x - from_x)) : (to_x - from_x) < 0 ? atan((to_y - from_y) / (to_x - from_x)) + 180 : ((to_y - from_y) > 0 ? 90 : -90) ));
+}
+
 public AffineCoordinateSystem3D coordinate_system_identity_3d() {
 return new AffineCoordinateSystem3D(matrix_eye_float(4));
 }

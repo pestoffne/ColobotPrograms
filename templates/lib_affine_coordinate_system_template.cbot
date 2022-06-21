@@ -108,6 +108,14 @@ public CAT(AffineCoordinateSystem, SIZE, D) CAT(coordinate_system_from_matrix_, 
 	return new CAT(AffineCoordinateSystem, SIZE, D)(ab);
 }
 
+// get 0x line from 2 points, and 0y perpendicular (+90) to 0x
+public CAT(AffineCoordinateSystem, SIZE, D) CAT(coordinate_system_from_2_points_, SIZE, d)(
+float from_x, float from_y IF_3D(, float from_z), float to_x, float to_y IF_3D(, float to_z)) {
+	return CAT(coordinate_system_identity_, SIZE, d)()
+	    .translate(from_x, from_y IF_3D(, from_z))
+	    .rotate(GET_ANGLE(to_x - from_x, to_y - from_y));  // 2D rotation
+}
+
 public CAT(AffineCoordinateSystem, SIZE, D) CAT(coordinate_system_identity_, SIZE, d)() {
 	return new CAT(AffineCoordinateSystem, SIZE, D)(matrix_eye_float(SIZE_P1));
 }

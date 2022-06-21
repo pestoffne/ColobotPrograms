@@ -97,6 +97,14 @@ ab.vstack_mut(new Matrix_float(3, 1, matrix_values(
 return new AffineCoordinateSystem2D(ab);
 }
 
+
+public AffineCoordinateSystem2D coordinate_system_from_2_points_2d(
+float from_x, float from_y , float to_x, float to_y ) {
+return coordinate_system_identity_2d()
+.translate(from_x, from_y )
+.rotate(( (to_x - from_x) > 0 ? atan((to_y - from_y) / (to_x - from_x)) : (to_x - from_x) < 0 ? atan((to_y - from_y) / (to_x - from_x)) + 180 : ((to_y - from_y) > 0 ? 90 : -90) ));
+}
+
 public AffineCoordinateSystem2D coordinate_system_identity_2d() {
 return new AffineCoordinateSystem2D(matrix_eye_float(3));
 }
