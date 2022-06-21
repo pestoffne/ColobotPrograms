@@ -154,6 +154,74 @@ public class TestAffineCoordinateSystem2D extends EBoost {
 		// assert
 		assert(_almost_eq_2d(p2_e, p2_a), "test_invert_y: error p2_e != p2_a");
 	}
+	
+	void test_from_2_points_m90() {
+		AffineCoordinateSystem2D cs; point p0, p0_a, p0_e, p1, p2;
+		
+		// prepare
+		p1 = new point(2, 3);
+		p2 = new point(2, 0);
+		p0 = new point(5, -1);
+		p0_e = new point(1, -2);
+		
+		// test
+		cs = coordinate_system_from_2_points_2d(p1.x, p1.y, p2.x, p2.y);
+		p0_a = cs._(p0);
+		
+		// assert
+		assert(_almost_eq_2d(p0_e, p0_a), "test_from_2_points_m90: error p0_e != p0_a");
+	}
+	
+	void test_from_2_points_p90() {
+		AffineCoordinateSystem2D cs; point p0, p0_a, p0_e, p1, p2;
+		
+		// prepare
+		p1 = new point(2, 0);
+		p2 = new point(2, 3);
+		p0 = new point(-2, 1);
+		p0_e = new point(1, -2);
+		
+		// test
+		cs = coordinate_system_from_2_points_2d(p1.x, p1.y, p2.x, p2.y);
+		p0_a = cs._(p0);
+		
+		// assert
+		assert(_almost_eq_2d(p0_e, p0_a), "test_from_2_points_p90: error p0_e != p0_a");
+	}
+	
+	void test_from_2_points_180() {
+		AffineCoordinateSystem2D cs; point p0, p0_a, p0_e, p1, p2;
+		
+		// prepare
+		p1 = new point(4, 3);
+		p2 = new point(2, 3);
+		p0 = new point(3, 5);
+		p0_e = new point(1, -2);
+		
+		// test
+		cs = coordinate_system_from_2_points_2d(p1.x, p1.y, p2.x, p2.y);
+		p0_a = cs._(p0);
+		
+		// assert
+		assert(_almost_eq_2d(p0_e, p0_a), "test_from_2_points_180: error p0_e != p0_a");
+	}
+	
+	void test_from_2_points_p45() {
+		AffineCoordinateSystem2D cs; point p0, p0_a, p0_e, p1, p2;
+		
+		// prepare
+		p1 = new point(2, 1);
+		p2 = new point(3, 2);
+		p0 = new point(2 * sqrt(2), sqrt(2));
+		p0_e = new point(3, 4);
+		
+		// test
+		cs = coordinate_system_from_2_points_2d(p1.x, p1.y, p2.x, p2.y);
+		p0_a = cs._(p0);
+		
+		// assert
+		assert(_almost_eq_2d(p0_e, p0_a), "test_from_2_points_p45: error p0_e != p0_a");
+	}
 }
 
 extern void Test_AffineCoordinateSystem2D() {
@@ -167,6 +235,9 @@ extern void Test_AffineCoordinateSystem2D() {
 	t.test_scale_rotate();
 	t.test_from_matrix();
 	t.test_invert_y();
+	t.test_from_2_points_m90();
+	t.test_from_2_points_p90();
+	t.test_from_2_points_180();
+	t.test_from_2_points_p45();
 	message("Tests passed", DisplayInfo);
 }
-
