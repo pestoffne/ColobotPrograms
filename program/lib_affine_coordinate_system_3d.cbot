@@ -72,7 +72,7 @@ return this._m.to_str();
 
 public point _(float x, float y , float z) {
 return _m2p_3d(this._m.mul(
-new Matrix_float(1, 4, matrix_values(x, y, z, 1))));
+new Matrix_float(1, 4, matrix_values(x, y, z, 1))).begin());
 }
 
 public point _(point pos) {
