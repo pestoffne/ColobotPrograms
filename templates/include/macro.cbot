@@ -1,3 +1,5 @@
+#pragma once
+
 #define _MAP_TRIPLET(count, macro, ...) _MT_ ## count(macro, __VA_ARGS__)
 #define _MT_1(m, a, b, c) m(a, b, c)
 #define _MT_2(m, a, b, c, ...) m(a, b, c, __VA_ARGS__) _MT_1(m, __VA_ARGS__)
@@ -62,3 +64,6 @@
 	? atan((dy) / (dx)) + 180 \
 	: ((dy) > 0 ? 90 : -90) \
 )
+
+#define ROUND_1(x) (round((x) * 10) / 10)
+#define ROUND_2(x) (round((x) * 100) / 100)

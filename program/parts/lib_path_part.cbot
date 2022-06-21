@@ -26,4 +26,9 @@ public class PathPart {
 	public void go(EBoost e) {
 		nan * 0;  // abstract method
 	}
+	
+	public string to_str() {
+		nan * 0;  // abstract method
+		return "";
+	}
 }

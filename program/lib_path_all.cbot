@@ -1,34 +1,42 @@
 
 
+
+
 public class PathPart {
- public void PathPart() {
-  nan * 0;
- }
-
- public point from() {
-  nan * 0;
-  return new point;
- }
-
- public point to() {
-  nan * 0;
-  return new point;
- }
-
- public float length() {
-  nan * 0;
-  return 0;
- }
-
- public float time() {
-  nan * 0;
-  return 0;
- }
-
- public void go(EBoost e) {
-  nan * 0;
- }
+public void PathPart() {
+nan * 0;
 }
+
+public point from() {
+nan * 0;
+return new point;
+}
+
+public point to() {
+nan * 0;
+return new point;
+}
+
+public float length() {
+nan * 0;
+return 0;
+}
+
+public float time() {
+nan * 0;
+return 0;
+}
+
+public void go(EBoost e) {
+nan * 0;
+}
+
+public string to_str() {
+nan * 0;
+return "";
+}
+}
+
 
 
 public class UnaryPredicatePathPart {
@@ -345,7 +353,9 @@ return new ListIteratorPathPart(null);
 
 
 
+
 public class PathNode { public void PathNode(float center_x , float center_y , float radius ) { this.center_x = center_x; this.center_y = center_y; this.radius = radius; } public float center_x; public float center_y; public float radius; }
+
 
 
 public class UnaryPredicatePathNode {
@@ -686,11 +696,17 @@ public void PathArc::go(EBoost e) {
 nan * 0;
 }
 
-
-
-
-
-
+public string PathArc::to_str() {
+return "PathArc(center_x=" + (round((center_x) * 100) / 100) + ", center_y=" + (round((center_y) * 100) / 100)
++ ", radius=" + (round((radius) * 100) / 100) + ", from_angle=" + (round((from_angle) * 100) / 100)
++ ", to_angle=" + (round((to_angle) * 100) / 100) + ")";
+}
+public PathArc create_arc(
+float from_x, float from_y, float to_x, float to_y, float center_x, float center_y, float radius) {
+return new PathArc(center_x, center_y, radius,
+( (from_x - center_x) > 0 ? atan((from_y - center_y) / (from_x - center_x)) : (from_x - center_x) < 0 ? atan((from_y - center_y) / (from_x - center_x)) + 180 : ((from_y - center_y) > 0 ? 90 : -90) ),
+( (to_x - center_x) > 0 ? atan((to_y - center_y) / (to_x - center_x)) : (to_x - center_x) < 0 ? atan((to_y - center_y) / (to_x - center_x)) + 180 : ((to_y - center_y) > 0 ? 90 : -90) ));
+}
 public class PathLine extends PathPart { public void PathLine(float from_x , float from_y , float to_x , float to_y ) { this.from_x = from_x; this.from_y = from_y; this.to_x = to_x; this.to_y = to_y; } public float from_x; public float from_y; public float to_x; public float to_y; }
 
 
@@ -716,6 +732,33 @@ return sqrt(pow((from_x) - (to_x), 2) + pow((from_y) - (to_y), 2)) / 5;
 public void PathLine::go(EBoost e) {
 nan * 0;
 }
+
+public string PathLine::to_str() {
+return "PathLine(from_x=" + (round((from_x) * 100) / 100) + ", from_y=" + (round((from_y) * 100) / 100)
++ ", to_x=" + (round((to_x) * 100) / 100) + ", to_y=" + (round((to_y) * 100) / 100) + ")";
+}
+
+public PathLine tangent_line(PathNode c1, PathNode c2) {
+AffineCoordinateSystem2D cs; point p1, p2; float dist, pm, mp, from_x, from_y, to_x, to_y;
+
+dist = sqrt(pow((c1.center_x) - (c2.center_x), 2) + pow((c1.center_y) - (c2.center_y), 2));
+mp = dist - c1.radius + c2.radius;
+pm = dist + c1.radius - c2.radius;
+
+
+from_x = sqrt(mp * pm) * c1.radius / dist;
+from_y = sqrt(pow(c1.radius, 2) - pow(from_x, 2));
+
+
+to_x = (pow(dist, 2) + c1.radius * c2.radius - pow(c2.radius, 2)) / dist;
+to_y = sqrt(pow(c2.radius, 2) - pow(to_x, 2) + pow(dist, 2));
+
+cs = coordinate_system_from_2_points_2d(c1.center_x, c1.center_y, c2.center_x, c2.center_y);
+p1 = cs._(from_x, from_y);
+p2 = cs._(to_x, to_y);
+return new PathLine(p1.x, p1.y, p2.x, p2.y);
+}
+
 
 
 
@@ -758,12 +801,27 @@ for (it = this._list.begin(); not it.is_null(); it.shift()) {
 it.value().go(e);
 }
 }
+
+public void debug_dump(string filename) {
+ListIteratorPathPart it; file f;
+
+f = new file();
+f.open(filename, "w");
+
+for (it = this._list.begin(); not it.is_null(); it.shift()) {
+f.writeln(it.value().to_str());
+}
+
+f.close();
+}
 }
 public class Path {
 private ListPathNode _list_nodes;
 private PathCompiled _path_compiled;
+private point _start;
 
-public void Path() {
+public void Path(point start) {
+this._start = start;
 this._list_nodes = new ListPathNode();
 }
 
@@ -772,36 +830,33 @@ public Path add_node(point center, float radius) {
 this._list_nodes.push_back(new PathNode(center.x, center.y, radius));
 return this;
 }
-
-public Path add_node(float center_x, float center_y, float radius) {
-this._list_nodes.push_back(new PathNode(center_x, center_y, radius));
-return this;
-}
-
-public void compile() {
-ListPathPart list_parts; ListIteratorPathNode it1, it2; PathLine tl;
+public Path compile() {
+ListPathPart list_parts; ListIteratorPathNode it1, it2; PathLine line; float px, py;
 
 list_parts = new ListPathPart();
 
-it1 = it2 = this._list_nodes.begin();
-it2.shift();
-
-
+it1 = this._list_nodes.begin();
+it2 = it1.copy().shift();
+px = this._start.x;
+py = this._start.y;
 
 while (not it2.is_null()) {
-tl = tangent_line(it1, it2);
+line = tangent_line(it1.value(), it2.value());
+list_parts.push_back(create_arc(
+px, py, line.from_x, line.from_y,
+it1.value().center_x, it1.value().center_y, it1.value().radius
+));
+list_parts.push_back(line);
 
-list_parts.push_back(tl);
-
-it1 = it2;
+px = line.to_x;
+py = line.to_y;
+it1.shift();
 it2.shift();
 }
 
-
-
-
 this._list_nodes = null;
 this._path_compiled = new PathCompiled(list_parts);
+return this;
 }
 
 public float length() {
@@ -815,54 +870,58 @@ return this._path_compiled.time();
 public void go(EBoost e) {
 this._path_compiled.go(e);
 }
+
+public void debug_dump(string filename="debug_dump_path.txt") {
+this._path_compiled.debug_dump(filename);
+}
 }
 
 public class MoveArcFunctionVV extends FunctionVV {
- private EBoost _e;
+private EBoost _e;
 
- public void MoveArcFunctionVV(EBoost e) {
-  this._e = e;
- }
+public void MoveArcFunctionVV(EBoost e) {
+this._e = e;
+}
 
- public void _() {
-  AffineCoordinateSystem2D css; Path path;
+public void _() {
+AffineCoordinateSystem2D css; Path path;
 
-  css = coordinate_system_from_matrix_2d(new Matrix_float(3, 2, matrix_values(
-              0, 5, 79.25,
-             -5, 0, -55.25
-         )));
-
-
-
-  point pos = this._e.actor.position;
-  pos.y += 1.75;
-  path = new Path()
-      .add_node(pos, 1.75)
+css = coordinate_system_from_matrix_2d(new Matrix_float(3, 2, matrix_values(
+0, 5, 79.25,
+-5, 0, -55.25
+)));
 
 
 
-      .add_node(css._(5, 5), 1.75)
-      .add_node(css._(2, 5), 1.75)
-      .add_node(css._(1, 4), 1.75)
-      .add_node(css._(1, 1), 1.75)
-      .add_node(css._(3, 0), 1.75)
-      .add_node(css._(3.35, 0), 0)
-      .compile();
-
-  message("length = " + path.length(), ", expected range from 68.86 to 92.5");
-  message("time = " + path.time(), ", expected range from ~16 to 27");
+point pos = this._e.actor.position;
+pos.y += 1.75;
+path = new Path(this._e.actor.position)
+.add_node(pos, 1.75)
 
 
- }
+
+.add_node(css._(5, 5), 1.75)
+.add_node(css._(2, 5), 1.75)
+.add_node(css._(1, 4), 1.75)
+.add_node(css._(1, 1), 1.75)
+.add_node(css._(3, 0), 1.75)
+.add_node(css._(3.35, 0), 0)
+.compile();
+
+message("length = " + path.length() + ", expected range from 68.86 to 92.5");
+message("time = " + path.time() + ", expected range from about 16 to 27");
+path.debug_dump("debug_dump_pathX.txt");
+
+}
 }
 
 extern void object::MoveLabirint()
 {
- float time;
- EBoost e(this);
+float time;
+EBoost e(this);
 
 
- time = e.benchmark(new MoveArcFunctionVV(e));
+time = e.benchmark(new MoveArcFunctionVV(e));
 
 
 

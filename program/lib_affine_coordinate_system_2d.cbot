@@ -1,4 +1,5 @@
 // Generated file.
+
 public class AffineCoordinateSystem2D {
 private Matrix_float _m;
 

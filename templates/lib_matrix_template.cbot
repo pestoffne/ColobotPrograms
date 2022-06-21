@@ -189,7 +189,7 @@ public class CAT(Matrix_, TYPE) {
 		this._set_shape_mut();
 	}
 	
-	public void debug_dump(string filename="matrix_debug_dump.txt") {
+	public void debug_dump(string filename="debug_dump_matrix.txt") {
 		CAT(MatrixElem_, TYPE) p; string line; file f;
 		
 		f = new file();

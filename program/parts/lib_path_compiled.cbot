@@ -2,6 +2,7 @@
 
 
 
+
 public class PathCompiled {
 private ListPathPart _list;
 
@@ -39,5 +40,18 @@ ListIteratorPathPart it;
 for (it = this._list.begin(); not it.is_null(); it.shift()) {
 it.value().go(e);
 }
+}
+
+public void debug_dump(string filename) {
+ListIteratorPathPart it; file f;
+
+f = new file();
+f.open(filename, "w");
+
+for (it = this._list.begin(); not it.is_null(); it.shift()) {
+f.writeln(it.value().to_str());
+}
+
+f.close();
 }
 }

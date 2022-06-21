@@ -31,7 +31,28 @@ public void PathLine::go(EBoost e) {
 	nan * 0;  // Not implemented
 }
 
+public string PathLine::to_str() {
+	return "PathLine(from_x=" + ROUND_2(from_x) + ", from_y=" + ROUND_2(from_y)
+	+ ", to_x=" + ROUND_2(to_x) + ", to_y=" + ROUND_2(to_y) + ")";
+}
+
 public PathLine tangent_line(PathNode c1, PathNode c2) {
-	// Not implemented
-	return new PathLine(0, 0, 1, 1);
+	AffineCoordinateSystem2D cs; point p1, p2; float dist, pm, mp, from_x, from_y, to_x, to_y;
+	
+	dist = DISTANCE_2D(c1.center_x, c1.center_y, c2.center_x, c2.center_y);
+	mp = dist - c1.radius + c2.radius;
+	pm = dist + c1.radius - c2.radius;
+	
+	// assume dist is not zero
+	from_x = sqrt(mp * pm) * c1.radius / dist;
+	from_y = sqrt(pow(c1.radius, 2) - pow(from_x, 2));
+	//to_x = sqrt(c2.radius * (2 * c1.radius - c2.radius) * mp * pm) + mp * pm / dist;
+	//to_x = sqrt((2 * c1.radius * c2.radius - pow(c2.radius, 2)) * mp * pm) + mp * pm / dist;
+	to_x = (pow(dist, 2) + c1.radius * c2.radius - pow(c2.radius, 2)) / dist;
+	to_y = sqrt(pow(c2.radius, 2) - pow(to_x, 2) + pow(dist, 2));
+	
+	cs = coordinate_system_from_2_points_2d(c1.center_x, c1.center_y, c2.center_x, c2.center_y);
+	p1 = cs._(from_x, from_y);
+	p2 = cs._(to_x, to_y);
+	return new PathLine(p1.x, p1.y, p2.x, p2.y);
 }

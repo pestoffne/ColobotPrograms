@@ -34,6 +34,12 @@ public void PathArc::go(EBoost e) {
 	nan * 0;  // Not implemented
 }
 
+public string PathArc::to_str() {
+	return "PathArc(center_x=" + ROUND_2(center_x) + ", center_y=" + ROUND_2(center_y)
+	+ ", radius=" + ROUND_2(radius)	+ ", from_angle=" + ROUND_2(from_angle)
+	+ ", to_angle=" + ROUND_2(to_angle) + ")";
+}
+
 #if 0
 public PathArc create_arc(point from, point to, point center, float radius) {
 	return new PathArc(center.x, center.y, radius,

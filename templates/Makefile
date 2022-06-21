@@ -33,7 +33,7 @@ define generate_0
 endef
 
 define assemble_parts
-	cpp -I$(PARTS_DIR) $(2) | grep -v '^#' > $(1)
+	cpp -I$(PARTS_DIR) $(2) | grep -v '^#' | awk '{$$1=$$1};1' > $(1)
 endef
 
 .PHONY: all clean

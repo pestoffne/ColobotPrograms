@@ -6,11 +6,14 @@
 
 
 
+
 public class Path {
 private ListPathNode _list_nodes;
 private PathCompiled _path_compiled;
+private point _start;
 
-public void Path() {
+public void Path(point start) {
+this._start = start;
 this._list_nodes = new ListPathNode();
 }
 
@@ -19,36 +22,33 @@ public Path add_node(point center, float radius) {
 this._list_nodes.push_back(new PathNode(center.x, center.y, radius));
 return this;
 }
-
-public Path add_node(float center_x, float center_y, float radius) {
-this._list_nodes.push_back(new PathNode(center_x, center_y, radius));
-return this;
-}
-
-public void compile() {
-ListPathPart list_parts; ListIteratorPathNode it1, it2; PathLine tl;
+public Path compile() {
+ListPathPart list_parts; ListIteratorPathNode it1, it2; PathLine line; float px, py;
 
 list_parts = new ListPathPart();
 
-it1 = it2 = this._list_nodes.begin();
-it2.shift();
-
-
+it1 = this._list_nodes.begin();
+it2 = it1.copy().shift();
+px = this._start.x;
+py = this._start.y;
 
 while (not it2.is_null()) {
-tl = tangent_line(it1, it2);
+line = tangent_line(it1.value(), it2.value());
+list_parts.push_back(create_arc(
+px, py, line.from_x, line.from_y,
+it1.value().center_x, it1.value().center_y, it1.value().radius
+));
+list_parts.push_back(line);
 
-list_parts.push_back(tl);
-
-it1 = it2;
+px = line.to_x;
+py = line.to_y;
+it1.shift();
 it2.shift();
 }
 
-
-
-
 this._list_nodes = null;
 this._path_compiled = new PathCompiled(list_parts);
+return this;
 }
 
 public float length() {
@@ -61,5 +61,9 @@ return this._path_compiled.time();
 
 public void go(EBoost e) {
 this._path_compiled.go(e);
+}
+
+public void debug_dump(string filename="debug_dump_path.txt") {
+this._path_compiled.debug_dump(filename);
 }
 }

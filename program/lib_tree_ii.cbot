@@ -1,5 +1,6 @@
 // Generated file.
 
+
 public class TreeNodeIntInt { public void TreeNodeIntInt(int key = 0 , int value = 0 , TreeNodeIntInt less = null , TreeNodeIntInt more = null ) { this.key = key; this.value = value; this.less = less; this.more = more; } public int key; public int value; public TreeNodeIntInt less; public TreeNodeIntInt more; }
 
 

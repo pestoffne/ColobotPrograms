@@ -1,5 +1,6 @@
 // Generated file.
 
+
 public class MatrixElem_float { public void MatrixElem_float(float value = 0.0 , MatrixElem_float right = null , MatrixElem_float down = null ) { this.value = value; this.right = right; this.down = down; } public float value; public MatrixElem_float right; public MatrixElem_float down; }
 public MatrixElem_float matrix_values(float v0 , float v1) { MatrixElem_float p0, p1; p0 = p1 = new MatrixElem_float(v0); p1 = p1.right = new MatrixElem_float(v1); return p0; }
 public MatrixElem_float matrix_values(float v0 , float v1 , float v2) { MatrixElem_float p0, p1; p0 = p1 = new MatrixElem_float(v0); p1 = p1.right = new MatrixElem_float(v1); p1 = p1.right = new MatrixElem_float(v2); return p0; }
@@ -159,7 +160,7 @@ this._height = this._height + that._height;
 this._set_shape_mut();
 }
 
-public void debug_dump(string filename="matrix_debug_dump.txt") {
+public void debug_dump(string filename="debug_dump_matrix.txt") {
 MatrixElem_float p; string line; file f;
 
 f = new file();
