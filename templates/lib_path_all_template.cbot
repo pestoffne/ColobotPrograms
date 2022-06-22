@@ -31,14 +31,14 @@ public class MoveArcFunctionVV extends FunctionVV {
 		point pos = this._e.actor.position;
 		pos.y += 1.75;
 		path = new Path(this._e.actor.position)
-			.add_node(pos, 1.75)
+			.add_node(pos, -1.75)
 #else
 		path = new Path(this._e.actor.position, this._e.actor.orientation)
 #endif
-			.add_node(css._(5, 5), 1.75)
-			.add_node(css._(2, 5), 1.75)
-			.add_node(css._(1, 4), 1.75)
-			.add_node(css._(1, 1), 1.75)
+			.add_node(css._(5, 5), -1.75)
+			.add_node(css._(2, 5), -1.75)
+			.add_node(css._(1, 4), -1.75)
+			.add_node(css._(1, 1), -1.75)
 			.add_node(css._(3, 0), 1.75)
 			.add_node(css._(3.35, 0), 0)  // 3.35 = 3 + 1.75 * 0.2
 			.compile();

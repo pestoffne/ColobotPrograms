@@ -7,28 +7,40 @@
 
 
 
-public class PathArc extends PathPart { public void PathArc(float center_x , float center_y , float radius , float from_angle , float to_angle ) { this.center_x = center_x; this.center_y = center_y; this.radius = radius; this.from_angle = from_angle; this.to_angle = to_angle; } public float center_x; public float center_y; public float radius; public float from_angle; public float to_angle; }
 
 
+public class PathArc extends PathPart {
+public float from_x, from_y, to_x, to_y, center_x, center_y, radius, from_angle, to_angle;
+}
 
-
-
+public void PathArc::PathArc(float from_x, float from_y, float to_x, float to_y,
+float center_x, float center_y, float radius) {
+this.from_x = from_x;
+this.from_y = from_y;
+this.to_x = to_x;
+this.to_y = to_y;
+this.center_x = center_x;
+this.center_y = center_y;
+this.radius = abs(radius);
+this.from_angle = ( (this.from_x - this.center_x) > 0 ? atan((this.from_y - this.center_y) / (this.from_x - this.center_x)) : (this.from_x - this.center_x) < 0 ? atan((this.from_y - this.center_y) / (this.from_x - this.center_x)) + 180 : ((this.from_y - this.center_y) > 0 ? 90 : -90) );
+this.to_angle = ( (this.to_x - this.center_x) > 0 ? atan((this.to_y - this.center_y) / (this.to_x - this.center_x)) : (this.to_x - this.center_x) < 0 ? atan((this.to_y - this.center_y) / (this.to_x - this.center_x)) + 180 : ((this.to_y - this.center_y) > 0 ? 90 : -90) );
+}
 
 public point PathArc::from() {
-return new point(center_x + radius * cos(from_angle), center_y + radius * sin(from_angle));
+return new point(this.from_x, this.from_y);
 }
 
 public point PathArc::to() {
-return new point(center_x + radius * cos(to_angle), center_y + radius * sin(to_angle));
+return new point(this.to_x, this.to_y);
 }
 
 public float PathArc::length() {
-return (3.14159265359 * abs(to_angle - from_angle) * (radius) / 180);
+return (3.14159265359 * abs(this.to_angle - this.from_angle) * (this.radius) / 180);
 }
 
 public float PathArc::time() {
-return (3.14159265359 * abs(to_angle - from_angle) * (radius) / 180)
-* ((((1 - 2 / ((radius) + 1))) + (1)) * 2.5);
+return (3.14159265359 * abs(this.to_angle - this.from_angle) * (this.radius) / 180)
+* ((((1 - 2 / ((this.radius) + 1))) + (1)) * 2.5);
 }
 
 public void PathArc::go(EBoost e) {
@@ -36,13 +48,14 @@ nan * 0;
 }
 
 public string PathArc::to_str() {
+
 return "PathArc(center_x=" + (round((center_x) * 100) / 100) + ", center_y=" + (round((center_y) * 100) / 100)
 + ", radius=" + (round((radius) * 100) / 100) + ", from_angle=" + (round((from_angle) * 100) / 100)
 + ", to_angle=" + (round((to_angle) * 100) / 100) + ")";
-}
-public PathArc create_arc(
-float from_x, float from_y, float to_x, float to_y, float center_x, float center_y, float radius) {
-return new PathArc(center_x, center_y, radius,
-( (from_x - center_x) > 0 ? atan((from_y - center_y) / (from_x - center_x)) : (from_x - center_x) < 0 ? atan((from_y - center_y) / (from_x - center_x)) + 180 : ((from_y - center_y) > 0 ? 90 : -90) ),
-( (to_x - center_x) > 0 ? atan((to_y - center_y) / (to_x - center_x)) : (to_x - center_x) < 0 ? atan((to_y - center_y) / (to_x - center_x)) + 180 : ((to_y - center_y) > 0 ? 90 : -90) ));
+
+
+
+
+
+
 }

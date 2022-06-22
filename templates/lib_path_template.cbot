@@ -41,7 +41,7 @@ public class Path {
 		
 		while (not it2.is_null()) {
 			line = tangent_line(it1.value(), it2.value());
-			list_parts.push_back(create_arc(
+			list_parts.push_back(new PathArc(
 			    px, py, line.from_x, line.from_y,
 			    it1.value().center_x, it1.value().center_y, it1.value().radius
 			));

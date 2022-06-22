@@ -5,29 +5,41 @@
 #define ARC_LENGTH(angle, radius) (PI * abs(angle) * (radius) / 180)
 #define RADIUS_TO_MOTOR_VALUE(radius) (1 - 2 / ((radius) + 1))
 #define PREDICT_VELOCITY(motor_left, motor_right) (((motor_left) + (motor_right)) * 2.5)
+#define FROM_ANGLE(arc) GET_ANGLE(arc.from_x - arc.center_x, arc.from_y - arc.center_y)
+#define TO_ANGLE(arc) GET_ANGLE(arc.to_x - arc.center_x, arc.to_y - arc.center_y)
 
-NAMED_TUPLE_EXTENDED(PathArc, PathPart, 5,
-        float, center_x,,
-        float, center_y,,
-        float, radius,,     // assume radius >= 0
-        float, from_angle,, // assume -180 < angle <= 180
-        float, to_angle,)
+public class PathArc extends PathPart {
+	public float from_x, from_y, to_x, to_y, center_x, center_y, radius, from_angle, to_angle;
+}
+
+public void PathArc::PathArc(float from_x, float from_y, float to_x, float to_y,
+float center_x, float center_y, float radius) {
+	this.from_x = from_x;
+	this.from_y = from_y;
+	this.to_x = to_x;
+	this.to_y = to_y;
+	this.center_x = center_x;
+	this.center_y = center_y;
+	this.radius = abs(radius);
+	this.from_angle = FROM_ANGLE(this);
+	this.to_angle = TO_ANGLE(this);
+}
 
 public point PathArc::from() {
-	return new point(center_x + radius * cos(from_angle), center_y + radius * sin(from_angle));
+	return new point(this.from_x, this.from_y);
 }
 
 public point PathArc::to() {
-	return new point(center_x + radius * cos(to_angle), center_y + radius * sin(to_angle));
+	return new point(this.to_x, this.to_y);
 }
 
 public float PathArc::length() {
-	return ARC_LENGTH(to_angle - from_angle, radius);
+	return ARC_LENGTH(this.to_angle - this.from_angle, this.radius);
 }
 
 public float PathArc::time() {
-	return ARC_LENGTH(to_angle - from_angle, radius)
-	* PREDICT_VELOCITY(RADIUS_TO_MOTOR_VALUE(radius), 1);
+	return ARC_LENGTH(this.to_angle - this.from_angle, this.radius)
+	* PREDICT_VELOCITY(RADIUS_TO_MOTOR_VALUE(this.radius), 1);
 }
 
 public void PathArc::go(EBoost e) {
@@ -35,22 +47,14 @@ public void PathArc::go(EBoost e) {
 }
 
 public string PathArc::to_str() {
+#if 1
 	return "PathArc(center_x=" + ROUND_2(center_x) + ", center_y=" + ROUND_2(center_y)
 	+ ", radius=" + ROUND_2(radius)	+ ", from_angle=" + ROUND_2(from_angle)
 	+ ", to_angle=" + ROUND_2(to_angle) + ")";
-}
-
-#if 0
-public PathArc create_arc(point from, point to, point center, float radius) {
-	return new PathArc(center.x, center.y, radius,
-	    GET_ANGLE(from.x - center.x, from.y - center.y),
-	    GET_ANGLE(to.x - center.x, to.y - center.y));
-}
+#else
+	return "cv2.line(img,(" + round(from_x * 10) + "," + round(1000 - from_y * 10)
+	+ "),(" + round(to_x * 10) + "," + round(1000 - to_y * 10) + "), 1)"
+	+ "\ncv2.circle(img,(" + round(center_x * 10) + "," + round(1000 - center_y * 10) + "),"
+	+ round(radius * 10) + ", 1)";
 #endif
-
-public PathArc create_arc(
-float from_x, float from_y, float to_x, float to_y, float center_x, float center_y, float radius) {
-	return new PathArc(center_x, center_y, radius,
-	    GET_ANGLE(from_x - center_x, from_y - center_y),
-	    GET_ANGLE(to_x - center_x, to_y - center_y));
 }

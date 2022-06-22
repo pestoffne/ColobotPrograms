@@ -668,28 +668,38 @@ return it;
 
 return new ListIteratorPathNode(null);
 }
-public class PathArc extends PathPart { public void PathArc(float center_x , float center_y , float radius , float from_angle , float to_angle ) { this.center_x = center_x; this.center_y = center_y; this.radius = radius; this.from_angle = from_angle; this.to_angle = to_angle; } public float center_x; public float center_y; public float radius; public float from_angle; public float to_angle; }
+public class PathArc extends PathPart {
+public float from_x, from_y, to_x, to_y, center_x, center_y, radius, from_angle, to_angle;
+}
 
-
-
-
-
+public void PathArc::PathArc(float from_x, float from_y, float to_x, float to_y,
+float center_x, float center_y, float radius) {
+this.from_x = from_x;
+this.from_y = from_y;
+this.to_x = to_x;
+this.to_y = to_y;
+this.center_x = center_x;
+this.center_y = center_y;
+this.radius = abs(radius);
+this.from_angle = ( (this.from_x - this.center_x) > 0 ? atan((this.from_y - this.center_y) / (this.from_x - this.center_x)) : (this.from_x - this.center_x) < 0 ? atan((this.from_y - this.center_y) / (this.from_x - this.center_x)) + 180 : ((this.from_y - this.center_y) > 0 ? 90 : -90) );
+this.to_angle = ( (this.to_x - this.center_x) > 0 ? atan((this.to_y - this.center_y) / (this.to_x - this.center_x)) : (this.to_x - this.center_x) < 0 ? atan((this.to_y - this.center_y) / (this.to_x - this.center_x)) + 180 : ((this.to_y - this.center_y) > 0 ? 90 : -90) );
+}
 
 public point PathArc::from() {
-return new point(center_x + radius * cos(from_angle), center_y + radius * sin(from_angle));
+return new point(this.from_x, this.from_y);
 }
 
 public point PathArc::to() {
-return new point(center_x + radius * cos(to_angle), center_y + radius * sin(to_angle));
+return new point(this.to_x, this.to_y);
 }
 
 public float PathArc::length() {
-return (3.14159265359 * abs(to_angle - from_angle) * (radius) / 180);
+return (3.14159265359 * abs(this.to_angle - this.from_angle) * (this.radius) / 180);
 }
 
 public float PathArc::time() {
-return (3.14159265359 * abs(to_angle - from_angle) * (radius) / 180)
-* ((((1 - 2 / ((radius) + 1))) + (1)) * 2.5);
+return (3.14159265359 * abs(this.to_angle - this.from_angle) * (this.radius) / 180)
+* ((((1 - 2 / ((this.radius) + 1))) + (1)) * 2.5);
 }
 
 public void PathArc::go(EBoost e) {
@@ -697,15 +707,16 @@ nan * 0;
 }
 
 public string PathArc::to_str() {
+
 return "PathArc(center_x=" + (round((center_x) * 100) / 100) + ", center_y=" + (round((center_y) * 100) / 100)
 + ", radius=" + (round((radius) * 100) / 100) + ", from_angle=" + (round((from_angle) * 100) / 100)
 + ", to_angle=" + (round((to_angle) * 100) / 100) + ")";
-}
-public PathArc create_arc(
-float from_x, float from_y, float to_x, float to_y, float center_x, float center_y, float radius) {
-return new PathArc(center_x, center_y, radius,
-( (from_x - center_x) > 0 ? atan((from_y - center_y) / (from_x - center_x)) : (from_x - center_x) < 0 ? atan((from_y - center_y) / (from_x - center_x)) + 180 : ((from_y - center_y) > 0 ? 90 : -90) ),
-( (to_x - center_x) > 0 ? atan((to_y - center_y) / (to_x - center_x)) : (to_x - center_x) < 0 ? atan((to_y - center_y) / (to_x - center_x)) + 180 : ((to_y - center_y) > 0 ? 90 : -90) ));
+
+
+
+
+
+
 }
 public class PathLine extends PathPart { public void PathLine(float from_x , float from_y , float to_x , float to_y ) { this.from_x = from_x; this.from_y = from_y; this.to_x = to_x; this.to_y = to_y; } public float from_x; public float from_y; public float to_x; public float to_y; }
 
@@ -733,25 +744,40 @@ public void PathLine::go(EBoost e) {
 nan * 0;
 }
 
+public bool eq(PathLine a, PathLine b) {
+return a.from_x == b.from_x
+and a.from_y == b.from_y
+and a.to_x == b.to_x
+and a.to_y == b.to_y;
+}
+
+public bool almost_equal(PathLine a, PathLine b) {
+return abs(a.from_x - b.from_x) < 0.001
+and abs(a.from_y - b.from_y) < 0.001
+and abs(a.to_x - b.to_x) < 0.001
+and abs(a.to_y - b.to_y) < 0.001;
+}
+
 public string PathLine::to_str() {
+
 return "PathLine(from_x=" + (round((from_x) * 100) / 100) + ", from_y=" + (round((from_y) * 100) / 100)
 + ", to_x=" + (round((to_x) * 100) / 100) + ", to_y=" + (round((to_y) * 100) / 100) + ")";
+
+
+
+
 }
 
 public PathLine tangent_line(PathNode c1, PathNode c2) {
 AffineCoordinateSystem2D cs; point p1, p2; float dist, pm, mp, from_x, from_y, to_x, to_y;
 
 dist = sqrt(pow((c1.center_x) - (c2.center_x), 2) + pow((c1.center_y) - (c2.center_y), 2));
-mp = dist - c1.radius + c2.radius;
-pm = dist + c1.radius - c2.radius;
 
 
-from_x = sqrt(mp * pm) * c1.radius / dist;
+from_x = (pow(c1.radius, 2) - c1.radius * c2.radius) / dist;
 from_y = sqrt(pow(c1.radius, 2) - pow(from_x, 2));
-
-
 to_x = (pow(dist, 2) + c1.radius * c2.radius - pow(c2.radius, 2)) / dist;
-to_y = sqrt(pow(c2.radius, 2) - pow(to_x, 2) + pow(dist, 2));
+to_y = sqrt(pow(c2.radius, 2) - pow(to_x - dist, 2));
 
 cs = coordinate_system_from_2_points_2d(c1.center_x, c1.center_y, c2.center_x, c2.center_y);
 p1 = cs._(from_x, from_y);
@@ -842,7 +868,7 @@ py = this._start.y;
 
 while (not it2.is_null()) {
 line = tangent_line(it1.value(), it2.value());
-list_parts.push_back(create_arc(
+list_parts.push_back(new PathArc(
 px, py, line.from_x, line.from_y,
 it1.value().center_x, it1.value().center_y, it1.value().radius
 ));
@@ -896,14 +922,14 @@ css = coordinate_system_from_matrix_2d(new Matrix_float(3, 2, matrix_values(
 point pos = this._e.actor.position;
 pos.y += 1.75;
 path = new Path(this._e.actor.position)
-.add_node(pos, 1.75)
+.add_node(pos, -1.75)
 
 
 
-.add_node(css._(5, 5), 1.75)
-.add_node(css._(2, 5), 1.75)
-.add_node(css._(1, 4), 1.75)
-.add_node(css._(1, 1), 1.75)
+.add_node(css._(5, 5), -1.75)
+.add_node(css._(2, 5), -1.75)
+.add_node(css._(1, 4), -1.75)
+.add_node(css._(1, 1), -1.75)
 .add_node(css._(3, 0), 1.75)
 .add_node(css._(3.35, 0), 0)
 .compile();

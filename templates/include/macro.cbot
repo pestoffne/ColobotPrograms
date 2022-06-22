@@ -56,6 +56,7 @@
 #define LOOP repeat (MAX_INT)
 #define MAX_SPEED 5
 #define PI 3.14159265359
+#define EPS 0.001
 
 #define GET_ANGLE(dx, dy) ( \
 	(dx) > 0 \

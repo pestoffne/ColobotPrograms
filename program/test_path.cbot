@@ -1,0 +1,98 @@
+// Depends:
+// lib_eboost.cbot
+// lib_path_all.cbot
+
+public class TestPath extends EBoost {
+	void test_tangent_line_base() {
+		PathNode c1, c2; PathLine l_a, l_e;
+		
+		// prepare
+		c1 = new PathNode(0, 0, 1);
+		c2 = new PathNode(3, 0, 1);
+		l_e = new PathLine(0, 1, 3, 1);
+		
+		// test
+		l_a = tangent_line(c1, c2);
+		
+		// assert
+		assert(almost_equal(l_a, l_e), "test_tangent_line_base: error");
+	}
+	
+	void test_tangent_line_hpp() {
+		PathNode c1, c2; PathLine l_a, l_e;
+		
+		// prepare
+		c1 = new PathNode(0, 1, 1);
+		c2 = new PathNode(5, 0, 2);
+		l_e = new PathLine(0, 2, 5, 2);
+		
+		// test
+		l_a = tangent_line(c1, c2);
+		//message("hpp " + l_a.to_str());
+		//wait(1);
+		
+		// assert
+		assert(almost_equal(l_a, l_e), "test_tangent_line_hpp: error");
+	}
+	
+	void test_tangent_line_hpm() {
+		PathNode c1, c2; PathLine l_a, l_e;
+		
+		// prepare
+		c1 = new PathNode(0, 1, 1);
+		c2 = new PathNode(5, 4, -2);
+		l_e = new PathLine(0, 2, 5, 2);
+		
+		// test
+		l_a = tangent_line(c1, c2);
+		//message("hpm " + l_a.to_str());
+		//wait(1);
+		
+		// assert
+		assert(almost_equal(l_a, l_e), "test_tangent_line_hpm: error");
+	}
+	
+	void test_tangent_line_hmp() {
+		PathNode c1, c2; PathLine l_a, l_e;
+		
+		// prepare
+		c1 = new PathNode(0, 3, -1);
+		c2 = new PathNode(5, 0, 2);
+		l_e = new PathLine(0, 2, 5, 2);
+		
+		// test
+		l_a = tangent_line(c1, c2);
+		//message("hmp " + l_a.to_str());
+		//wait(1);
+		
+		// assert
+		assert(almost_equal(l_a, l_e), "test_tangent_line_hmp: error");
+	}
+	
+	void test_tangent_line_hmm() {
+		PathNode c1, c2; PathLine l_a, l_e;
+		
+		// prepare
+		c1 = new PathNode(0, 3, -1);
+		c2 = new PathNode(5, 4, -2);
+		l_e = new PathLine(0, 2, 5, 2);
+		
+		// test
+		l_a = tangent_line(c1, c2);
+		//message("hmm " + l_a.to_str());
+		//wait(1);
+		
+		// assert
+		assert(almost_equal(l_a, l_e), "test_tangent_line_hmm: error");
+	}
+}
+
+extern void Test_Path() {
+	TestPath t();
+	t.test_tangent_line_base();
+	t.test_tangent_line_hpp();
+	t.test_tangent_line_hpm();  // fail
+	t.test_tangent_line_hmp();  // fail
+	t.test_tangent_line_hmm();  // fail
+	message("Tests passed", DisplayInfo);
+}
