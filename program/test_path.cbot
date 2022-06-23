@@ -28,8 +28,6 @@ public class TestPath extends EBoost {
 		
 		// test
 		l_a = tangent_line(c1, c2);
-		//message("hpp " + l_a.to_str());
-		//wait(1);
 		
 		// assert
 		assert(almost_equal(l_a, l_e), "test_tangent_line_hpp: error");
@@ -45,8 +43,6 @@ public class TestPath extends EBoost {
 		
 		// test
 		l_a = tangent_line(c1, c2);
-		//message("hpm " + l_a.to_str());
-		//wait(1);
 		
 		// assert
 		assert(almost_equal(l_a, l_e), "test_tangent_line_hpm: error");
@@ -62,8 +58,6 @@ public class TestPath extends EBoost {
 		
 		// test
 		l_a = tangent_line(c1, c2);
-		//message("hmp " + l_a.to_str());
-		//wait(1);
 		
 		// assert
 		assert(almost_equal(l_a, l_e), "test_tangent_line_hmp: error");
@@ -79,11 +73,24 @@ public class TestPath extends EBoost {
 		
 		// test
 		l_a = tangent_line(c1, c2);
-		//message("hmm " + l_a.to_str());
-		//wait(1);
 		
 		// assert
 		assert(almost_equal(l_a, l_e), "test_tangent_line_hmm: error");
+	}
+	
+	void test_tangent_line_zz() {
+		PathNode c1, c2; PathLine l_a, l_e;
+		
+		// prepare
+		c1 = new PathNode(-1, -2, 0);
+		c2 = new PathNode(-3, -4, 0);
+		l_e = new PathLine(-1, -2, -3, -4);
+		
+		// test
+		l_a = tangent_line(c1, c2);
+		
+		// assert
+		assert(almost_equal(l_a, l_e), "test_tangent_line_zz: error");
 	}
 }
 
@@ -91,8 +98,9 @@ extern void Test_Path() {
 	TestPath t();
 	t.test_tangent_line_base();
 	t.test_tangent_line_hpp();
-	t.test_tangent_line_hpm();  // fail
-	t.test_tangent_line_hmp();  // fail
-	t.test_tangent_line_hmm();  // fail
+	t.test_tangent_line_hpm();
+	t.test_tangent_line_hmp();
+	t.test_tangent_line_hmm();
+	t.test_tangent_line_zz();
 	message("Tests passed", DisplayInfo);
 }

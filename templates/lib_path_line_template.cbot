@@ -4,6 +4,7 @@
 #include <macro.cbot>
 
 #define DISTANCE_2D(fx, fy, tx, ty) sqrt(pow((fx) - (tx), 2) + pow((fy) - (ty), 2))
+#define SIGN(x) ((x) > 0 ? 1 : -1)
 
 NAMED_TUPLE_EXTENDED(PathLine, PathPart, 4,
 	float, from_x,,
@@ -48,7 +49,8 @@ public bool almost_equal(PathLine a, PathLine b) {
 public string PathLine::to_str() {
 #if 1
 	return "PathLine(from_x=" + ROUND_2(from_x) + ", from_y=" + ROUND_2(from_y)
-	+ ", to_x=" + ROUND_2(to_x) + ", to_y=" + ROUND_2(to_y) + ")";
+	+ ", to_x=" + ROUND_2(to_x) + ", to_y=" + ROUND_2(to_y)
+	+ ", length=" + ROUND_2(length()) + ", time=" + ROUND_2(time()) + ")";
 #else
         return "cv2.line(img,(" + round(from_x * 10) + "," + round(1000 - from_y * 10)
         + "),(" + round(to_x * 10) + "," + round(1000 - to_y * 10) + "), 2)";
@@ -62,9 +64,9 @@ public PathLine tangent_line(PathNode c1, PathNode c2) {
 	
 	// assume dist is non-zero
 	from_x = (pow(c1.radius, 2) - c1.radius * c2.radius) / dist;
-	from_y = sqrt(pow(c1.radius, 2) - pow(from_x, 2));
+	from_y = sqrt(pow(c1.radius, 2) - pow(from_x, 2)) * SIGN(c1.radius);
 	to_x = (pow(dist, 2) + c1.radius * c2.radius - pow(c2.radius, 2)) / dist;
-	to_y = sqrt(pow(c2.radius, 2) - pow(to_x - dist, 2));
+	to_y = sqrt(pow(c2.radius, 2) - pow(to_x - dist, 2)) * SIGN(c2.radius);
 	
 	cs = coordinate_system_from_2_points_2d(c1.center_x, c1.center_y, c2.center_x, c2.center_y);
 	p1 = cs._(from_x, from_y);

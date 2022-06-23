@@ -40,7 +40,7 @@ return (3.14159265359 * abs(this.to_angle - this.from_angle) * (this.radius) / 1
 
 public float PathArc::time() {
 return (3.14159265359 * abs(this.to_angle - this.from_angle) * (this.radius) / 180)
-* ((((1 - 2 / ((this.radius) + 1))) + (1)) * 2.5);
+/ ((((1 - 2 / ((this.radius) + 1))) + (1)) * 2.5);
 }
 
 public void PathArc::go(EBoost e) {
@@ -50,8 +50,11 @@ nan * 0;
 public string PathArc::to_str() {
 
 return "PathArc(center_x=" + (round((center_x) * 100) / 100) + ", center_y=" + (round((center_y) * 100) / 100)
-+ ", radius=" + (round((radius) * 100) / 100) + ", from_angle=" + (round((from_angle) * 100) / 100)
-+ ", to_angle=" + (round((to_angle) * 100) / 100) + ")";
++ ", radius=" + (round((radius) * 100) / 100)
++ ", from_angle=" + (round((from_angle) * 100) / 100) + ", to_angle=" + (round((to_angle) * 100) / 100)
++ ", from_x=" + (round((from_x) * 100) / 100) + ", from_y=" + (round((from_y) * 100) / 100)
++ ", to_x=" + (round((to_x) * 100) / 100) + ", to_y=" + (round((to_y) * 100) / 100)
++ ", length=" + (round((length()) * 100) / 100) + ", time=" + (round((time()) * 100) / 100) + ")";
 
 
 
