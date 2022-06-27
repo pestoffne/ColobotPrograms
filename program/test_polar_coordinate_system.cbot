@@ -1,0 +1,67 @@
+public class TestPolarCoordinateSystem extends EBoost {
+	private bool _almost_eq(PolarPoint p1, PolarPoint p2) {
+		return abs(normalize_angle(p1.angle) - normalize_angle(p2.angle)) < 0.5
+			and abs(p1.dist - p2.dist) < 0.01;
+	}
+
+	void test_std() {
+		PolarCoordinateSystem cs; point pc, p1, p2, p3, p4;
+		PolarPoint p1_e, p1_a, p2_e, p2_a, p3_e, p3_a, p4_e, p4_a;
+		
+		// prepare
+		pc = new point(100, 50);
+		p1 = new point(102, 52);
+		p1_e = new PolarPoint(45, 2 * sqrt(2));
+		p2 = new point(98, 52);
+		p2_e = new PolarPoint(135, 2 * sqrt(2));
+		p3 = new point(98, 48);
+		p3_e = new PolarPoint(-135, 2 * sqrt(2));
+		p4 = new point(102, 48);
+		p4_e = new PolarPoint(-45, 2 * sqrt(2));
+		
+		// test
+		cs = new PolarCoordinateSystem(pc.x, pc.y);
+		p1_a = cs._(p1);
+		p2_a = cs._(p2);
+		p3_a = cs._(p3);
+		p4_a = cs._(p4);
+		
+		// assert
+		assert(_almost_eq(p1_a, p1_e), "test_std: error 1");
+		assert(_almost_eq(p2_a, p2_e), "test_std: error 2");
+		assert(_almost_eq(p3_a, p3_e), "test_std: error 3");
+		assert(_almost_eq(p4_a, p4_e), "test_std: error 4");
+	}
+	
+	void test_clock() {
+		PolarCoordinateSystem cs; point pc, p1, p2, p3;
+		PolarPoint p1_e, p1_a, p2_e, p2_a, p3_e, p3_a;
+		
+		// prepare
+		pc = new point(10, 10);
+		p1 = new point(11, 10 + sqrt(3));
+		p1_e = new PolarPoint(1, 2);  // 1 hour
+		p2 = new point(10 + sqrt(3), 11);
+		p2_e = new PolarPoint(2, 2);  // 2 hours
+		p3 = new point(12, 10);
+		p3_e = new PolarPoint(3, 2);  // 3 hours
+		
+		// test
+		cs = new PolarCoordinateSystem(pc.x, pc.y, 90, -1/30.0);
+		p1_a = cs._(p1);
+		p2_a = cs._(p2);
+		p3_a = cs._(p3);
+		
+		// assert
+		assert(_almost_eq(p1_a, p1_e), "test_clock: error 1");
+		assert(_almost_eq(p2_a, p2_e), "test_clock: error 2");
+		assert(_almost_eq(p3_a, p3_e), "test_clock: error 3");
+	}
+}
+
+extern void Test_PolarCoordinateSystem() {
+	TestPolarCoordinateSystem t();
+	t.test_std();
+	t.test_clock();
+	message("Tests passed", DisplayInfo);
+}
