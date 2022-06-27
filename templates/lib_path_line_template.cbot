@@ -3,7 +3,6 @@
 // lib_affine_coordinate_system.cbot
 #include <macro.cbot>
 
-#define DISTANCE_2D(fx, fy, tx, ty) sqrt(pow((fx) - (tx), 2) + pow((fy) - (ty), 2))
 #define SIGN(x) ((x) > 0 ? 1 : -1)
 
 NAMED_TUPLE_EXTENDED(PathLine, PathPart, 4,

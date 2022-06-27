@@ -1,0 +1,31 @@
+// Generated file.
+
+
+public class PolarPoint { public void PolarPoint(float angle , float dist ) { this.angle = angle; this.dist = dist; } public float angle; public float dist; }
+
+
+
+public class PolarCoordinateSystem {
+private float center_x;
+private float center_y;
+private float angle_0;
+private float angle_coef;
+
+public void PolarCoordinateSystem(
+float center_x, float center_y, float angle_0=0, float angle_coef=1) {
+this.center_x = center_x;
+this.center_y = center_y;
+this.angle_0 = angle_0;
+this.angle_coef = angle_coef;
+}
+
+public PolarPoint _(point p) {
+return new PolarPoint(
+(( (p.x - center_x) > 0 ? atan((p.y - center_y) / (p.x - center_x)) : (p.x - center_x) < 0 ? atan((p.y - center_y) / (p.x - center_x)) + 180 : ((p.y - center_y) > 0 ? 90 : -90) ) - angle_0) * angle_coef,
+sqrt(pow((p.x) - (center_x), 2) + pow((p.y) - (center_y), 2))
+);
+}
+}
+
+extern void Library_PolarCoordinateSystem() {
+}

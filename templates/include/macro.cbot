@@ -66,5 +66,7 @@
 	: ((dy) > 0 ? 90 : -90) \
 )
 
+#define DISTANCE_2D(fx, fy, tx, ty) sqrt(pow((fx) - (tx), 2) + pow((fy) - (ty), 2))
+#define ROUND_0(x) round(x)
 #define ROUND_1(x) (round((x) * 10) / 10)
 #define ROUND_2(x) (round((x) * 100) / 100)

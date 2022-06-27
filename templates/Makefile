@@ -45,7 +45,8 @@ $(PROGRAM_DIR)/lib_matrix_float.cbot \
 $(PROGRAM_DIR)/lib_matrix_float.cbot \
 $(PROGRAM_DIR)/lib_affine_coordinate_system_2d.cbot \
 $(PROGRAM_DIR)/lib_affine_coordinate_system_3d.cbot \
-$(PROGRAM_DIR)/lib_path_all.cbot
+$(PROGRAM_DIR)/lib_path_all.cbot \
+$(PROGRAM_DIR)/lib_polar_coordinate_system.cbot
 
 clean:
 	rm -vf $(PROGRAM_DIR)/lib_list_*.cbot $(PROGRAM_DIR)/lib_tree_*.cbot \
@@ -55,7 +56,8 @@ clean:
 	$(PARTS_DIR)/lib_path_compiled.cbot \
 	$(PARTS_DIR)/lib_path_line.cbot \
 	$(PARTS_DIR)/lib_path.cbot \
-	$(PROGRAM_DIR)/lib_path_all.cbot
+	$(PROGRAM_DIR)/lib_path_all.cbot \
+	$(PROGRAM_DIR)/lib_polar_coordinate_system.cbot
 
 $(PROGRAM_DIR)/lib_list_int.cbot: lib_list_template.cbot $(INCLUDE_DIR)/macro.cbot
 	$(call generate_list,$(PROGRAM_DIR)/lib_list_int.cbot,int,Int,0,1,lib_list_template.cbot)
@@ -114,3 +116,6 @@ $(PARTS_DIR)/lib_path_node.cbot $(PARTS_DIR)/lib_list_path_node.cbot \
 $(PARTS_DIR)/lib_path_arc.cbot $(PARTS_DIR)/lib_path_line.cbot \
 $(PARTS_DIR)/lib_path_compiled.cbot $(PARTS_DIR)/lib_path.cbot
 	$(call assemble_parts,$(PROGRAM_DIR)/lib_path_all.cbot,lib_path_all_template.cbot)
+
+$(PROGRAM_DIR)/lib_polar_coordinate_system.cbot: lib_polar_coordinate_system_template.cbot $(INCLUDE_DIR)/macro.cbot
+	$(call generate_0,$(PROGRAM_DIR)/lib_polar_coordinate_system.cbot,lib_polar_coordinate_system_template.cbot)
