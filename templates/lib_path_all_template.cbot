@@ -42,6 +42,12 @@ public class MoveArcFunctionVV extends FunctionVV {
 			.add_node(css._(3, 0), 1.75)
 			.add_node(css._(3.35, 0), 0)  // 3.35 = 3 + 1.75 * 0.2
 			.compile();
+		// |radius|  time | length| speed |
+		// | 2    | 17.21 | 79.98 | 4.647 |
+		// | 1.8  | 16.95 | 78.76 | 4.647 |
+		// | 1.75 | 16.89 | 78.47 | 4.646 |
+		// | 1.7  | 16.78 | 78.18 | 4.659 |
+		// | 1.5  | 16.57 | 76.99 | 4.646 |
 		
 		message("length = " + path.length() + ", expected range from 68.86 to 92.5");
 		message("time = " + path.time() + ", expected range from about 16 to 27");

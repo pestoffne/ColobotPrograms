@@ -1009,6 +1009,12 @@ path = new Path(this._e.actor.position)
 .add_node(css._(3.35, 0), 0)
 .compile();
 
+
+
+
+
+
+
 message("length = " + path.length() + ", expected range from 68.86 to 92.5");
 message("time = " + path.time() + ", expected range from about 16 to 27");
 path.debug_dump("debug_dump_pathX.txt");
