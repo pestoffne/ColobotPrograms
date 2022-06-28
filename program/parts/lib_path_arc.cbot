@@ -10,7 +10,8 @@
 
 
 public class PathArc extends PathPart {
-public float from_x, from_y, to_x, to_y, center_x, center_y, radius, from_angle, to_angle;
+public float from_x, from_y, to_x, to_y, center_x, center_y, radius, from_angle, to_angle, max_progress;
+public PolarCoordinateSystem cs;
 }
 
 public void PathArc::PathArc(float from_x, float from_y, float to_x, float to_y,
@@ -24,6 +25,9 @@ this.center_y = center_y;
 this.radius = abs(radius);
 this.from_angle = ( (this.from_x - this.center_x) > 0 ? atan((this.from_y - this.center_y) / (this.from_x - this.center_x)) : (this.from_x - this.center_x) < 0 ? atan((this.from_y - this.center_y) / (this.from_x - this.center_x)) + 180 : ((this.from_y - this.center_y) > 0 ? 90 : -90) );
 this.to_angle = ( (this.to_x - this.center_x) > 0 ? atan((this.to_y - this.center_y) / (this.to_x - this.center_x)) : (this.to_x - this.center_x) < 0 ? atan((this.to_y - this.center_y) / (this.to_x - this.center_x)) + 180 : ((this.to_y - this.center_y) > 0 ? 90 : -90) );
+this.max_progress = (3.14159265359 * abs(to_angle - from_angle) * (radius) / 180);
+this.cs = new PolarCoordinateSystem(
+center_x, center_y, from_angle, ((to_angle - from_angle) > 0 ? 1 : -1));
 }
 
 public point PathArc::from() {
@@ -41,6 +45,22 @@ return (3.14159265359 * abs(this.to_angle - this.from_angle) * (this.radius) / 1
 public float PathArc::time() {
 return (3.14159265359 * abs(this.to_angle - this.from_angle) * (this.radius) / 180)
 / ((((1 - 2 / ((this.radius) + 1))) + (1)) * 2.5);
+}
+
+public float PathArc::get_progress(float px, float py) {
+return (3.14159265359 * abs(this.cs.s(px, py).angle) * (this.radius) / 180);
+}
+
+public float PathArc::get_progress(point pos) {
+return (3.14159265359 * abs(this.cs.s(pos).angle) * (this.radius) / 180);
+}
+
+public float PathArc::max_progress() {
+return this.max_progress;
+}
+
+public point PathArc::get_position(float progress) {
+return this.cs.i(progress, this.radius);
 }
 
 public void PathArc::go(EBoost e) {

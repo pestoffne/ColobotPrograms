@@ -9,7 +9,8 @@
 #define TO_ANGLE(arc) GET_ANGLE(arc.to_x - arc.center_x, arc.to_y - arc.center_y)
 
 public class PathArc extends PathPart {
-	public float from_x, from_y, to_x, to_y, center_x, center_y, radius, from_angle, to_angle;
+	public float from_x, from_y, to_x, to_y, center_x, center_y, radius, from_angle, to_angle, max_progress;
+	public PolarCoordinateSystem cs;
 }
 
 public void PathArc::PathArc(float from_x, float from_y, float to_x, float to_y,
@@ -23,6 +24,9 @@ float center_x, float center_y, float radius) {
 	this.radius = abs(radius);
 	this.from_angle = FROM_ANGLE(this);
 	this.to_angle = TO_ANGLE(this);
+	this.max_progress = ARC_LENGTH(to_angle - from_angle, radius);
+	this.cs = new PolarCoordinateSystem(
+		center_x, center_y, from_angle, SIGN(to_angle - from_angle));
 }
 
 public point PathArc::from() {
@@ -40,6 +44,22 @@ public float PathArc::length() {
 public float PathArc::time() {
 	return ARC_LENGTH(this.to_angle - this.from_angle, this.radius)
 	/ PREDICT_VELOCITY(RADIUS_TO_MOTOR_VALUE(this.radius), 1);
+}
+
+public float PathArc::get_progress(float px, float py) {
+	return ARC_LENGTH(this.cs.s(px, py).angle, this.radius);
+}
+
+public float PathArc::get_progress(point pos) {
+	return ARC_LENGTH(this.cs.s(pos).angle, this.radius);
+}
+
+public float PathArc::max_progress() {
+	return this.max_progress;
+}
+
+public point PathArc::get_position(float progress) {
+	return this.cs.i(progress, this.radius);
 }
 
 public void PathArc::go(EBoost e) {

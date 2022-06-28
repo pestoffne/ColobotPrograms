@@ -4,27 +4,45 @@ NAMED_TUPLE(PolarPoint, 2,
 	float, angle,,
 	float, dist,)
 
-public class PolarCoordinateSystem {
-	private float center_x;
-	private float center_y;
-	private float angle_0;
-	private float angle_coef;
-	
-	public void PolarCoordinateSystem(
-	float center_x, float center_y, float angle_0=0, float angle_coef=1) {
-		this.center_x = center_x;
-		this.center_y = center_y;
-		this.angle_0 = angle_0;
-		this.angle_coef = angle_coef;
-	}
-	
-	public PolarPoint _(point p) {
-		return new PolarPoint(
-			(GET_ANGLE(p.x - center_x, p.y - center_y) - angle_0) * angle_coef,
-			DISTANCE_2D(p.x, p.y, center_x, center_y)
-		);
-	}
+NAMED_TUPLE(PolarCoordinateSystem, 4,
+	float, center_x,,
+	float, center_y,,
+	float, angle_0, =0,
+	float, angle_coef, =1)
+
+// from Descartes to Polar. straight transform
+public PolarPoint PolarCoordinateSystem::s(float x, float y) {
+	return new PolarPoint(
+		(GET_ANGLE(x - center_x, y - center_y) - angle_0) * angle_coef,
+		DISTANCE_2D(x, y, center_x, center_y)
+	);
 }
 
+// from Descartes to Polar. straight transform
+public PolarPoint PolarCoordinateSystem::s(point pos) {
+	return new PolarPoint(
+		(GET_ANGLE(pos.x - center_x, pos.y - center_y) - angle_0) * angle_coef,
+		DISTANCE_2D(pos.x, pos.y, center_x, center_y)
+	);
+}
+
+// from Polar to Descartes. inverse transform
+public point PolarCoordinateSystem::i(float angle, float dist) {
+	return new point(
+		cos(angle / angle_coef + angle_0) * dist + center_x,
+		sin(angle / angle_coef + angle_0) * dist + center_y
+	);
+}
+
+// from Polar to Descartes. inverse transform
+public point PolarCoordinateSystem::i(PolarPoint pol) {
+	return new point(
+		cos(pol.angle / angle_coef + angle_0) * pol.dist + center_x,
+		sin(pol.angle / angle_coef + angle_0) * pol.dist + center_y
+	);
+}
+
+#if 1
 extern void Library_PolarCoordinateSystem() {
 }
+#endif

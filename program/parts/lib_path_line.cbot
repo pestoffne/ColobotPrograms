@@ -4,14 +4,20 @@
 
 
 
+public class PathLine extends PathPart {
+public float from_x, from_y, to_x, to_y, max_progress;
+public AffineCoordinateSystem2D css, csi;
+}
 
-
-
-public class PathLine extends PathPart { public void PathLine(float from_x , float from_y , float to_x , float to_y ) { this.from_x = from_x; this.from_y = from_y; this.to_x = to_x; this.to_y = to_y; } public float from_x; public float from_y; public float to_x; public float to_y; }
-
-
-
-
+public void PathLine::PathLine(float from_x, float from_y, float to_x, float to_y) {
+this.from_x = from_x;
+this.from_y = from_y;
+this.to_x = to_x;
+this.to_y = to_y;
+this.max_progress = sqrt(pow((from_x) - (to_x), 2) + pow((from_y) - (to_y), 2));
+this.css = coordinate_system_from_2_points_2d(from_x, from_y, to_x, to_y);
+this.csi = css.inverse();
+}
 
 public point PathLine::from() {
 return new point(from_x, from_y);
@@ -27,6 +33,22 @@ return sqrt(pow((from_x) - (to_x), 2) + pow((from_y) - (to_y), 2));
 
 public float PathLine::time() {
 return sqrt(pow((from_x) - (to_x), 2) + pow((from_y) - (to_y), 2)) / 5;
+}
+
+public float PathLine::get_progress(float px, float py) {
+return this.css._(px, py).x;
+}
+
+public float PathLine::get_progress(point pos) {
+return this.css._(pos).x;
+}
+
+public float PathLine::max_progress() {
+return this.max_progress;
+}
+
+public point PathLine::get_position(float progress) {
+return this.csi._(progress, 0);
 }
 
 public void PathLine::go(EBoost e) {

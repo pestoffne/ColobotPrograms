@@ -5,27 +5,44 @@ public class PolarPoint { public void PolarPoint(float angle , float dist ) { th
 
 
 
-public class PolarCoordinateSystem {
-private float center_x;
-private float center_y;
-private float angle_0;
-private float angle_coef;
+public class PolarCoordinateSystem { public void PolarCoordinateSystem(float center_x , float center_y , float angle_0 =0 , float angle_coef =1 ) { this.center_x = center_x; this.center_y = center_y; this.angle_0 = angle_0; this.angle_coef = angle_coef; } public float center_x; public float center_y; public float angle_0; public float angle_coef; }
 
-public void PolarCoordinateSystem(
-float center_x, float center_y, float angle_0=0, float angle_coef=1) {
-this.center_x = center_x;
-this.center_y = center_y;
-this.angle_0 = angle_0;
-this.angle_coef = angle_coef;
-}
 
-public PolarPoint _(point p) {
+
+
+
+
+public PolarPoint PolarCoordinateSystem::s(float x, float y) {
 return new PolarPoint(
-(( (p.x - center_x) > 0 ? atan((p.y - center_y) / (p.x - center_x)) : (p.x - center_x) < 0 ? atan((p.y - center_y) / (p.x - center_x)) + 180 : ((p.y - center_y) > 0 ? 90 : -90) ) - angle_0) * angle_coef,
-sqrt(pow((p.x) - (center_x), 2) + pow((p.y) - (center_y), 2))
+(( (x - center_x) > 0 ? atan((y - center_y) / (x - center_x)) : (x - center_x) < 0 ? atan((y - center_y) / (x - center_x)) + 180 : ((y - center_y) > 0 ? 90 : -90) ) - angle_0) * angle_coef,
+sqrt(pow((x) - (center_x), 2) + pow((y) - (center_y), 2))
 );
 }
+
+
+public PolarPoint PolarCoordinateSystem::s(point pos) {
+return new PolarPoint(
+(( (pos.x - center_x) > 0 ? atan((pos.y - center_y) / (pos.x - center_x)) : (pos.x - center_x) < 0 ? atan((pos.y - center_y) / (pos.x - center_x)) + 180 : ((pos.y - center_y) > 0 ? 90 : -90) ) - angle_0) * angle_coef,
+sqrt(pow((pos.x) - (center_x), 2) + pow((pos.y) - (center_y), 2))
+);
 }
+
+
+public point PolarCoordinateSystem::i(float angle, float dist) {
+return new point(
+cos(angle / angle_coef + angle_0) * dist + center_x,
+sin(angle / angle_coef + angle_0) * dist + center_y
+);
+}
+
+
+public point PolarCoordinateSystem::i(PolarPoint pol) {
+return new point(
+cos(pol.angle / angle_coef + angle_0) * pol.dist + center_x,
+sin(pol.angle / angle_coef + angle_0) * pol.dist + center_y
+);
+}
+
 
 extern void Library_PolarCoordinateSystem() {
 }

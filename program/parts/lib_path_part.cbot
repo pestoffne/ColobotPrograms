@@ -23,6 +23,26 @@ public class PathPart {
 		return 0;
 	}
 	
+	public float get_progress(float px, float py) {
+		nan * 0;  // abstract method
+		return 0;
+	}
+	
+	public float get_progress(point pos) {
+		nan * 0;  // abstract method
+		return 0;
+	}
+	
+	public float max_progress() {
+		nan * 0;  // abstract method
+		return 0;
+	}
+	
+	public point get_position(float progress) {
+		nan * 0;  // abstract method
+		return new point;
+	}
+	
 	public void go(EBoost e) {
 		nan * 0;  // abstract method
 	}

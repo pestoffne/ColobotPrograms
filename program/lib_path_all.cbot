@@ -27,6 +27,26 @@ nan * 0;
 return 0;
 }
 
+public float get_progress(float px, float py) {
+nan * 0;
+return 0;
+}
+
+public float get_progress(point pos) {
+nan * 0;
+return 0;
+}
+
+public float max_progress() {
+nan * 0;
+return 0;
+}
+
+public point get_position(float progress) {
+nan * 0;
+return new point;
+}
+
 public void go(EBoost e) {
 nan * 0;
 }
@@ -669,7 +689,8 @@ return it;
 return new ListIteratorPathNode(null);
 }
 public class PathArc extends PathPart {
-public float from_x, from_y, to_x, to_y, center_x, center_y, radius, from_angle, to_angle;
+public float from_x, from_y, to_x, to_y, center_x, center_y, radius, from_angle, to_angle, max_progress;
+public PolarCoordinateSystem cs;
 }
 
 public void PathArc::PathArc(float from_x, float from_y, float to_x, float to_y,
@@ -683,6 +704,9 @@ this.center_y = center_y;
 this.radius = abs(radius);
 this.from_angle = ( (this.from_x - this.center_x) > 0 ? atan((this.from_y - this.center_y) / (this.from_x - this.center_x)) : (this.from_x - this.center_x) < 0 ? atan((this.from_y - this.center_y) / (this.from_x - this.center_x)) + 180 : ((this.from_y - this.center_y) > 0 ? 90 : -90) );
 this.to_angle = ( (this.to_x - this.center_x) > 0 ? atan((this.to_y - this.center_y) / (this.to_x - this.center_x)) : (this.to_x - this.center_x) < 0 ? atan((this.to_y - this.center_y) / (this.to_x - this.center_x)) + 180 : ((this.to_y - this.center_y) > 0 ? 90 : -90) );
+this.max_progress = (3.14159265359 * abs(to_angle - from_angle) * (radius) / 180);
+this.cs = new PolarCoordinateSystem(
+center_x, center_y, from_angle, ((to_angle - from_angle) > 0 ? 1 : -1));
 }
 
 public point PathArc::from() {
@@ -700,6 +724,22 @@ return (3.14159265359 * abs(this.to_angle - this.from_angle) * (this.radius) / 1
 public float PathArc::time() {
 return (3.14159265359 * abs(this.to_angle - this.from_angle) * (this.radius) / 180)
 / ((((1 - 2 / ((this.radius) + 1))) + (1)) * 2.5);
+}
+
+public float PathArc::get_progress(float px, float py) {
+return (3.14159265359 * abs(this.cs.s(px, py).angle) * (this.radius) / 180);
+}
+
+public float PathArc::get_progress(point pos) {
+return (3.14159265359 * abs(this.cs.s(pos).angle) * (this.radius) / 180);
+}
+
+public float PathArc::max_progress() {
+return this.max_progress;
+}
+
+public point PathArc::get_position(float progress) {
+return this.cs.i(progress, this.radius);
 }
 
 public void PathArc::go(EBoost e) {
@@ -721,11 +761,26 @@ return "PathArc(center_x=" + (round((center_x) * 100) / 100) + ", center_y=" + (
 
 
 }
-public class PathLine extends PathPart { public void PathLine(float from_x , float from_y , float to_x , float to_y ) { this.from_x = from_x; this.from_y = from_y; this.to_x = to_x; this.to_y = to_y; } public float from_x; public float from_y; public float to_x; public float to_y; }
 
 
 
 
+
+
+public class PathLine extends PathPart {
+public float from_x, from_y, to_x, to_y, max_progress;
+public AffineCoordinateSystem2D css, csi;
+}
+
+public void PathLine::PathLine(float from_x, float from_y, float to_x, float to_y) {
+this.from_x = from_x;
+this.from_y = from_y;
+this.to_x = to_x;
+this.to_y = to_y;
+this.max_progress = sqrt(pow((from_x) - (to_x), 2) + pow((from_y) - (to_y), 2));
+this.css = coordinate_system_from_2_points_2d(from_x, from_y, to_x, to_y);
+this.csi = css.inverse();
+}
 
 public point PathLine::from() {
 return new point(from_x, from_y);
@@ -741,6 +796,22 @@ return sqrt(pow((from_x) - (to_x), 2) + pow((from_y) - (to_y), 2));
 
 public float PathLine::time() {
 return sqrt(pow((from_x) - (to_x), 2) + pow((from_y) - (to_y), 2)) / 5;
+}
+
+public float PathLine::get_progress(float px, float py) {
+return this.css._(px, py).x;
+}
+
+public float PathLine::get_progress(point pos) {
+return this.css._(pos).x;
+}
+
+public float PathLine::max_progress() {
+return this.max_progress;
+}
+
+public point PathLine::get_position(float progress) {
+return this.csi._(progress, 0);
 }
 
 public void PathLine::go(EBoost e) {
