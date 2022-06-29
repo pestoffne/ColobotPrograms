@@ -2,6 +2,9 @@
 // lib_list_pathpart.cbot
 #include <macro.cbot>
 
+#define PROGRESS_DELTA 3.0
+#define TIME_DELTA 0.1
+
 public class PathCompiled {
 	private ListPathPart _list;
 	
@@ -34,10 +37,29 @@ public class PathCompiled {
 	}
 	
 	public void go(EBoost e) {
-		ListIteratorPathPart it;
+		PID pid; ListIteratorPathPart it1, it2; point pos_predict, pos_expect;
+		float error, prev_pr, curr_pr, diff_pr;
 		
-		for (it = this._list.begin(); not it.is_null(); it.shift()) {
-			it.value().go(e);
+		pid = new PID(1, 0, 1, TIME_DELTA);
+		it1 = this._list.begin();
+		it2 = it1.copy();
+		prev_pr = curr_pr = 0;
+		
+		LOOP {
+			if (it1.is_null()) {
+				break;
+			}
+			
+			curr_pr = it1.value().get_progress(e.actor.position);
+			pos_predict = it1.value().get_position(curr_pr + PROGRESS_DELTA);
+			pos_expect = BAR(it2.value(), ...);
+			
+			error = foo(pos_predict, pos_expect);
+			
+			_ = pid.compute(error);
+			
+			motor(_, _);
+			wait(TIME_DELTA);
 		}
 	}
 	
