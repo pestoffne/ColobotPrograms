@@ -92,6 +92,20 @@ public class TestPath extends EBoost {
 		// assert
 		assert(almost_equal(l_a, l_e), "test_tangent_line_zz: error");
 	}
+	
+	void test_predict_position_arc() {
+		point velocity, pos, pos_a, pos_e; float time_delta, motor_left, motor_right;
+		
+		// prepare
+		//velocity = ...
+		pos_e = new point();
+		
+		// test
+		pos_a = predict_position_arc();
+		
+		// assert
+		assert(almost_equal(pos_a, pos_e), "test_predict_position_arc: error");
+	}
 }
 
 extern void Test_Path() {
@@ -102,5 +116,6 @@ extern void Test_Path() {
 	t.test_tangent_line_hmp();
 	t.test_tangent_line_hmm();
 	t.test_tangent_line_zz();
+	t.test_predict_position_arc();
 	message("Tests passed", DisplayInfo);
 }

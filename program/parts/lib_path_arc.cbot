@@ -7,8 +7,6 @@
 
 
 
-
-
 public class PathArc extends PathPart {
 public float from_x, from_y, to_x, to_y, center_x, center_y, radius, from_angle, to_angle, max_progress;
 public PolarCoordinateSystem cs;

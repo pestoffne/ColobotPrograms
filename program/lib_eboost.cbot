@@ -547,6 +547,7 @@ public class EBoost {
 		return h * 0.25;
 	}
 	
+	// predict_position_line
 	public point get_next_position_line(object item, float dt) {
 		int item_category; point item_position, item_velocity, next_position;
 		

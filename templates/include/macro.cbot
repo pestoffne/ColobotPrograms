@@ -68,6 +68,14 @@
 
 #define SIGN(x) ((x) > 0 ? 1 : -1)
 #define DISTANCE_2D(fx, fy, tx, ty) sqrt(pow((fx) - (tx), 2) + pow((fy) - (ty), 2))
+#define VECTOR_LENGTH(x, y) sqrt(pow(x, 2) + pow(y, 2))
+#define RADIUS_TO_MOTOR_VALUE(radius) (1 - 2 / ((radius) + 1))
+#define MOTOR_VALUE_TO_RADIUS(motor_value) (2 / (1 - (motor_value)) - 1)
+#define PREDICT_VELOCITY(motor_left, motor_right) (((motor_left) + (motor_right)) * 2.5)
+
 #define ROUND_0(x) round(x)
 #define ROUND_1(x) (round((x) * 10) / 10)
 #define ROUND_2(x) (round((x) * 100) / 100)
+
+#define MIN(x, y) ((x) < (y) ? (x) : (y))
+#define MAX(x, y) ((x) < (y) ? (y) : (x))

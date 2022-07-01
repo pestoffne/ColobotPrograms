@@ -3,6 +3,31 @@
 
 
 
+
+
+
+point predict_position_arc(
+float dt, point position, point velocity, float motor_left, float motor_right) {
+AffineCoordinateSystem2D css, csi; float radius, velocity_a, velocity_b, angle;
+
+css = coordinate_system_from_2_points_2d(
+position.x, position.y, position.x + velocity.x, position.y + velocity.y);
+csi = css.inverse();
+
+velocity_a = sqrt(pow(velocity.x, 2) + pow(velocity.y, 2));
+velocity_b = (((motor_left) + (motor_right)) * 2.5);
+message("velocity_a = " + velocity_a + ", velocity_b = " + velocity_b);
+
+
+radius = (2 / (1 - (((motor_left) < (motor_right) ? (motor_left) : (motor_right)))) - 1);
+angle = velocity_a * 1.0 * 180 / 3.14159265359 / radius;
+
+return new point(
+csi._(radius * sin(angle)),
+csi._(radius * (1 - cos(angle)) * (motor_left < motor_right ? 1 : -1))
+);
+}
+
 public class PathCompiled {
 private ListPathPart _list;
 
@@ -35,10 +60,30 @@ return sum;
 }
 
 public void go(EBoost e) {
-ListIteratorPathPart it;
+PID pid; ListIteratorPathPart it1, it2; point pos_predict, pos_expect;
+float error, prev_pr, curr_pr, diff_pr;
 
-for (it = this._list.begin(); not it.is_null(); it.shift()) {
-it.value().go(e);
+pid = new PID(1, 0, 1, 1.0);
+it1 = this._list.begin();
+it2 = it1.copy();
+prev_pr = curr_pr = 0;
+
+repeat (2147483647) {
+if (it1.is_null()) {
+break;
+}
+
+curr_pr = it1.value().get_progress(e.actor.position);
+pos_predict = predict_position_arc(1.0, e.actor.position,
+e.get_velocity(e.actor.velocity), motor_left, motor_right);
+pos_expect = BAR(it2.value(), ...);
+
+error = foo(pos_predict, pos_expect);
+
+_ = pid.compute(error);
+
+motor(_, _);
+wait(0.1);
 }
 }
 

@@ -3,8 +3,6 @@
 #include <macro.cbot>
 
 #define ARC_LENGTH(angle, radius) (PI * abs(angle) * (radius) / 180)
-#define RADIUS_TO_MOTOR_VALUE(radius) (1 - 2 / ((radius) + 1))
-#define PREDICT_VELOCITY(motor_left, motor_right) (((motor_left) + (motor_right)) * 2.5)
 #define FROM_ANGLE(arc) GET_ANGLE(arc.from_x - arc.center_x, arc.from_y - arc.center_y)
 #define TO_ANGLE(arc) GET_ANGLE(arc.to_x - arc.center_x, arc.to_y - arc.center_y)
 

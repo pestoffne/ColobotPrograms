@@ -2,8 +2,30 @@
 // lib_list_pathpart.cbot
 #include <macro.cbot>
 
-#define PROGRESS_DELTA 3.0
-#define TIME_DELTA 0.1
+#define TIME_DELTA 1.0
+#define TIME_TICK 0.1
+
+/*private*/ point predict_position_arc(
+float dt, point position, point velocity, float motor_left, float motor_right) {
+	AffineCoordinateSystem2D css, csi; float radius, velocity_a, velocity_b, angle;
+	
+	css = coordinate_system_from_2_points_2d(
+		position.x, position.y, position.x + velocity.x, position.y + velocity.y);
+	csi = css.inverse();
+	
+	velocity_a = VECTOR_LENGTH(velocity.x, velocity.y);
+	velocity_b = PREDICT_VELOCITY(motor_left, motor_right);
+	message("velocity_a = " + velocity_a + ", velocity_b = " + velocity_b);
+	
+	// assume motor_left or motor_right is 1
+	radius = MOTOR_VALUE_TO_RADIUS(MIN(motor_left, motor_right));
+	angle = velocity_a * TIME_DELTA * 180 / PI / radius;
+	
+	return new point(
+		csi._(radius * sin(angle)),
+		csi._(radius * (1 - cos(angle)) * (motor_left < motor_right ? 1 : -1))
+	);
+}
 
 public class PathCompiled {
 	private ListPathPart _list;
@@ -51,7 +73,8 @@ public class PathCompiled {
 			}
 			
 			curr_pr = it1.value().get_progress(e.actor.position);
-			pos_predict = it1.value().get_position(curr_pr + PROGRESS_DELTA);
+			pos_predict = predict_position_arc(TIME_DELTA, e.actor.position,
+				e.get_velocity(e.actor.velocity), motor_left, motor_right);
 			pos_expect = BAR(it2.value(), ...);
 			
 			error = foo(pos_predict, pos_expect);
@@ -59,7 +82,7 @@ public class PathCompiled {
 			_ = pid.compute(error);
 			
 			motor(_, _);
-			wait(TIME_DELTA);
+			wait(TIME_TICK);
 		}
 	}
 	
