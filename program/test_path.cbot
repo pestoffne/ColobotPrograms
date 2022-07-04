@@ -3,6 +3,10 @@
 // lib_path_all.cbot
 
 public class TestPath extends EBoost {
+	private bool almost_equal(point p1, point p2) {
+		return abs(p1.x - p2.x) < 0.01 and abs(p1.y - p2.y) < 0.01;
+	}
+
 	void test_tangent_line_base() {
 		PathNode c1, c2; PathLine l_a, l_e;
 		
@@ -93,18 +97,43 @@ public class TestPath extends EBoost {
 		assert(almost_equal(l_a, l_e), "test_tangent_line_zz: error");
 	}
 	
-	void test_predict_position_arc() {
+	void test_predict_position_arc_zero() {
 		point velocity, pos, pos_a, pos_e; float time_delta, motor_left, motor_right;
 		
 		// prepare
-		//velocity = ...
-		pos_e = new point();
+		time_delta = 0.0;
+		pos = new point(-6, 7.5);
+		pos_e = pos;
+		// time_delta is zero, so pos = pos_e
+		// motor_left, motor_right and velocity values does not affect to pos_e value
+		motor_left = 1.0;
+		motor_right = 0.8;
+		velocity = new point(1.0, -1.0);
 		
 		// test
-		pos_a = predict_position_arc();
+		pos_a = predict_position_arc(time_delta, pos, velocity, motor_left, motor_right);
 		
 		// assert
-		assert(almost_equal(pos_a, pos_e), "test_predict_position_arc: error");
+		assert(almost_equal(pos_a, pos_e), "test_predict_position_arc_zero: error");
+	}
+	
+	void test_predict_position_arc_180() {
+		point velocity, pos, pos_a, pos_e; float time_delta, motor_left, motor_right, radius;
+		
+		// prepare
+		motor_left = 0.5;
+		motor_right = 1.0;
+		radius = 3.0;  // = MOTOR_VALUE_TO_RADIUS(0.5)
+		pos = new point(radius, 0);
+		velocity = new point(0.0, 3.75);  // 3.75 = PREDICT_VELOCITY(0.5, 1.0)
+		time_delta = 3.14159265359;  // = PI
+		pos_e = new point(-radius, 0);
+		
+		// test
+		pos_a = predict_position_arc(time_delta, pos, velocity, motor_left, motor_right);
+		
+		// assert
+		assert(almost_equal(pos_a, pos_e), "test_predict_position_arc_180: error");
 	}
 }
 
@@ -116,6 +145,7 @@ extern void Test_Path() {
 	t.test_tangent_line_hmp();
 	t.test_tangent_line_hmm();
 	t.test_tangent_line_zz();
-	t.test_predict_position_arc();
+	t.test_predict_position_arc_zero();
+	t.test_predict_position_arc_180();
 	message("Tests passed", DisplayInfo);
 }

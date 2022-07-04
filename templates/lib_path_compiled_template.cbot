@@ -2,30 +2,30 @@
 // lib_list_pathpart.cbot
 #include <macro.cbot>
 
-#define TIME_DELTA 1.0
-#define TIME_TICK 0.1
-
-/*private*/ point predict_position_arc(
+public point predict_position_arc(
 float dt, point position, point velocity, float motor_left, float motor_right) {
 	AffineCoordinateSystem2D css, csi; float radius, velocity_a, velocity_b, angle;
 	
+	// assume velocity is not zero
 	css = coordinate_system_from_2_points_2d(
 		position.x, position.y, position.x + velocity.x, position.y + velocity.y);
-	csi = css.inverse();
 	
 	velocity_a = VECTOR_LENGTH(velocity.x, velocity.y);
 	velocity_b = PREDICT_VELOCITY(motor_left, motor_right);
-	message("velocity_a = " + velocity_a + ", velocity_b = " + velocity_b);
+	//message("velocity_a = " + velocity_a + ", velocity_b = " + velocity_b);
 	
 	// assume motor_left or motor_right is 1
 	radius = MOTOR_VALUE_TO_RADIUS(MIN(motor_left, motor_right));
-	angle = velocity_a * TIME_DELTA * 180 / PI / radius;
+	angle = velocity_a * dt * 180 / PI / radius;
 	
-	return new point(
-		csi._(radius * sin(angle)),
-		csi._(radius * (1 - cos(angle)) * (motor_left < motor_right ? 1 : -1))
+	return css._(
+		radius * sin(angle),
+		radius * (1 - cos(angle)) * (motor_left < motor_right ? 1 : -1)
 	);
 }
+
+#define TIME_DELTA 1.0
+#define TIME_TICK 0.1
 
 public class PathCompiled {
 	private ListPathPart _list;
@@ -59,7 +59,7 @@ public class PathCompiled {
 	}
 	
 	public void go(EBoost e) {
-		PID pid; ListIteratorPathPart it1, it2; point pos_predict, pos_expect;
+		/*PID pid; ListIteratorPathPart it1, it2; point pos_predict, pos_expect;
 		float error, prev_pr, curr_pr, diff_pr;
 		
 		pid = new PID(1, 0, 1, TIME_DELTA);
@@ -83,7 +83,7 @@ public class PathCompiled {
 			
 			motor(_, _);
 			wait(TIME_TICK);
-		}
+		}*/
 	}
 	
 	public void debug_dump(string filename) {
