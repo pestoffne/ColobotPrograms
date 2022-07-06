@@ -7,7 +7,7 @@
 
 * $L = 0.5$ `motor_left`
 * $R = 1$ `motor_right`
-* $\alpha = 90 \quad \text{angle between pos and pos_e}$
+* $\alpha = 90$ `angle between pos and pos_e`
 
 
 **Output**
