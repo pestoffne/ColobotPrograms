@@ -5,9 +5,9 @@
 
 **Input**
 
-* L = 0.5  `motor_left`
-* R = 1  `motor_right`
-* $\alpha = 90$  `angle between pos and pos_e`
+* L = 0.5  motor_left
+* R = 1  motor_right
+* $\alpha = 90$  angle between pos and pos_e
 
 
 **Output**
@@ -16,15 +16,15 @@
 
 **Solution**
 
-$r = \frac{2}{1-\frac{L}{R}}-1 = 3$  `MOTOR_VALUE_TO_RADIUS_2`
+$r = \cfrac{2}{1-\cfrac{L}{R}}-1 = 3$  MOTOR_VALUE_TO_RADIUS_2
 
-$V = \frac{S}{t}$  `Velocity definition`
+$V = \frac{S}{t}$  Velocity definition
 
-$L = \frac{\alpha \phi r}{180}$  `Arc length`
+$L = \frac{\alpha \pi r}{180}$  Arc length
 
-$V = 2.5(L + R) = 3.75$  `PREDICT_VELOCITY`
+$V = 2.5(L + R) = 3.75$  PREDICT_VELOCITY
 
-$t = \frac{\phi r}{5(L + R)} = \frac{2}{5} \phi \\approx 1.256637$
+$t = \frac{\pi r}{5(L + R)} = \frac{2}{5} \pi \\approx 1.256637$
 
 ![picture](../images/test_predict_position_arc_p90_left.png) |
 
