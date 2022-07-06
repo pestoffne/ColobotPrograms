@@ -3,10 +3,8 @@
 <details>
   <summary>test_predict_position_arc_p90_left</summary>
 
-   ```
-   x*x + y*y = r*r
-   ```
+   |  |  |  |
+   | --- | --- | --- |
+   | Input<br>L = 0.5<br>R = 1<br>$\alpha = 90$ | Solution | ![picture](../images/test_predict_position_arc_p90_left.png) |
 
-   ![picture](../images/test_predict_position_arc_p90_left.png)
 </details>
-
