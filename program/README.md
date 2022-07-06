@@ -5,24 +5,24 @@
 
 **Input**
 
-* $L = 0.5 \quad \text{motor_left}$
-* $R = 1 \quad \text{motor_right}$
+* $L = 0.5$ `motor_left`
+* $R = 1$ `motor_right`
 * $\alpha = 90 \quad \text{angle between pos and pos_e}$
 
 
 **Output**
 
-* $t \quad \text{time_delta}$
+* t `time_delta`
 
 **Solution**
 
-$r = \cfrac{2}{1-\cfrac{L}{R}}-1 = 3 \quad \text{MOTOR_VALUE_TO_RADIUS_2}$
+$r = \cfrac{2}{1-\cfrac{L}{R}}-1 = 3$ `MOTOR_VALUE_TO_RADIUS_2`
 
 $V = \frac{S}{t} \quad \text{Velocity definition}$
 
 $L = \frac{\alpha \pi r}{180} \quad \text{Arc length}$
 
-$V = 2.5(L + R) = 3.75 \quad \text{PREDICT_VELOCITY}$
+$V = 2.5(L + R) = 3.75$ `PREDICT_VELOCITY`
 
 $t = \frac{\pi r}{5(L + R)} = \frac{2}{5} \pi \\approx 1.256637$
 
