@@ -286,11 +286,11 @@ public class CAT(Matrix_, TYPE) {
 		
 		p = this._root;
 		
-                repeat (y) {
-                        p = p.down;
-                }
+		repeat (y) {
+			p = p.down;
+		}
 		
-                return p;
+		return p;
 	}
 	
 	private void _add_row_mut(CAT(MatrixElem_, TYPE) p_from, CAT(MatrixElem_, TYPE) p_to,
