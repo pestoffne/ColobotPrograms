@@ -1,5 +1,8 @@
 ## CBot highligtings for nano editor
-## include this file in ~/.config/nano/nanorc to see CBot highlightings in *.txt files
+## To see CBot highlightings in *.cbot files in nano editor
+## include this file in ~/.nanorc or ~/.config/nano/nanorc using the following syntax:
+##   include <CBOT_PROGS>/cbot.nanorc
+## where <CBOT_PROGS> is path to that file.
 
 
 syntax cbot "\.cbot$"
