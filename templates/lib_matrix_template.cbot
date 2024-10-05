@@ -391,19 +391,12 @@ public class CAT(Matrix_, TYPE) {
 				}
 				
 				p1_i = p1_i.down;
-				
-				if (++y >= size) {
-					break;
-				}
-				
+				if (++y >= size) { break; }
 				p1_i_left = p1_i_left.down;
 				p2_i_left = p2_i_left.down;
 			}
 			
-			if (++x >= size) {
-				break;
-			}
-			
+			if (++x >= size) { break; }
 			p1_diag = p1_diag.right.down;
 			p1_diag_top = p1_diag_top.right;
 			p1_diag_left = p1_diag_left.down;
