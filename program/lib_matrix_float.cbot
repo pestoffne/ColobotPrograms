@@ -267,6 +267,22 @@ public Matrix_float copy() {
 return new Matrix_float(this._width, this._height, this._copy_values());
 }
 
+public float at(int x, int y) {
+MatrixElem_float p;
+
+p = this._root;
+
+repeat (y) {
+p = p.down;
+}
+
+repeat (x) {
+p = p.right;
+}
+
+return p.value;
+}
+
 private MatrixElem_float _at_y(int y) {
 MatrixElem_float p;
 
@@ -377,19 +393,12 @@ m2._add_row_mut(p2_diag_left, p2_i_left, coef, size - 1);
 }
 
 p1_i = p1_i.down;
-
-if (++y >= size) {
-break;
-}
-
+if (++y >= size) { break; }
 p1_i_left = p1_i_left.down;
 p2_i_left = p2_i_left.down;
 }
 
-if (++x >= size) {
-break;
-}
-
+if (++x >= size) { break; }
 p1_diag = p1_diag.right.down;
 p1_diag_top = p1_diag_top.right;
 p1_diag_left = p1_diag_left.down;
@@ -397,6 +406,43 @@ p2_diag_left = p2_diag_left.down;
 }
 
 return m2;
+}
+
+public Matrix_float solve() {
+Matrix_float m1; float coef; int x, y;
+MatrixElem_float p1_diag, p1_diag_left, p1_diag_top, p1_i, p1_i_left;
+
+
+m1 = this.copy();
+
+x = 0;
+p1_i = p1_i_left = p1_diag = p1_diag_left = p1_diag_top = m1._root;
+
+repeat (2147483647) {
+y = 0;
+p1_i_left = m1._root;
+
+coef = 1 / p1_diag.value;
+m1._mul_row_mut(p1_diag_left, coef, this._width - 1);
+
+repeat (2147483647) {
+if (x != y) {
+coef = -p1_i.value;
+m1._add_row_mut(p1_diag_left, p1_i_left, coef, this._width - 1);
+}
+
+p1_i = p1_i.down;
+if (++y >= this._height) { break; }
+p1_i_left = p1_i_left.down;
+}
+
+if (++x >= this._height) { break; }
+p1_diag = p1_diag.right.down;
+p1_diag_top = p1_diag_top.right;
+p1_diag_left = p1_diag_left.down;
+}
+
+return m1;
 }
 
 public Matrix_float transpose() {

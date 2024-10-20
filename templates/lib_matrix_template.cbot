@@ -280,7 +280,23 @@ public class CAT(Matrix_, TYPE) {
 	public CAT(Matrix_, TYPE) copy() {
 		return new CAT(Matrix_, TYPE)(this._width, this._height, this._copy_values());
 	}
-	
+
+	public TYPE at(int x, int y) {
+		CAT(MatrixElem_, TYPE) p;
+
+		p = this._root;
+
+		repeat (y) {
+			p = p.down;
+		}
+
+		repeat (x) {
+			p = p.right;
+		}
+
+		return p.value;
+	}
+
 	private CAT(MatrixElem_, TYPE) _at_y(int y) {
 		CAT(MatrixElem_, TYPE) p;
 		
@@ -360,6 +376,8 @@ public class CAT(Matrix_, TYPE) {
 		return acc;
 	}
 	
+    // TODO: add private _diag_mut, use in inverse, solve
+
 	public CAT(Matrix_, TYPE) inverse() {
 		CAT(Matrix_, TYPE) m1, m2; TYPE coef; int x, y, size;
 		CAT(MatrixElem_, TYPE) p1_diag, p1_diag_left, p1_diag_top, p1_i, p1_i_left, p2_diag_left, p2_i_left;
@@ -406,6 +424,43 @@ public class CAT(Matrix_, TYPE) {
 		return m2;
 	}
 	
+	public CAT(Matrix_, TYPE) solve() {
+		CAT(Matrix_, TYPE) m1; TYPE coef; int x, y;
+		CAT(MatrixElem_, TYPE) p1_diag, p1_diag_left, p1_diag_top, p1_i, p1_i_left;
+		
+		// assume width == height + 1
+		m1 = this.copy();
+		
+		x = 0;
+		p1_i = p1_i_left = p1_diag = p1_diag_left = p1_diag_top = m1._root;
+		
+		LOOP {
+			y = 0;
+			p1_i_left = m1._root;
+			
+			coef = 1 / p1_diag.value;
+			m1._mul_row_mut(p1_diag_left, coef, this._width - 1);
+			
+			LOOP {
+				if (x != y) {
+					coef = -p1_i.value;
+					m1._add_row_mut(p1_diag_left, p1_i_left, coef, this._width - 1);
+				}
+				
+				p1_i = p1_i.down;
+				if (++y >= this._height) { break; }
+				p1_i_left = p1_i_left.down;
+			}
+			
+			if (++x >= this._height) { break; }
+			p1_diag = p1_diag.right.down;
+			p1_diag_top = p1_diag_top.right;
+			p1_diag_left = p1_diag_left.down;
+		}
+		
+		return m1;
+	}
+
 	public CAT(Matrix_, TYPE) transpose() {
 		return new CAT(Matrix_, TYPE)(this._height, this._width, this._copy_transposed());
 	}
