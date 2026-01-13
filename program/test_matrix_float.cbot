@@ -305,21 +305,38 @@ public class TestMatrix_float extends EBoost {
 		assert(_check_structure(m4), "test_copy: error m4 structure");
 	}
 	
-	void test_determenant_3x3_zero() {
+	void test_determenant_3x3_zero_1() {
 		Matrix_float m; float d;
 		
 		// prepare
 		m = new Matrix_float(3, 3, matrix_values(
-			1, 2, 3,
-			4, 5, 6,
-			7, 8, 9
+			1, 2, 3,  //   | 1  2   3 |   | 1  2  3 |
+			4, 5, 6,  // = | 0 -3  -6 | = | 0 -3 -6 | = 0
+			7, 8, 9   //   | 0 -6 -12 |   | 0  0  0 |
 		));
 		
 		// test
 		d = m.determenant();
 		
 		// assert
-		assert(d == 0, "test_determenant_3x3_zero: error");
+		assert(d == 0, "test_determenant_3x3_zero_1: error");
+	}
+	
+	void test_determenant_3x3_zero_2() {
+		Matrix_float m; float d;
+		
+		// prepare
+		m = new Matrix_float(3, 3, matrix_values(
+			1, 1, 1,  //   | 1 1 1 |
+			1, 1, 2,  // = | 0 0 1 | = 0
+			0, 0, 1   //   | 0 0 1 |
+		));
+		
+		// test
+		d = m.determenant();
+		
+		// assert
+		assert(d == 0, "test_determenant_3x3_zero_2: error");
 	}
 	
 	void test_determenant_3x3() {
@@ -344,7 +361,7 @@ public class TestMatrix_float extends EBoost {
 		
 		// prepare
 		m = new Matrix_float(3, 3, matrix_values(
-			0, 0, 1,
+			0, 0, 1,  // two swaps
 			1, 0, 0,
 			0, 1, 0
 		));
@@ -361,7 +378,7 @@ public class TestMatrix_float extends EBoost {
 		
 		// prepare
 		m = new Matrix_float(3, 3, matrix_values(
-			0, 0, 1,
+			0, 0, 1,  // one swap
 			0, 1, 0,
 			1, 0, 0
 		));
@@ -378,7 +395,7 @@ public class TestMatrix_float extends EBoost {
 		
 		// prepare
 		m = new Matrix_float(3, 3, matrix_values(
-			1, 0, 0,
+			1, 0, 0,  // one swap
 			0, 0, 1,
 			0, 1, 0
 		));
@@ -388,6 +405,23 @@ public class TestMatrix_float extends EBoost {
 		
 		// assert
 		assert(abs(d + 1) < 0.001, "test_determenant_3x3_swap_3: error");
+	}
+	
+	void test_determenant_3x3_swap_4() {
+		Matrix_float m; float d;
+		
+		// prepare
+		m = new Matrix_float(3, 3, matrix_values(
+			0, 1, 2,  // 2, 0, 1,
+			2, 0, 1,  // 0, 1, 2,
+			1, 2, 0   // 1, 2, 0
+		));
+		
+		// test
+		d = m.determenant();
+		
+		// assert
+		assert(abs(d - 9) < 0.001, "test_determenant_3x3_swap_4: error");
 	}
 	
 	void test_determenant_4x4() {
@@ -492,6 +526,29 @@ public class TestMatrix_float extends EBoost {
 		// assert
 		assert(m2.eq(m3), "test_transpose: error");
 		assert(_check_structure(m3), "test_transpose: error m3 structure");
+	}
+	
+	void test_solve_one_swap() {
+		Matrix_float m1, m2, m3;
+
+		// prepare		
+		m1 = new Matrix_float(4, 3, matrix_values(
+		    0, 2, 2, 4,
+		    3, 2, 1, 0,
+		    2, 1, 0, -1
+		));
+		m2 = new Matrix_float(4, 3, matrix_values(
+		    1, 0, 0, 1,
+		    0, 1, 0, -3,
+		    0, 0, 1, 5
+		));
+		
+		// test
+		m3 = m1.solve();
+		
+		// assert
+		assert(m2.eq(m3), "test_solve_one_swap: error");
+		assert(_check_structure(m3), "test_solve_one_swap: error m3 structure");
 	}
 	
 	void test_transpose_mut() {
@@ -613,15 +670,18 @@ extern void Test_Matrix_float() {
 	t.test_iterator_vertical_row();
 	t.test_iterator_vertical_column();
 	t.test_copy();
-	t.test_determenant_3x3_zero();
+	t.test_determenant_3x3_zero_1();
+	t.test_determenant_3x3_zero_2(); // fixed
 	t.test_determenant_3x3();
-	//t.test_determenant_3x3_swap_1(); // Dividing by zero
-	//t.test_determenant_3x3_swap_2(); // Dividing by zero
-	//t.test_determenant_3x3_swap_3(); // Dividing by zero
+	t.test_determenant_3x3_swap_1(); // fixed
+	t.test_determenant_3x3_swap_2(); // fixed
+	t.test_determenant_3x3_swap_3(); // fixed
+	t.test_determenant_3x3_swap_4(); // fixed
 	t.test_determenant_4x4();
-	//t.test_determenant_4x4_ones(); // Dividing by zero
+	t.test_determenant_4x4_ones(); // fixed
 	t.test_inverse_3x3();
 	//t.test_inverse_4x4_ones(); // Dividing by zero
+	//t.test_solve_one_swap();  // Dividing by zero
 	t.test_transpose();
 	t.test_transpose_mut();
 	t.test_add();

@@ -338,44 +338,109 @@ public class CAT(Matrix_, TYPE) {
 		}
 	}
 	
-	private void _triangulate_mut() {
-		CAT(MatrixElem_, TYPE) p_diag, p_i; int x, size;
+	private int _triangulate_mut() {
+		CAT(MatrixElem_, TYPE) p_diag, p_i, p_j, p_abs_max, p_k1, p_k2;
+		TYPE abs_max_value, tmp; int x, size, det_coef;
 		
 		// assume width == height
 		size = this._width;
 		p_diag = this._root;
 		x = size - 1;
+		det_coef = 1;  // In case of odd swap count det should be inverted.
 		
 		p_i = p_diag;
-		
+		if (abs(p_diag.value) < 0.001) {
+			// Find max abs in column below diagonal.
+			p_abs_max = p_j = p_diag;
+			abs_max_value = abs(p_j.value);
+			repeat (x) {
+				p_j = p_j.down;
+				if (abs(p_j.value) > abs_max_value) {
+					p_abs_max = p_j;
+					abs_max_value = abs(p_j.value);
+				}
+			}
+			// If abs max is 0 then return 0 to prevent dividing by 0.
+			// Determinant will be 0 in that case.
+			if (abs_max_value == 0) { return 0; }
+			// Swap two rows to place abs max into diagonal.
+			// All left values in both rows are zeros, so swap only right.
+			if (p_diag != p_abs_max) {
+				det_coef *= -1;
+				p_k1 = p_diag;
+				p_k2 = p_abs_max;
+				tmp = p_k1.value;
+				p_k1.value = p_k2.value;
+				p_k2.value = tmp;
+				repeat (x) {
+					p_k1 = p_k1.right;
+					p_k2 = p_k2.right;
+					tmp = p_k1.value;
+					p_k1.value = p_k2.value;
+					p_k2.value = tmp;
+				}
+			}
+		}
 		repeat (x) {
 			p_i = p_i.down;
 			this._add_row_mut(p_diag, p_i, -p_i.value / p_diag.value, x);
 		}
 		
-		repeat (x) {
+		repeat (x - 1) {
 			--x;
 			p_diag = p_diag.right.down;
 			
 			p_i = p_diag;
-			
+			if (abs(p_diag.value) < 0.001) {
+				// Find max abs in column below diagonal.
+				p_abs_max = p_j = p_diag;
+				abs_max_value = abs(p_j.value);
+				repeat (x) {
+					p_j = p_j.down;
+					if (abs(p_j.value) > abs_max_value) {
+						p_abs_max = p_j;
+						abs_max_value = abs(p_j.value);
+					}
+				}
+				// If abs max is 0 then return 0 to prevent dividing by 0.
+				// Determinant will be 0 in that case.
+				if (abs_max_value == 0) { return 0; }
+				// Swap two rows to place abs max into diagonal.
+				// All left values in both rows are zeros, so swap only right.
+				if (p_diag != p_abs_max) {
+					det_coef *= -1;
+					p_k1 = p_diag;
+					p_k2 = p_abs_max;
+					tmp = p_k1.value;
+					p_k1.value = p_k2.value;
+					p_k2.value = tmp;
+					repeat (x) {
+						p_k1 = p_k1.right;
+						p_k2 = p_k2.right;
+						tmp = p_k1.value;
+						p_k1.value = p_k2.value;
+						p_k2.value = tmp;
+					}
+				}
+			}
 			repeat (x) {
 				p_i = p_i.down;
 				this._add_row_mut(p_diag, p_i, -p_i.value / p_diag.value, x);
 			}
 		}
+		return det_coef;
 	}
 	
 	public TYPE determenant() {
 		CAT(Matrix_, TYPE) m; CAT(MatrixElem_, TYPE) p; TYPE acc;
 		
 		m = this.copy();
-		m._triangulate_mut();
+		acc = m._triangulate_mut();
 		
-		// assume width == height
+		// assume width == height due to determentant definition
 		// assume there is at least one element
 		p = m._root;
-		acc = p.value;
+		acc *= p.value;
 		
 		repeat (this._width - 1) {
 			p = p.right.down;
@@ -385,7 +450,7 @@ public class CAT(Matrix_, TYPE) {
 		return acc;
 	}
 	
-    // TODO: add private _diag_mut, use in inverse, solve
+	// TODO: add private _diag_mut, use in inverse, solve
 
 	public CAT(Matrix_, TYPE) inverse() {
 		CAT(Matrix_, TYPE) m1, m2; TYPE coef; int x, y, size;
